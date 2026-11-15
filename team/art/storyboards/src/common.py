@@ -30,9 +30,18 @@ def wireframe(screen,seed=3,extra=None):
         if x==0: continue
         p.zone(c,n,x,y,w,h,fs=12); p.text(f"{x},{y} {w}×{h}",x+4,y+h-4,10,W1,anchor="ld")
     reserved(p,True,12)
-    for (c,n,x,y,w,h,_) in RESERVED: p.text(f"{x},{y} {w}×{h}",(x-150 if c=='M' else x+4),(y+70 if c=='M' else y+16),10,W1,anchor="la")
+    for (c,n,x,y,w,h,_) in RESERVED:
+        if c=='M': p.text(f"{x},{y} {w}×{h}",x+w,y+h+30,10,W1,anchor="ra")
+        else: p.text(f"{x},{y} {w}×{h}",x+4,y+16,10,W1,anchor="la")
     return p
 def save(title,sub,panels,cols,fname,**kw):
+    import sys,os
+    b=os.path.basename(sys.argv[0])
+    if b.startswith("b") and b[1:].split("_")[0]!=fname.split("_")[0] and not (b[1:3]==fname[:2] and fname[2]=="_" and b[3]=="_"): return None  # imported for helpers only
     path=f"{OUT}/{fname}"; board(title,sub,panels,cols,path,pw=PW,**kw); print("wrote",path); return path
-HEAD="TABULA RASA demo · Storyboard "
-SUB="logical 1280×720 (SPEC v1.1) · sumi-e ink, single vermilion accent · zones per src/zones.py"
+HEAD="INKBORNE demo · Storyboard "
+SUB="logical 1280×720 (SPEC v1.1) · sumi-e ink, single vermilion accent"
+def prompt(p,cx,y,txt,red=False,fs=15):
+    """P2 interact prompt (220x44) centred on cx, tag above so the prompt text stays readable."""
+    p.zone("P2","interact prompt",cx-110,y,220,44,red=red,tag="above",fs=11)
+    p.text(txt,cx,y+22,fs,INK,"serifb","mm")

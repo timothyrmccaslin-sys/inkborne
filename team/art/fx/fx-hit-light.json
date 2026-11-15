@@ -1,0 +1,17 @@
+{
+  "key": "fx-hit-light",
+  "src": "fx/fx-hit-light.webp",
+  "w": 2304,
+  "h": 256,
+  "frames": 9,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.4375,
+    0.5
+  ],
+  "layer": "over",
+  "note": "center on the impact point; splash flies to +x (party hitting a left-facing enemy). Flip horizontally for hits on the party."
+}

@@ -1,0 +1,17 @@
+{
+  "key": "fx-brushstroke-clean-line",
+  "src": "fx/fx-brushstroke-clean-line.webp",
+  "w": 2048,
+  "h": 256,
+  "frames": 8,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.5
+  ],
+  "layer": "over",
+  "note": "Clean Line (perfect press). Center on the Brushstroke timing ring; enso closes, slash, vermilion seal pops."
+}

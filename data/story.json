@@ -1,3 +1,16 @@
-{ "title": "Inkborne",
-  "hook": "The world of Kasane was painted onto one endless scroll by the First Brush. Now its edges are going white. Villages forget their names, rivers lose their banks, and the Blank creeps inward like morning fog that never lifts. Akane, apprentice to the last scroll-mender, wakes to find her master gone and his brush in her hand - still wet with a red ink the Blank cannot erase.",
-  "chapters": [ { "id": "c1", "name": "The Wet Brush", "goal": "Cross Mistcedar Path to Hollowbell and learn where the master went." } ] }
+{
+ "title": "Inkborne",
+ "hook": "The world of Shirofuda was painted into being by the First Brush, and everything in it is ink on living paper. Where the red seals of the old shrines hold, the painting stays true. Now the seals are cracking, and the Blot is soaking through the land, unwriting whatever it touches into blank paper and wandering ink-beasts. A swordsman with no memory, a shrine archer who refuses to let her town be erased, and a retired temple monk set out from Hanshi to find who is breaking the seals, each carrying a fragment of the First Brush's red ink that lets them Unfurl into a winged Inkwing.",
+ "chapters": [
+  {
+   "id": "c1",
+   "name": "The Blank Seal",
+   "goal": "Walk Sumikage Wood with Itsuki, Benika, and Gonzō, reach the broken seal-stone at its heart, and defeat the Smudge Ronin.",
+   "pois": [
+    "town",
+    "forest"
+   ],
+   "boss": "smudge_ronin"
+  }
+ ]
+}

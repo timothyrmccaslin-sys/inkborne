@@ -11,7 +11,8 @@ pub struct Hit { pub gap_ms: f64, pub mult: f64 }
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Stroke { pub id: String, pub name: String, pub hits: Vec<Hit>, pub finish_mult: f64 }
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Seal { pub name: String, pub seals: u32, pub mult: f64, pub element: String }
+pub struct Seal { pub name: String, pub seals: u32, pub mult: f64, pub element: String, #[serde(default = "mat_s")] pub stat: String }
+fn mat_s() -> String { "mat".into() }
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Member {
     pub id: String, pub name: String, #[serde(default)] pub title: String, pub element: String, pub lv: u32,
@@ -38,7 +39,7 @@ pub fn elem_mod(atk: &str, def: &str) -> f64 {
 
 /// Brushstroke judgement. `delta_ms` = press time - ring-close time.
 /// 2 = Clean Line, 1 = good, 0 = miss (chain breaks).
-pub const CLEAN_MS: f64 = 70.0;
+pub const CLEAN_MS: f64 = 95.0;
 pub const GOOD_MS: f64 = 150.0;
 pub fn judge_delta(delta_ms: f64) -> u8 { let d = delta_ms.abs(); if d <= CLEAN_MS { 2 } else if d <= GOOD_MS { 1 } else { 0 } }
 
@@ -47,7 +48,7 @@ impl Rng { fn next(&mut self) -> f64 { self.0 ^= self.0 << 13; self.0 ^= self.0 
 
 #[derive(Clone, Serialize)]
 struct Fighter { side: u8, idx: usize, id: String, name: String, element: String, hp: f64, max_hp: f64, atk: f64, def: f64, mat: f64, mdf: f64, spd: f64,
-    ink: f64, guarding: bool, inkwing: u32, alive: bool, mon: u32 }
+    ink: f64, guarding: bool, inkwing: u32, alive: bool, mon: u32, #[serde(skip)] fm: [f64; 5], form: String }
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 struct Save { gold: u32, inv: BTreeMap<String, u32>, hp: BTreeMap<String, f64>, ink: BTreeMap<String, f64>, flags: BTreeMap<String, bool>, node: String }
@@ -60,7 +61,12 @@ pub struct Game {
     fighters: Vec<Fighter>, order: Vec<usize>, turn_pos: usize, round: u32, battle_over: Option<String>,
     // walker
     walk: Walker,
+    forms: BTreeMap<String, (String, String, [f64; 5])>,
 }
+/// Inkwing multipliers [atk, def, mat, mdf, spd] from transformation.json (Jake).
+fn forms_of(f: &BTreeMap<String, (String, String, [f64; 5])>, id: &str) -> [f64; 5] { f.get(id).map(|x| x.2).unwrap_or([1.5, 1.25, 1.3, 1.25, 1.0]) }
+/// Jake's damage curve: never below a quarter of attack.
+pub fn raw(a: f64, d: f64) -> f64 { (a * 2.0 - d).max(a * 0.25) }
 
 #[derive(Default)]
 struct Walker { x: f64, y: f64, w: f64, h: f64, solids: Vec<[f64; 4]>, triggers: Vec<(String, [f64; 4])>, r: f64 }
@@ -74,12 +80,24 @@ impl Game {
         let e: EnemyFile = serde_json::from_str(enemies_json).map_err(|e| JsValue::from_str(&format!("enemies.json: {e}")))?;
         let i: ItemFile = serde_json::from_str(items_json).map_err(|e| JsValue::from_str(&format!("items.json: {e}")))?;
         let mut st = Save { gold: 120, node: String::new(), ..Default::default() };
-        st.inv.insert("lotus".into(), 3); st.inv.insert("embercharm".into(), 1);
+        st.inv.insert("rice_cake".into(), 3); st.inv.insert("paper_cracker".into(), 1); st.inv.insert("inkstone_chip".into(), 1);
         for m in &p.members { st.hp.insert(m.id.clone(), m.hp); st.ink.insert(m.id.clone(), m.ink); }
         Ok(Game { party: p.members, enemies: e.enemies, encounters: e.encounters, items: i.items, st, rng: Rng(seed as u64 * 2654435761 + 1),
-            fighters: vec![], order: vec![], turn_pos: 0, round: 0, battle_over: None, walk: Walker::default() })
+            fighters: vec![], order: vec![], turn_pos: 0, round: 0, battle_over: None, walk: Walker::default(), forms: BTreeMap::new() })
     }
 
+    /// Load Inkwing forms from transformation.json (optional; defaults otherwise).
+    pub fn set_rules(&mut self, tj: &str) -> bool {
+        let Ok(v) = serde_json::from_str::<Value>(tj) else { return false };
+        if let Some(f) = v["forms"].as_object() { for (id, x) in f {
+            let m = &x["mult"]; let g = |k: &str| m[k].as_f64().unwrap_or(1.0);
+            self.forms.insert(id.clone(), (x["form_name"].as_str().unwrap_or("").into(), x["passive"]["id"].as_str().unwrap_or("").into(), [g("atk"), g("def"), g("mat"), g("mdf"), g("spd")]));
+        } }
+        true
+    }
+    fn passive_on(&self, pid: &str) -> bool { self.fighters.iter().any(|f| f.side == 0 && f.alive && f.inkwing > 0 && self.forms.get(&f.id).map(|x| x.1 == pid).unwrap_or(false)) }
+    fn st(&self, i: usize, k: usize) -> f64 { let f = &self.fighters[i]; let b = [f.atk, f.def, f.mat, f.mdf, f.spd][k]; if f.inkwing > 0 { b * f.fm[k] } else { b } }
+    fn add_ink(&mut self, i: usize, n: f64) { let f = &mut self.fighters[i]; if f.side == 0 && f.alive && f.inkwing == 0 { f.ink = (f.ink + n).clamp(0.0, 100.0); } }
     // ---------- save / economy ----------
     pub fn save_json(&self) -> String { serde_json::to_string(&self.st).unwrap() }
     pub fn load_json(&mut self, s: &str) -> bool { match serde_json::from_str::<Save>(s) { Ok(v) => { self.st = v; true } Err(_) => false } }
@@ -119,13 +137,13 @@ impl Game {
         for (i, m) in self.party.iter().enumerate() {
             let hp = self.st.hp[&m.id].max(1.0);
             self.fighters.push(Fighter { side: 0, idx: i, id: m.id.clone(), name: m.name.clone(), element: m.element.clone(), hp, max_hp: m.hp, atk: m.atk, def: m.def,
-                mat: m.mat, mdf: m.mdf, spd: m.spd, ink: self.st.ink[&m.id], guarding: false, inkwing: 0, alive: true, mon: 0 });
+                mat: m.mat, mdf: m.mdf, spd: m.spd, ink: self.st.ink[&m.id], guarding: false, inkwing: 0, alive: true, mon: 0, fm: forms_of(&self.forms, &m.id), form: self.forms.get(&m.id).map(|f| f.0.clone()).unwrap_or_default() });
         }
         let ids = self.encounters.get(encounter).cloned().unwrap_or_default();
         for (k, id) in ids.iter().enumerate() {
             if let Some(d) = self.enemies.iter().find(|e| &e.id == id) {
                 self.fighters.push(Fighter { side: 1, idx: k, id: d.id.clone(), name: d.name.clone(), element: d.element.clone(), hp: d.hp, max_hp: d.hp, atk: d.atk, def: d.def,
-                    mat: d.mat, mdf: d.mdf, spd: d.spd, ink: 0.0, guarding: false, inkwing: 0, alive: true, mon: d.mon });
+                    mat: d.mat, mdf: d.mdf, spd: d.spd, ink: 0.0, guarding: false, inkwing: 0, alive: true, mon: d.mon, fm: [1.0; 5], form: String::new() });
             }
         }
         self.new_round();
@@ -134,7 +152,8 @@ impl Game {
     fn new_round(&mut self) {
         self.round += 1;
         let mut o: Vec<usize> = (0..self.fighters.len()).filter(|&i| self.fighters[i].alive).collect();
-        o.sort_by(|&a, &b| self.fighters[b].spd.partial_cmp(&self.fighters[a].spd).unwrap().then(a.cmp(&b)));
+        let key = |i: usize| { let f = &self.fighters[i]; let tw = f.inkwing > 0 && self.forms.get(&f.id).map(|x| x.1 == "tailwind").unwrap_or(false); if tw { 1e6 } else { self.st(i, 4) } };
+        o.sort_by(|&a, &b| key(b).partial_cmp(&key(a)).unwrap().then(a.cmp(&b)));
         self.order = o; self.turn_pos = 0;
     }
     pub fn battle_json(&self) -> String {
@@ -169,73 +188,86 @@ impl Game {
     pub fn spoils(&self) -> u32 { self.fighters.iter().filter(|f| f.side == 1).map(|f| f.mon).sum() }
     fn var(&mut self) -> f64 { 0.94 + self.rng.next() * 0.12 }
     fn hurt(&mut self, t: usize, raw: f64) -> f64 {
+        let mantle = self.fighters[t].side == 0 && self.passive_on("slate_mantle");
         let f = &mut self.fighters[t];
         let mut d = raw.max(1.0);
         if f.guarding { d *= 0.5 }
-        if f.inkwing > 0 { d *= 0.7 }
+        if mantle { d *= 0.85 }
         let d = d.round();
-        f.hp = (f.hp - d).max(0.0); if f.hp <= 0.0 { f.alive = false; f.inkwing = 0; }
+        f.hp = (f.hp - d).max(0.0); if f.hp <= 0.0 { f.alive = false; f.inkwing = 0; if f.side == 0 { f.ink = 0.0 } }
+        if f.side == 0 && f.alive && f.inkwing == 0 { // Vermilion Ink from damage taken (Jake): round(30*dmg/max), 1..15, x1.5 in Still Water
+            let mut g = (30.0 * d / f.max_hp).round().clamp(1.0, 15.0); if f.guarding { g = (g * 1.5).round() }
+            f.ink = (f.ink + g).min(100.0);
+        }
         d
     }
 
-    /// Party attack with a Brushstroke. `grades` = per-hit judgement (2/1/0); stops at first 0.
+    /// Party attack with a Brushstroke Chain. `grades` = per-hit judgement (2/1/0); stops at first 0.
     pub fn stroke(&mut self, actor: usize, target: usize, stroke_idx: usize, grades: &[u8]) -> String {
         let Some(m) = self.party.get(self.fighters[actor].idx).cloned() else { return "{}".into() };
         let s = m.strokes[stroke_idx.min(m.strokes.len() - 1)].clone();
-        let mut events = vec![]; let mut landed = 0;
-        let (atk, def) = (self.fighters[actor].atk * if self.fighters[actor].inkwing > 0 { 1.5 } else { 1.0 }, self.fighters[target].def);
+        let mut events = vec![]; let mut landed = 0; let mut cleans = 0;
+        let (atk, def) = (self.st(actor, 0), self.st(target, 1));
+        let elem = if self.fighters[actor].inkwing > 0 { self.fighters[actor].element.clone() } else { String::new() };
+        let em = elem_mod(&elem, &self.fighters[target].element);
         for (k, h) in s.hits.iter().enumerate() {
             let g = *grades.get(k).unwrap_or(&0);
             if g == 0 { events.push(json!({"hit": k, "grade": 0})); break }
-            landed += 1;
-            let mut raw = atk * h.mult * 100.0 / (100.0 + def * 2.0) * 2.2 * self.var();
-            if g == 2 { raw *= 1.25 }
-            if landed == s.hits.len() { raw *= s.finish_mult }
-            let d = self.hurt(target, raw);
-            let gain = if g == 2 { 9.0 } else { 5.0 };
-            let a = &mut self.fighters[actor]; if a.inkwing == 0 { a.ink = (a.ink + gain).min(100.0); }
-            events.push(json!({"hit": k, "grade": g, "dmg": d, "target": target, "killed": !self.fighters[target].alive}));
-            if !self.fighters[target].alive { break }
+            landed += 1; if g == 2 { cleans += 1 }
+            let mut r = raw(atk, def) * h.mult * em * self.var();
+            if g == 2 { r *= 1.25 }
+            if landed == s.hits.len() { r *= s.finish_mult }
+            let d = self.hurt(target, r);
+            self.add_ink(actor, if g == 2 { 8.0 } else { 4.0 });
+            let killed = !self.fighters[target].alive; if killed { self.add_ink(actor, 3.0) }
+            events.push(json!({"hit": k, "grade": g, "dmg": d, "target": target, "killed": killed}));
+            if killed { break }
         }
-        let full = landed == s.hits.len();
-        if landed == 0 { // a broken chain still lands a weak glancing cut
-            let v = self.var(); let raw = atk * 0.35 * 100.0 / (100.0 + def * 2.0) * 2.2 * v;
-            let d = self.hurt(target, raw); events.push(json!({"glance": true, "dmg": d, "target": target}));
-        }
-        let out = json!({"kind": "stroke", "name": s.name, "events": events, "full": full, "ink": self.fighters[actor].ink});
+        let full = landed == s.hits.len(); let perfect = full && cleans == s.hits.len();
+        if perfect { self.add_ink(actor, 10.0) } else if full { self.add_ink(actor, 6.0) }
+        if landed == 0 { let v = self.var(); let d = self.hurt(target, raw(atk, def) * 0.3 * v); events.push(json!({"glance": true, "dmg": d, "target": target})); }
+        let out = json!({"kind": "stroke", "name": s.name, "events": events, "full": full, "perfect": perfect, "elem": em, "ink": self.fighters[actor].ink});
         self.tick_inkwing(actor); self.advance(); out.to_string()
     }
     /// Inkwing: needs a full gauge, lasts 3 of this character's turns. Uses this turn.
     pub fn inkwing(&mut self, actor: usize) -> String {
         let a = &mut self.fighters[actor];
         if a.side != 0 || a.ink < 100.0 || a.inkwing > 0 { return json!({"ok": false}).to_string() }
-        a.ink = 0.0; a.inkwing = 4; // decremented at end of this turn -> 3 turns of Seal Arts
-        let out = json!({"kind": "inkwing", "ok": true, "actor": actor});
+        a.ink = 0.0; a.inkwing = 4; // decremented at end of this turn -> 3 Inkwing turns
+        let heal = (a.max_hp * 0.15).round().min(a.max_hp - a.hp); a.hp += heal;
+        let out = json!({"kind": "inkwing", "ok": true, "actor": actor, "heal": heal, "form": a.form});
         self.tick_inkwing(actor); self.advance(); out.to_string()
     }
-    /// Seal Arts (Inkwing only): `hits` seals struck out of the member's seal count, `clean` of those perfect.
+    /// Seal Arts (Inkwing only): `hits` seals struck of the member's seal count, `clean` of those perfect.
+    /// Missed seals still land at half (Jake: magic is forgiving).
     pub fn seal_art(&mut self, actor: usize, hits: u32, clean: u32) -> String {
         if self.fighters[actor].inkwing == 0 { return json!({"ok": false}).to_string() }
         let m = self.party[self.fighters[actor].idx].clone();
-        let n = m.seal.seals.max(1) as f64;
-        let power = 0.5 + 1.1 * (hits as f64 / n) + 0.35 * (clean as f64 / n);
-        let mat = self.fighters[actor].mat * 1.5;
+        let n = m.seal.seals.max(1); let hits = hits.min(n); let clean = clean.min(hits);
+        let power = (clean as f64 * 1.25 + (hits - clean) as f64 + (n - hits) as f64 * 0.5) / n as f64;
+        let a = if m.seal.stat == "atk" { self.st(actor, 0) } else { self.st(actor, 2) };
         let mut events = vec![];
         let targets: Vec<usize> = (0..self.fighters.len()).filter(|&i| self.fighters[i].side == 1 && self.fighters[i].alive).collect();
         for t in targets {
             let em = elem_mod(&m.seal.element, &self.fighters[t].element);
-            let raw = mat * m.seal.mult * power * 100.0 / (100.0 + self.fighters[t].mdf * 2.0) * 2.4 * em * self.var();
-            let d = self.hurt(t, raw);
+            let dstat = if m.seal.stat == "atk" { self.st(t, 1) } else { self.st(t, 3) };
+            let v = self.var();
+            let d = self.hurt(t, raw(a, dstat) * m.seal.mult * power * 1.6 * em * v);
             events.push(json!({"target": t, "dmg": d, "elem": em, "killed": !self.fighters[t].alive}));
         }
-        let out = json!({"kind": "seal", "ok": true, "name": m.seal.name, "element": m.seal.element, "events": events, "power": power});
+        let mut heals = vec![];
+        if clean > 0 && self.forms.get(&m.id).map(|x| x.1 == "kindling_prayer").unwrap_or(false) {
+            for i in 0..self.fighters.len() { let f = &mut self.fighters[i]; if f.side == 0 && f.alive { let h = (f.max_hp * 0.05 * clean as f64).round().min(f.max_hp - f.hp); f.hp += h; heals.push(json!({"target": i, "heal": h})); } }
+        }
+        let out = json!({"kind": "seal", "ok": true, "name": m.seal.name, "element": m.seal.element, "events": events, "heals": heals, "power": power});
         self.tick_inkwing(actor); self.advance(); out.to_string()
     }
     fn tick_inkwing(&mut self, actor: usize) { let a = &mut self.fighters[actor]; if a.inkwing > 0 { a.inkwing -= 1; } }
     /// Still Water: halve damage until next turn and restore 10% max HP.
     pub fn guard(&mut self, actor: usize) -> String {
         let a = &mut self.fighters[actor];
-        let heal = (a.max_hp * 0.1).round(); a.hp = (a.hp + heal).min(a.max_hp); a.guarding = true;
+        let heal = (a.max_hp * if a.inkwing > 0 { 0.15 } else { 0.1 }).round().min(a.max_hp - a.hp); a.hp += heal; a.guarding = true;
+        if a.inkwing == 0 { a.ink = (a.ink + 6.0).min(100.0) }
         let out = json!({"kind": "guard", "actor": actor, "heal": heal});
         self.tick_inkwing(actor); self.advance_keep_guard(actor); out.to_string()
     }
@@ -260,16 +292,17 @@ impl Game {
     pub fn enemy_turn(&mut self) -> String {
         let me = self.current(); if me < 0 { return "{}".into() } let me = me as usize;
         if self.fighters[me].side != 1 { return "{}".into() }
-        let def = self.enemies.iter().find(|e| e.id == self.fighters[me].id).cloned().unwrap();
+        let def = match self.enemies.iter().find(|e| e.id == self.fighters[me].id).cloned() { Some(d) if !d.moves.is_empty() => d, _ => { self.advance(); return json!({"kind": "enemy", "actor": me, "move": "hesitates", "target": -1, "dmg": 0}).to_string() } };
         let total: u32 = def.moves.iter().map(|m| m.weight).sum();
         let mut r = (self.rng.next() * total as f64) as u32; let mut mv = def.moves[0].clone();
         for m in &def.moves { if r < m.weight { mv = m.clone(); break } r -= m.weight; }
         let alive: Vec<usize> = (0..self.fighters.len()).filter(|&i| self.fighters[i].side == 0 && self.fighters[i].alive).collect();
+        if alive.is_empty() { self.advance(); return "{}".into() }
         let t = alive[(self.rng.next() * alive.len() as f64) as usize % alive.len()];
         let (raw, em) = if mv.kind == "elem" {
             let e = mv.element.clone().unwrap_or_default(); let em = elem_mod(&e, &self.fighters[t].element);
-            (self.fighters[me].mat * mv.power * 100.0 / (100.0 + self.fighters[t].mdf * 2.0) * 2.0 * em * self.var(), em)
-        } else { (self.fighters[me].atk * mv.power * 100.0 / (100.0 + self.fighters[t].def * 2.0) * 2.0 * self.var(), 1.0) };
+            { let v = self.var(); (raw(self.st(me, 2), self.st(t, 3)) * mv.power * em * v * 0.8, em) }
+        } else { let v = self.var(); (raw(self.st(me, 0), self.st(t, 1)) * mv.power * v * 0.8, 1.0) };
         let guarded = self.fighters[t].guarding;
         let d = self.hurt(t, raw);
         let out = json!({"kind": "enemy", "actor": me, "move": mv.name, "moveKind": mv.kind, "element": mv.element, "target": t, "dmg": d, "elem": em, "guarded": guarded, "killed": !self.fighters[t].alive});
@@ -312,12 +345,12 @@ mod tests {
         let p = std::fs::read_to_string("../data/party.json").unwrap();
         let e = std::fs::read_to_string("../data/enemies.json").unwrap();
         let i = std::fs::read_to_string("../data/items.json").unwrap();
-        Game::new(&p, &e, &i, 7).unwrap()
+        { let mut g = Game::new(&p, &e, &i, 7).unwrap(); g.set_rules(&std::fs::read_to_string("../data/transformation.json").unwrap()); g }
     }
     #[test] fn elements() { assert_eq!(elem_mod("ember", "tide"), 2.0); assert_eq!(elem_mod("gale", "gale"), 0.5); assert_eq!(elem_mod("dawn", "ember"), 1.0); }
     #[test] fn timing() { assert_eq!(judge_delta(30.0), 2); assert_eq!(judge_delta(-120.0), 1); assert_eq!(judge_delta(200.0), 0); }
     #[test] fn full_battle() {
-        let mut g = g(); g.start_battle("mistcedar");
+        let mut g = g(); g.start_battle("sumikage_c");
         let mut guard = 0;
         while g.current() >= 0 && guard < 500 {
             guard += 1; let c = g.current() as usize;
@@ -330,6 +363,6 @@ mod tests {
         assert_eq!(g.battle_over.as_deref(), Some("win"));
         assert!(g.gold() > 120);
     }
-    #[test] fn shop() { let mut g = g(); assert!(g.buy("lotus", 2)); assert_eq!(g.gold(), 60); assert!(g.sell("lotus", 1)); assert_eq!(g.gold(), 75); assert!(!g.buy("phial", 1)); }
-    #[test] fn guard_heals() { let mut g = g(); g.start_battle("mistcedar"); g.fighters[0].hp = 100.0; let c = g.current() as usize; let r: Value = serde_json::from_str(&g.guard(c)).unwrap(); assert!(r["heal"].as_f64().unwrap() > 0.0); }
+    #[test] fn shop() { let mut g = g(); assert!(g.buy("rice_cake", 2)); assert_eq!(g.gold(), 90); assert!(g.sell("rice_cake", 1)); assert_eq!(g.gold(), 97); assert!(!g.buy("thunder_jar", 1)); }
+    #[test] fn guard_heals() { let mut g = g(); g.start_battle("sumikage_c"); let c = g.current() as usize; g.fighters[c].hp = 100.0; let r: Value = serde_json::from_str(&g.guard(c)).unwrap(); assert!(r["heal"].as_f64().unwrap() > 0.0); }
 }

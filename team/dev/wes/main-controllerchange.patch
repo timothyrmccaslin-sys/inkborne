@@ -1,0 +1,11 @@
+--- a/src/main.js
++++ b/src/main.js
+@@ -107,5 +107,7 @@
+     if (reg.waiting && navigator.serviceWorker.controller) show();
+     reg.addEventListener('updatefound', () => { const w = reg.installing; w && w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) show(); }); });
+   }).catch(() => {});
+-  let reloaded = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
++  // Reload only when an existing worker is replaced (the update button), not when the first install claims the page.
++  const hadController = !!navigator.serviceWorker.controller;
++  let reloaded = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+ }

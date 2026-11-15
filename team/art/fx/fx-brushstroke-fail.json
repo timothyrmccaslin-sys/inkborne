@@ -1,0 +1,17 @@
+{
+  "key": "fx-brushstroke-fail",
+  "src": "fx/fx-brushstroke-fail.webp",
+  "w": 1792,
+  "h": 256,
+  "frames": 7,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.5
+  ],
+  "layer": "over",
+  "note": "Missed press. Grey, dry-cracked broken ring and stroke that smear and crumble. No red."
+}

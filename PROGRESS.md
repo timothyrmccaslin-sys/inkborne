@@ -2,8 +2,12 @@
 - [x] SPEC.md v1.1 (Inkborne, Vermilion Ink, Unfurl, SFX extras, transformation.json)
 - [x] Rust core (core/src/lib.rs, crate inkborne_core): battle, judge, ink, Unfurl/Inkwing, Seal Arts, Still Water, items, shop, walker, save. Tests pass.
 - [x] src/ink.js brush helpers
-- [ ] data from team (party=jake lv5, items/shops=jane, strings=jamie, barks=ollie)
+- [x] data from team via tools/integrate.py (party=jake lv5, items/shops/strings/barks/dialogue/story=story team, mon=jane, sfx=james, voice=rita, bg=bob). Core updated to Jake rules, pkg built.
 - [ ] JS: main, input, audio, art, ui, scenes (title, world, poi, action: battle/dialogue/shop)
 - [ ] PWA: index.html, manifest, sw.js, icons
 - [ ] Tests (Chromium + WebKit iPad), shots, mp4
 - [ ] Repo + Pages deploy, personal site card
+- Layout decisions: POIs are one screen (1280x720 logical) using Bob's 3 layers; walk band y>=540. Town shop door ~x610, Hotaru by stone lantern ~x260. Forest ambush mid path, Smudge Ronin at right seal-stone.
+- Helen LAYOUT_NOTES adopted: touch rects T1 64,496,192x188 / T2 1024,496,192x188 / M 1152,36,64x64; bottom bars x272-1008; battle stage anchors; HUD B4; menu B5; banner B3; dialogue D1/D2/D7; shop S4.
+- world.json names from Lisa (Hakushi Clearing, Shuin Stair, Usuzumi Shore).
+- Files written: src/{ink,figures,input,audio,art,ui,main}.js, scenes/{title,world,poi}.js, index.html, style.css, manifest.json, data/pois/*. TODO: battle.js dialogue.js shop.js sw.js icons kanji font tests deploy site.

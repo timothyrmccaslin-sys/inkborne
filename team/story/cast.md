@@ -1,4 +1,4 @@
-# Tabula Rasa: cast and flavor text (story team)
+# Inkborne: cast and flavor text (story team)
 Source of truth: `CANON.md`. Ids match `team/systems` data.
 
 ## Party
@@ -40,5 +40,8 @@ A tiny, sharp-eyed shopkeeper who has sold tea and charms in Hanshi for longer t
 - **Sumikage Wood** (`sumikage` node, `forest` POI): An ink-shadow wood of bamboo and old pines, with drifting mist and falling leaves, and broken seal-stones along the path.
 - **Hanshi** (`hanshi` node, `town` POI): A small border town of paper-walled houses and red lanterns, with Benika's shrine at the top of the stair.
 
-## Open
-- The gauge name is TBD. SPEC's "Spirit Ink" may become "Vermilion Ink", pending Marc.
+## Mechanics note
+- The transformation gauge is **Vermilion Ink**, which is locked.
+- **Hakushi Clearing** (`woods_edge`): The paper-white clearing where Itsuki woke. It's the start of the demo.
+- **Shuin Stair** (`shrine_stair`): Ninety-nine seal-stamped steps up to Benika's shrine. It's locked in the demo.
+- **Usuzumi Shore** (`grey_shore`): A beach where the sea is fading to thin grey ink. It's locked in the demo.

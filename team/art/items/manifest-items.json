@@ -1,0 +1,134 @@
+{
+ "images": {
+  "icon-rice_cake": {
+   "src": "icons/icon-rice_cake.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-plum_tonic": {
+   "src": "icons/icon-plum_tonic.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-pine_tea": {
+   "src": "icons/icon-pine_tea.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-festival_bento": {
+   "src": "icons/icon-festival_bento.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-inkstone_chip": {
+   "src": "icons/icon-inkstone_chip.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-fresh_ink_pot": {
+   "src": "icons/icon-fresh_ink_pot.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-paper_cracker": {
+   "src": "icons/icon-paper_cracker.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-thunder_jar": {
+   "src": "icons/icon-thunder_jar.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "prop-kobo-tsuru-mark": {
+   "src": "props/prop-kobo-tsuru-mark.webp",
+   "w": 512,
+   "h": 512,
+   "frames": 1,
+   "fw": 512,
+   "fh": 512,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "prop-kobo-tsuru-mark-ink": {
+   "src": "props/prop-kobo-tsuru-mark-ink.webp",
+   "w": 512,
+   "h": 512,
+   "frames": 1,
+   "fw": 512,
+   "fh": 512,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  }
+ }
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Inkborne</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="description" content="Inkborne: an original sumi-e ink JRPG demo. Rust + WebAssembly, installable, works offline.">
+<meta name="theme-color" content="#1b1813">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Inkborne">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="boot">Grinding ink…</div>
+<div id="touch" aria-hidden="true">
+  <div id="stick"><div id="knob"></div></div>
+  <div id="btns">
+    <button class="tb" data-act="cancel" id="btn-b">B</button>
+    <button class="tb big" data-act="confirm" id="btn-a">A</button>
+  </div>
+  <button class="tb small" data-act="menu" id="menu-btn" aria-label="Menu">☰</button>
+</div>
+<button id="update" hidden>New version, tap to refresh</button>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

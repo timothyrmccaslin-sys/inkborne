@@ -1,0 +1,243 @@
+{
+ "hanshi_dusk": {
+  "nodes": {
+   "n01": {
+    "who": "gonzo",
+    "mood": "smile",
+    "text": "Chimney smoke. Real food. I could weep.",
+    "next": "n02"
+   },
+   "n02": {
+    "who": "benika",
+    "mood": "smile",
+    "text": "You wept at the river too, Gonzō. Over a fish.",
+    "next": "n03"
+   },
+   "n03": {
+    "who": "gonzo",
+    "mood": "sad",
+    "text": "It was a very good fish.",
+    "next": "n04"
+   },
+   "n04": {
+    "who": "itsuki",
+    "mood": "calm",
+    "text": "The lanterns aren't lit. It's nearly dark.",
+    "next": "n05"
+   },
+   "n05": {
+    "who": "lantern_keeper",
+    "mood": "sad",
+    "text": "There now, little one, burn for me... No. Grey again. Lady Benika, is that you? Thank the First Brush.",
+    "next": "n06"
+   },
+   "n06": {
+    "who": "benika",
+    "mood": "angry",
+    "text": "Old Hotaru, why is it grey? The shrine seals should keep every flame red. I checked them myself before I left.",
+    "next": "n07"
+   },
+   "n07": {
+    "who": "lantern_keeper",
+    "mood": "sad",
+    "text": "Since the new moon, the paper drinks the red like it's thirsty. And the Blot has crept to the bottom of the stair.",
+    "next": "n08"
+   },
+   "n08": {
+    "who": "itsuki",
+    "mood": "calm",
+    "text": "We came through Sumikage Wood. The birds were painted on the branches mid-song, and none of them moved.",
+    "next": "n09"
+   },
+   "n09": {
+    "who": "lantern_keeper",
+    "mood": "sad",
+    "text": "Without the lanterns, the things that crawl out of that wood will walk our streets at night.",
+    "next": "n10"
+   },
+   "n10": {
+    "who": "gonzo",
+    "mood": "angry",
+    "text": "Then they can walk into my staff.",
+    "next": "n11"
+   },
+   "n11": {
+    "who": "lantern_keeper",
+    "mood": "calm",
+    "text": "And this young man? A stranger, with his hand wrapped.",
+    "choices": [
+     {
+      "text": "I need somewhere to sleep. Hard to sleep with ink-beasts at the door.",
+      "next": "n12"
+     },
+     {
+      "text": "Point me at whatever's breaking the seals.",
+      "next": "n12b",
+      "set": "eager"
+     }
+    ]
+   },
+   "n12": {
+    "who": "itsuki",
+    "mood": "calm",
+    "text": "I need somewhere to sleep. Hard to sleep with ink-beasts at the door.",
+    "next": "n13"
+   },
+   "n13": {
+    "who": "benika",
+    "mood": "smile",
+    "text": "Translation: yes, he'll help. He's just bad at saying it.",
+    "next": "n14"
+   },
+   "n14": {
+    "who": "lantern_keeper",
+    "mood": "smile",
+    "text": "Ha! Then take this. My last good lantern seal, painted before the cracking.",
+    "next": "n15"
+   },
+   "n15": {
+    "who": "itsuki",
+    "mood": "calm",
+    "text": "It's warm. Like it's still wet. My palm itches.",
+    "next": "n16"
+   },
+   "n16": {
+    "who": "lantern_keeper",
+    "mood": "calm",
+    "text": "Ink remembers the hand that made it. Find who's breaking the seals, and maybe it'll remember how to hold.",
+    "next": "n17"
+   },
+   "n17": {
+    "who": "benika",
+    "mood": "angry",
+    "text": "Nobody unwrites my town. We go up the stair at first light.",
+    "next": "n18"
+   },
+   "n18": {
+    "who": "gonzo",
+    "mood": "sad",
+    "text": "After breakfast. Tell me it's after breakfast.",
+    "next": "n19"
+   },
+   "n19": {
+    "who": "lantern_keeper",
+    "mood": "smile",
+    "text": "Grandmother Tsuru's shop is still open. She'll feed you, if you buy something.",
+    "next": "n20"
+   },
+   "n20": {
+    "who": "itsuki",
+    "mood": "calm",
+    "text": "First light, then. Let's see what's hungry for ink.",
+    "end": true
+   },
+   "n12b": {
+    "who": "itsuki",
+    "mood": "calm",
+    "text": "Point me at whatever's breaking the seals. I'd like a word with it.",
+    "next": "n13",
+    "_todo": "integrator line, pending Ollie"
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_greet": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "smile",
+    "text": "Come in, come in. Wipe your feet, the Blot gets everywhere.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_greet_again": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "smile",
+    "text": "Back again? Good. I was starting to worry.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_buy": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "calm",
+    "text": "What'll it be?",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_buy_ok": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "smile",
+    "text": "Good choice. Don't waste it.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_buy_poor": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "sad",
+    "text": "Your purse is lighter than your appetite, dear.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_sell": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "calm",
+    "text": "Let's see what you've dragged in.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_sell_ok": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "smile",
+    "text": "Fair trade. I'll find it a home.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_leave": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "calm",
+    "text": "Mind the stair after dark. And eat something, Gonzō.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ },
+ "shop_tsuru_leave_alt": {
+  "nodes": {
+   "n01": {
+    "who": "tsuru",
+    "mood": "smile",
+    "text": "Come back alive. I like customers who pay twice.",
+    "end": true
+   }
+  },
+  "start": "n01"
+ }
+}

@@ -1,0 +1,79 @@
+{
+  "source": "SPEC v1 section 2 (Six Inks). This file only spells out the matrix.",
+  "elements": [
+    "ember",
+    "tide",
+    "gale",
+    "stone",
+    "dawn",
+    "dusk"
+  ],
+  "display": {
+    "ember": "Ember",
+    "tide": "Tide",
+    "gale": "Gale",
+    "stone": "Stone",
+    "dawn": "Dawn",
+    "dusk": "Dusk"
+  },
+  "opposite": {
+    "ember": "tide",
+    "tide": "ember",
+    "gale": "stone",
+    "stone": "gale",
+    "dawn": "dusk",
+    "dusk": "dawn"
+  },
+  "neutral": "none",
+  "rule": "attack element vs defender element: opposite x2.0, same x0.5, otherwise x1.0; 'none' on either side x1.0",
+  "chart": {
+    "ember": {
+      "ember": 0.5,
+      "tide": 2.0,
+      "gale": 1.0,
+      "stone": 1.0,
+      "dawn": 1.0,
+      "dusk": 1.0
+    },
+    "tide": {
+      "ember": 2.0,
+      "tide": 0.5,
+      "gale": 1.0,
+      "stone": 1.0,
+      "dawn": 1.0,
+      "dusk": 1.0
+    },
+    "gale": {
+      "ember": 1.0,
+      "tide": 1.0,
+      "gale": 0.5,
+      "stone": 2.0,
+      "dawn": 1.0,
+      "dusk": 1.0
+    },
+    "stone": {
+      "ember": 1.0,
+      "tide": 1.0,
+      "gale": 2.0,
+      "stone": 0.5,
+      "dawn": 1.0,
+      "dusk": 1.0
+    },
+    "dawn": {
+      "ember": 1.0,
+      "tide": 1.0,
+      "gale": 1.0,
+      "stone": 1.0,
+      "dawn": 0.5,
+      "dusk": 2.0
+    },
+    "dusk": {
+      "ember": 1.0,
+      "tide": 1.0,
+      "gale": 1.0,
+      "stone": 1.0,
+      "dawn": 2.0,
+      "dusk": 0.5
+    }
+  }
+}

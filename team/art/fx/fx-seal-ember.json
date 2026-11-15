@@ -1,0 +1,17 @@
+{
+  "key": "fx-seal-ember",
+  "src": "fx/fx-seal-ember.webp",
+  "w": 9216,
+  "h": 512,
+  "frames": 18,
+  "fw": 512,
+  "fh": 512,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5859375,
+    0.80078125
+  ],
+  "layer": "over",
+  "note": "Seal Art, ember (Ember Kite). Anchor = target enemy's feet. Frames 0-2 seal stamps, brush passes over it ~f4 (press moment), effect f6-17."
+}

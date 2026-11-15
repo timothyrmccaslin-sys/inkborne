@@ -1,14 +1,207 @@
-{ "members": [
-  { "id": "akane", "name": "Akane", "title": "Scroll-mender's apprentice", "element": "ember", "lv": 5,
-    "hp": 220, "atk": 34, "def": 18, "mat": 26, "mdf": 16, "spd": 14, "ink": 85,
-    "strokes": [ { "id": "threefold", "name": "Threefold Line", "hits": [ {"gap_ms": 700, "mult": 0.6}, {"gap_ms": 520, "mult": 0.7}, {"gap_ms": 460, "mult": 0.9} ], "finish_mult": 1.2 } ],
-    "seal": { "name": "Vermilion Comet", "seals": 5, "mult": 1.0, "element": "ember" } },
-  { "id": "yuzuru", "name": "Yuzuru", "title": "Ronin of the long spear", "element": "gale", "lv": 5,
-    "hp": 250, "atk": 38, "def": 20, "mat": 18, "mdf": 14, "spd": 11, "ink": 30,
-    "strokes": [ { "id": "reedwind", "name": "Reed-Wind Thrust", "hits": [ {"gap_ms": 760, "mult": 0.8}, {"gap_ms": 600, "mult": 1.0} ], "finish_mult": 1.15 } ],
-    "seal": { "name": "Cedar Gale", "seals": 4, "mult": 1.1, "element": "gale" } },
-  { "id": "tsubaki", "name": "Tsubaki", "title": "Keeper of the drowned bell", "element": "tide", "lv": 5,
-    "hp": 190, "atk": 24, "def": 15, "mat": 34, "mdf": 24, "spd": 12, "ink": 40,
-    "strokes": [ { "id": "bellchime", "name": "Bell-Chime Rhythm", "hits": [ {"gap_ms": 680, "mult": 0.5}, {"gap_ms": 420, "mult": 0.5}, {"gap_ms": 420, "mult": 0.6}, {"gap_ms": 540, "mult": 0.8} ], "finish_mult": 1.25 } ],
-    "seal": { "name": "Undertow Hymn", "seals": 5, "mult": 0.9, "element": "tide" } }
-] }
+{
+ "members": [
+  {
+   "id": "itsuki",
+   "name": "Itsuki",
+   "title": "Wandering Swordsman",
+   "element": "gale",
+   "lv": 5,
+   "hp": 214,
+   "atk": 32,
+   "def": 18,
+   "mat": 14,
+   "mdf": 14,
+   "spd": 17,
+   "ink": 85,
+   "strokes": [
+    {
+     "id": "falling_pine",
+     "name": "Falling Pine",
+     "unlock_lv": 1,
+     "hits": [
+      {
+       "gap_ms": 700,
+       "mult": 0.7
+      },
+      {
+       "gap_ms": 520,
+       "mult": 0.8
+      },
+      {
+       "gap_ms": 460,
+       "mult": 1.0
+      }
+     ],
+     "finish_mult": 1.3
+    },
+    {
+     "id": "wet_edge",
+     "name": "Wet Edge",
+     "unlock_lv": 5,
+     "hits": [
+      {
+       "gap_ms": 650,
+       "mult": 0.5
+      },
+      {
+       "gap_ms": 450,
+       "mult": 0.6
+      },
+      {
+       "gap_ms": 420,
+       "mult": 0.7
+      },
+      {
+       "gap_ms": 420,
+       "mult": 1.1
+      }
+     ],
+     "finish_mult": 1.5
+    }
+   ],
+   "seal": {
+    "id": "crane_gale_script",
+    "name": "Gale Crane Script",
+    "seals": 4,
+    "mult": 0.55,
+    "element": "gale",
+    "stat": "atk"
+   },
+   "role": "physical_dps",
+   "base": {
+    "hp": 150,
+    "atk": 22,
+    "def": 12,
+    "mat": 10,
+    "mdf": 10,
+    "spd": 14
+   },
+   "growth": {
+    "hp": 16,
+    "atk": 2.6,
+    "def": 1.4,
+    "mat": 1.0,
+    "mdf": 1.1,
+    "spd": 0.8
+   }
+  },
+  {
+   "id": "benika",
+   "name": "Benika",
+   "title": "Shrine Archer",
+   "element": "ember",
+   "lv": 5,
+   "hp": 177,
+   "atk": 22,
+   "def": 14,
+   "mat": 33,
+   "mdf": 24,
+   "spd": 20,
+   "ink": 30,
+   "strokes": [
+    {
+     "id": "three_prayer_slips",
+     "name": "Three Prayer Slips",
+     "unlock_lv": 1,
+     "hits": [
+      {
+       "gap_ms": 760,
+       "mult": 0.6
+      },
+      {
+       "gap_ms": 560,
+       "mult": 0.6
+      },
+      {
+       "gap_ms": 520,
+       "mult": 0.9
+      }
+     ],
+     "finish_mult": 1.25
+    }
+   ],
+   "seal": {
+    "id": "ember_kite_litany",
+    "name": "Ember Kite Litany",
+    "seals": 5,
+    "mult": 0.4,
+    "element": "ember",
+    "stat": "mat"
+   },
+   "role": "healer_support",
+   "base": {
+    "hp": 125,
+    "atk": 15,
+    "def": 10,
+    "mat": 22,
+    "mdf": 16,
+    "spd": 16
+   },
+   "growth": {
+    "hp": 13,
+    "atk": 1.8,
+    "def": 1.1,
+    "mat": 2.8,
+    "mdf": 1.9,
+    "spd": 0.9
+   }
+  },
+  {
+   "id": "gonzo",
+   "name": "Gonzō",
+   "title": "Retired Temple Monk",
+   "element": "stone",
+   "lv": 5,
+   "hp": 288,
+   "atk": 30,
+   "def": 27,
+   "mat": 11,
+   "mdf": 20,
+   "spd": 10,
+   "ink": 20,
+   "strokes": [
+    {
+     "id": "temple_bell",
+     "name": "Temple Bell",
+     "unlock_lv": 1,
+     "hits": [
+      {
+       "gap_ms": 820,
+       "mult": 1.0
+      },
+      {
+       "gap_ms": 640,
+       "mult": 1.3
+      }
+     ],
+     "finish_mult": 1.4
+    }
+   ],
+   "seal": {
+    "id": "stone_owl_verse",
+    "name": "Stone Owl Verse",
+    "seals": 3,
+    "mult": 0.8,
+    "element": "stone",
+    "stat": "atk"
+   },
+   "role": "tank",
+   "base": {
+    "hp": 200,
+    "atk": 20,
+    "def": 18,
+    "mat": 8,
+    "mdf": 14,
+    "spd": 8
+   },
+   "growth": {
+    "hp": 22,
+    "atk": 2.4,
+    "def": 2.2,
+    "mat": 0.7,
+    "mdf": 1.6,
+    "spd": 0.5
+   }
+  }
+ ]
+}

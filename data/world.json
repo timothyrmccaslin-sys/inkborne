@@ -1,8 +1,58 @@
-{ "start": "trailhead",
-  "nodes": [
-    { "id": "trailhead", "name": "Mender's Hut", "x": 230, "y": 470 },
-    { "id": "mistcedar", "name": "Mistcedar Path", "x": 560, "y": 360, "poi": "forest" },
-    { "id": "hollowbell", "name": "Hollowbell", "x": 930, "y": 450, "poi": "town" },
-    { "id": "palegate", "name": "The Pale Gate", "x": 1110, "y": 210, "locked": true }
+{
+ "start": "woods_edge",
+ "_note": "Node positions in 1280x720 over Bob's world-bg (forest lower left, Hanshi centre, sea right).",
+ "nodes": [
+  {
+   "id": "woods_edge",
+   "name": "Hakushi Clearing",
+   "x": 120,
+   "y": 640
+  },
+  {
+   "id": "sumikage",
+   "name": "Sumikage Wood",
+   "x": 300,
+   "y": 560,
+   "poi": "forest"
+  },
+  {
+   "id": "hanshi",
+   "name": "Hanshi",
+   "x": 560,
+   "y": 470,
+   "poi": "town"
+  },
+  {
+   "id": "shrine_stair",
+   "name": "Shuin Stair",
+   "x": 470,
+   "y": 250,
+   "locked": true
+  },
+  {
+   "id": "grey_shore",
+   "name": "Usuzumi Shore",
+   "x": 960,
+   "y": 420,
+   "locked": true
+  }
+ ],
+ "paths": [
+  [
+   "woods_edge",
+   "sumikage"
   ],
-  "paths": [ ["trailhead", "mistcedar", [[360, 520], [430, 340]]], ["mistcedar", "hollowbell", [[700, 300], [800, 520]]], ["hollowbell", "palegate", [[1040, 420], [1020, 250]]] ] }
+  [
+   "sumikage",
+   "hanshi"
+  ],
+  [
+   "hanshi",
+   "shrine_stair"
+  ],
+  [
+   "hanshi",
+   "grey_shore"
+  ]
+ ]
+}

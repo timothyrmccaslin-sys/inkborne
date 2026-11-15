@@ -1,0 +1,17 @@
+{
+  "key": "fx-seal-mark",
+  "src": "fx/fx-seal-mark.webp",
+  "w": 1280,
+  "h": 256,
+  "frames": 5,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.5
+  ],
+  "layer": "over",
+  "note": "Seal Arts: one red seal stamping onto the path. Hold the last frame; place one per seal (party.json seal.seals)."
+}

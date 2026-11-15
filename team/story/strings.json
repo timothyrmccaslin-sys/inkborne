@@ -62,7 +62,7 @@
   "seal.miss": "Smudged",
   "seal.complete": "{art}!",
   "seal.counter": "{n} / {total} seals",
-  "battle.gauge.label": "TBD",
+  "battle.gauge.label": "Vermilion Ink",
   "battle.gauge.value": "{gauge} {n}",
   "battle.gauge.charging": "Filling",
   "battle.gauge.ready": "Ready to Unfurl",

@@ -1,0 +1,465 @@
+{
+ "images": {
+  "world-bg": {
+   "src": "bg/world-bg.webp",
+   "w": 2560,
+   "h": 1440,
+   "frames": 1,
+   "fw": 2560,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-forest-far": {
+   "src": "bg/poi-forest-far.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-forest-mid": {
+   "src": "bg/poi-forest-mid.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-forest-near": {
+   "src": "bg/poi-forest-near.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-town-far": {
+   "src": "bg/poi-town-far.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-town-mid": {
+   "src": "bg/poi-town-mid.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-town-near": {
+   "src": "bg/poi-town-near.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "battle-forest": {
+   "src": "bg/battle-forest.webp",
+   "w": 2560,
+   "h": 1440,
+   "frames": 1,
+   "fw": 2560,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "fx-brushstroke-clean-line": {
+   "src": "fx/fx-brushstroke-clean-line.webp",
+   "w": 2048,
+   "h": 256,
+   "frames": 8,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "loop": false
+  },
+  "fx-brushstroke-fail": {
+   "src": "fx/fx-brushstroke-fail.webp",
+   "w": 1792,
+   "h": 256,
+   "frames": 7,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "loop": false
+  },
+  "fx-death-demo": {
+   "src": "fx/fx-death-demo.webp",
+   "w": 3584,
+   "h": 256,
+   "frames": 14,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "loop": false
+  },
+  "fx-death-ink": {
+   "src": "fx/fx-death-ink.webp",
+   "w": 3584,
+   "h": 256,
+   "frames": 14,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "loop": false
+  },
+  "fx-death-mask": {
+   "src": "fx/fx-death-mask.webp",
+   "w": 3584,
+   "h": 256,
+   "frames": 14,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    1.0
+   ],
+   "loop": false
+  },
+  "fx-hit-heavy": {
+   "src": "fx/fx-hit-heavy.webp",
+   "w": 2560,
+   "h": 256,
+   "frames": 10,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.4375,
+    0.5
+   ],
+   "loop": false
+  },
+  "fx-hit-light": {
+   "src": "fx/fx-hit-light.webp",
+   "w": 2304,
+   "h": 256,
+   "frames": 9,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.4375,
+    0.5
+   ],
+   "loop": false
+  },
+  "fx-inkwing-ember-loop": {
+   "src": "fx/fx-inkwing-ember-loop.webp",
+   "w": 6144,
+   "h": 512,
+   "frames": 12,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.859375
+   ],
+   "loop": true
+  },
+  "fx-inkwing-ember": {
+   "src": "fx/fx-inkwing-ember.webp",
+   "w": 15360,
+   "h": 512,
+   "frames": 30,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.859375
+   ],
+   "loop": false
+  },
+  "fx-inkwing-gale-loop": {
+   "src": "fx/fx-inkwing-gale-loop.webp",
+   "w": 6144,
+   "h": 512,
+   "frames": 12,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.859375
+   ],
+   "loop": true
+  },
+  "fx-inkwing-gale": {
+   "src": "fx/fx-inkwing-gale.webp",
+   "w": 15360,
+   "h": 512,
+   "frames": 30,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.859375
+   ],
+   "loop": false
+  },
+  "fx-inkwing-stone-loop": {
+   "src": "fx/fx-inkwing-stone-loop.webp",
+   "w": 6144,
+   "h": 512,
+   "frames": 12,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.859375
+   ],
+   "loop": true
+  },
+  "fx-inkwing-stone": {
+   "src": "fx/fx-inkwing-stone.webp",
+   "w": 15360,
+   "h": 512,
+   "frames": 30,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.859375
+   ],
+   "loop": false
+  },
+  "fx-seal-ember": {
+   "src": "fx/fx-seal-ember.webp",
+   "w": 9216,
+   "h": 512,
+   "frames": 18,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5859375,
+    0.80078125
+   ],
+   "loop": false
+  },
+  "fx-seal-gale": {
+   "src": "fx/fx-seal-gale.webp",
+   "w": 9216,
+   "h": 512,
+   "frames": 18,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5859375,
+    0.80078125
+   ],
+   "loop": false
+  },
+  "fx-seal-mark": {
+   "src": "fx/fx-seal-mark.webp",
+   "w": 1280,
+   "h": 256,
+   "frames": 5,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "loop": false
+  },
+  "fx-seal-pass": {
+   "src": "fx/fx-seal-pass.webp",
+   "w": 2048,
+   "h": 256,
+   "frames": 8,
+   "fw": 256,
+   "fh": 256,
+   "fps": 12,
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "loop": false
+  },
+  "fx-seal-stone": {
+   "src": "fx/fx-seal-stone.webp",
+   "w": 9216,
+   "h": 512,
+   "frames": 18,
+   "fw": 512,
+   "fh": 512,
+   "fps": 12,
+   "anchor": [
+    0.5859375,
+    0.80078125
+   ],
+   "loop": false
+  },
+  "icon-rice_cake": {
+   "src": "icons/icon-rice_cake.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-plum_tonic": {
+   "src": "icons/icon-plum_tonic.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-pine_tea": {
+   "src": "icons/icon-pine_tea.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-festival_bento": {
+   "src": "icons/icon-festival_bento.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-inkstone_chip": {
+   "src": "icons/icon-inkstone_chip.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-fresh_ink_pot": {
+   "src": "icons/icon-fresh_ink_pot.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-paper_cracker": {
+   "src": "icons/icon-paper_cracker.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-thunder_jar": {
+   "src": "icons/icon-thunder_jar.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  }
+ },
+ "_note": "v2: POI layers are 3200x1440 (1.25 screens) per Creative Director, wider than SPEC 5's 2560. All three layers of a POI are the same size and left-aligned (x=0 matches)."
+}

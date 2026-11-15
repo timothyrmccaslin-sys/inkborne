@@ -22,7 +22,7 @@ def stat_at(base, growth, lv):
 
 MEMBERS = [
     {
-        "id": "itsuki", "name": "Itsuki Hane", "title": "Wandering Swordsman",
+        "id": "itsuki", "name": "Itsuki", "full_name": "Itsuki Hane", "title": "Wandering Swordsman",
         "role": "physical_dps", "element": "gale",
         "base":   {"hp": 150, "atk": 22, "def": 12, "mat": 10, "mdf": 10, "spd": 14},
         "growth": {"hp": 16,  "atk": 2.6, "def": 1.4, "mat": 1.0, "mdf": 1.1, "spd": 0.8},
@@ -31,13 +31,13 @@ MEMBERS = [
              "hits": [{"gap_ms": 700, "mult": 0.7}, {"gap_ms": 520, "mult": 0.8}, {"gap_ms": 460, "mult": 1.0}],
              "finish_mult": 1.3},
             {"id": "wet_edge", "name": "Wet Edge", "unlock_lv": 5,
-             "hits": [{"gap_ms": 650, "mult": 0.5}, {"gap_ms": 450, "mult": 0.6}, {"gap_ms": 380, "mult": 0.7}, {"gap_ms": 340, "mult": 1.1}],
+             "hits": [{"gap_ms": 650, "mult": 0.5}, {"gap_ms": 450, "mult": 0.6}, {"gap_ms": 420, "mult": 0.7}, {"gap_ms": 420, "mult": 1.1}],
              "finish_mult": 1.5},
         ],
         "seal": {"id": "crane_gale_script", "name": "Gale Crane Script", "seals": 4, "mult": 0.55, "element": "gale", "stat": "atk"},
     },
     {
-        "id": "benika", "name": "Benika Matsuo", "title": "Shrine Archer",
+        "id": "benika", "name": "Benika", "full_name": "Benika Matsuo", "title": "Shrine Archer",
         "role": "healer_support", "element": "ember",
         "base":   {"hp": 125, "atk": 15, "def": 10, "mat": 22, "mdf": 16, "spd": 16},
         "growth": {"hp": 13,  "atk": 1.8, "def": 1.1, "mat": 2.8, "mdf": 1.9, "spd": 0.9},
@@ -46,13 +46,13 @@ MEMBERS = [
              "hits": [{"gap_ms": 760, "mult": 0.6}, {"gap_ms": 560, "mult": 0.6}, {"gap_ms": 520, "mult": 0.9}],
              "finish_mult": 1.25},
             {"id": "lantern_volley", "name": "Lantern Volley", "unlock_lv": 6,
-             "hits": [{"gap_ms": 700, "mult": 0.5}, {"gap_ms": 500, "mult": 0.5}, {"gap_ms": 440, "mult": 0.6}, {"gap_ms": 400, "mult": 0.9}],
+             "hits": [{"gap_ms": 700, "mult": 0.5}, {"gap_ms": 500, "mult": 0.5}, {"gap_ms": 440, "mult": 0.6}, {"gap_ms": 420, "mult": 0.9}],
              "finish_mult": 1.4},
         ],
         "seal": {"id": "ember_kite_litany", "name": "Ember Kite Litany", "seals": 5, "mult": 0.4, "element": "ember", "stat": "mat"},
     },
     {
-        "id": "gonzo", "name": "Gonzō Kuraishi", "title": "Retired Temple Monk",
+        "id": "gonzo", "name": "Gonzō", "full_name": "Gonzō Kuraishi", "title": "Retired Temple Monk",
         "role": "tank", "element": "stone",
         "base":   {"hp": 200, "atk": 20, "def": 18, "mat": 8,  "mdf": 14, "spd": 8},
         "growth": {"hp": 22,  "atk": 2.4, "def": 2.2, "mat": 0.7, "mdf": 1.6, "spd": 0.5},
@@ -130,7 +130,7 @@ def build_party():
 def build_transformation():
     return {
         "gauge": {
-            "display_name": "Vermilion Gauge", "field": "ink", "max": 100,
+            "display_name": "Vermilion Ink", "field": "ink", "max": 100,
             "ui_pulse_at": [25, 50, 75, 100],
             "persists_between_battles": True, "saved": True,
             "decay_per_turn": 0,

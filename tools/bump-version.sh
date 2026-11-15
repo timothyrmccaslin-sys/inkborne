@@ -37,7 +37,7 @@ NEW="$1"
 
 extract_const() {
   local file="$1" name="$2" line=""
-  line="$(grep -E -m1 "^[[:space:]]*const ${name} = '" "$file" || true)"
+  line="$(grep -E -m1 "^[[:space:]]*(export[[:space:]]+)?const ${name} = '" "$file" || true)"
   [[ -n "$line" ]] || die "no 'const ${name} = '...' assignment in $file"
   if [[ "$line" =~ const[[:space:]]${name}[[:space:]]=[[:space:]]\'([^\']+)\' ]]; then
     printf '%s\n' "${BASH_REMATCH[1]}"
@@ -98,7 +98,7 @@ tmp_sw="$(mktemp)"
 trap 'rm -f "$tmp_app" "$tmp_sw"' EXIT
 
 awk -v new="$NEW" '
-  !done && $0 ~ /^[[:space:]]*const APP_VERSION = '\''/ {
+  !done && $0 ~ /^[[:space:]]*(export[[:space:]]+)?const APP_VERSION = '\''/ {
     sub(/const APP_VERSION = '\''[0-9]+\.[0-9]+\.[0-9]+'\''/, "const APP_VERSION = '\''" new "'\''")
     done=1
   }

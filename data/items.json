@@ -1,7 +1,70 @@
-{ "items": [
-  { "id": "lotus", "name": "Lotus Salve", "desc": "Restores 80 HP to one ally.", "kind": "heal", "power": 80, "price": 30 },
-  { "id": "suntea", "name": "Sun-Steeped Tea", "desc": "Restores 50 HP to the whole party.", "kind": "healall", "power": 50, "price": 70 },
-  { "id": "phial", "name": "Ink Phial", "desc": "Adds 30 Vermilion Ink to one ally.", "kind": "ink", "power": 30, "price": 90 },
-  { "id": "embercharm", "name": "Ember Charm", "desc": "Bursts for 90 Ember damage on one foe.", "kind": "bomb", "power": 90, "element": "ember", "price": 60 },
-  { "id": "tidecharm", "name": "Tide Charm", "desc": "Bursts for 90 Tide damage on one foe.", "kind": "bomb", "power": 90, "element": "tide", "price": 60 }
-] }
+{
+  "items": [
+    {
+      "id": "rice_cake",
+      "name": "Rice Cake",
+      "desc": "Sweet and filling. Restores 50 HP to one ally.",
+      "kind": "heal",
+      "power": 50,
+      "price": 15
+    },
+    {
+      "id": "plum_tonic",
+      "name": "Plum Tonic",
+      "desc": "Sour enough to wake the dead, nearly. Restores 200 HP to one ally.",
+      "kind": "heal",
+      "power": 200,
+      "price": 60
+    },
+    {
+      "id": "pine_tea",
+      "name": "Pot of Pine Tea",
+      "desc": "One pot, three cups. Restores 80 HP to the whole party.",
+      "kind": "healall",
+      "power": 80,
+      "price": 120
+    },
+    {
+      "id": "festival_bento",
+      "name": "Festival Bento",
+      "desc": "Packed for a feast that never came. Restores 250 HP to the whole party.",
+      "kind": "healall",
+      "power": 250,
+      "price": 280
+    },
+    {
+      "id": "inkstone_chip",
+      "name": "Inkstone Chip",
+      "desc": "Grind it, wet it, and the brush drinks. Adds 20 red ink to one ally.",
+      "kind": "ink",
+      "power": 20,
+      "price": 40
+    },
+    {
+      "id": "fresh_ink_pot",
+      "name": "Pot of Fresh Ink",
+      "desc": "Rich and dark, still smelling of pine soot. Adds 50 red ink to one ally.",
+      "kind": "ink",
+      "power": 50,
+      "price": 110
+    },
+    {
+      "id": "paper_cracker",
+      "name": "Paper Firecracker",
+      "desc": "Festival leftovers. Bursts for 60 Ember damage on one foe.",
+      "kind": "bomb",
+      "power": 60,
+      "element": "ember",
+      "price": 50
+    },
+    {
+      "id": "thunder_jar",
+      "name": "Thunder Jar",
+      "desc": "Grandmother Tsuru won't say what's inside. Bursts for 150 Gale damage on one foe.",
+      "kind": "bomb",
+      "power": 150,
+      "element": "gale",
+      "price": 150
+    }
+  ]
+}

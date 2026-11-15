@@ -1,0 +1,17 @@
+{
+  "key": "fx-hit-heavy",
+  "src": "fx/fx-hit-heavy.webp",
+  "w": 2560,
+  "h": 256,
+  "frames": 10,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.4375,
+    0.5
+  ],
+  "layer": "over",
+  "note": "center on the impact point; heavy/finisher variant with shock ring. Flip horizontally for hits on the party."
+}

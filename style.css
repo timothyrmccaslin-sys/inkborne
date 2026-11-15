@@ -1,0 +1,18 @@
+@font-face { font-family: Marker; src: url(fonts/permanentmarker.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: Hand; src: url(fonts/patrickhandsc.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: Kanji; src: url(fonts/inkborne-kanji.woff2) format('woff2'); font-display: swap; }
+html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; overscroll-behavior: none; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+canvas { position: fixed; inset: 0; display: block; }
+#boot { position: fixed; inset: 0; display: grid; place-items: center; color: #ece6d8; font: 28px Marker, serif; }
+#touch { position: fixed; inset: 0; pointer-events: none; }
+#stick { position: absolute; left: calc(24px + env(safe-area-inset-left)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(236,230,216,.10), rgba(236,230,216,.22)); border: 3px solid rgba(27,24,19,.45); pointer-events: auto; touch-action: none; }
+#knob { position: absolute; left: 45px; top: 45px; width: 60px; height: 60px; border-radius: 50%; background: rgba(27,24,19,.55); border: 2px solid rgba(236,230,216,.5); }
+#btns { position: absolute; right: calc(24px + env(safe-area-inset-right)); bottom: calc(28px + env(safe-area-inset-bottom)); display: flex; gap: 18px; align-items: flex-end; pointer-events: auto; }
+.tb { width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(27,24,19,.6); background: rgba(236,230,216,.55); color: #1b1813; font: 26px Marker, serif; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.tb.big { width: 96px; height: 96px; background: rgba(179,38,30,.78); color: #fbf6ec; font-size: 34px; }
+.tb.on { transform: scale(.92); filter: brightness(1.2); }
+.tb.small { position: absolute; right: calc(16px + env(safe-area-inset-right)); top: calc(14px + env(safe-area-inset-top)); width: 52px; height: 52px; font-size: 22px; pointer-events: auto; }
+body.pad #stick, body.pad #btns { display: none; }
+body.nostick #stick { display: none; }
+#update { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translateX(-50%); font: 18px Hand, sans-serif; padding: 8px 16px; border: 2px solid #1b1813; background: #ece6d8; border-radius: 6px; }

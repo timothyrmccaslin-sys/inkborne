@@ -11,7 +11,7 @@ Owner: June (QA) · Lead: Noe · Status: **DRAFT v0.1 (pre-spec)** · 2026-11-15
 None yet; no build exists. Findings will be logged here as **S1 Critical** (crash, soft-lock, data loss, demo cannot be completed), **S2 Major** (feature broken with workaround, input method unusable), **S3 Minor** (cosmetic, polish, non-blocking text), **S4 Trivial**. Each entry: ID, area, device/input, steps, expected, actual, frequency, build hash.
 
 ## Recommendations
-- Land `SPEC.md` with explicit numbers (timing windows in ms/frames, SP gain values, prices) so tests can assert them.
+- Land `SPEC.md` with explicit numbers (timing windows in ms/frames, Ink gain values, prices) so tests can assert them.
 - Expose a debug overlay / URL flag (`?debug=1`) showing FPS, current input device, combo window state and RNG seed; and a seeded-RNG option for repeatable battles.
 - Expose deterministic game-logic hooks from Rust (combo judging, damage, shop transactions) so Richard can unit-test them natively without WASM/browser.
 
@@ -75,7 +75,7 @@ Format: ID · case · expected. Priority P0/P1/P2.
 - BAT-02 P0 · Target select by touch tap, pad, keyboard · correct target hit; dead targets not selectable.
 - BAT-03 P0 · Victory → rewards screen (XP, gold, drops) → return to field; values match [SPEC].
 - BAT-04 P0 · Defeat → game over flow per [SPEC]; Continue loads last save.
-- BAT-05 P1 · Guard behaviour (damage reduction, HP/SP regen per [SPEC]).
+- BAT-05 P1 · Guard behaviour (damage reduction, HP/Ink regen per [SPEC]).
 - BAT-06 P1 · Item use in battle consumes inventory; shared with field inventory.
 - BAT-07 P1 · Flee success/failure rules; cannot flee forced fights.
 - BAT-08 P1 · Background/resume mid-turn and mid-animation · no skipped turn, no double action.
@@ -94,7 +94,7 @@ Timing windows are input- and latency-sensitive; test on real iPad only.
 - CMB-10 P2 · Combo unlock/learning progression per [SPEC].
 
 ### 5.5 Battle: transformation
-- TRN-01 P0 · Transform unavailable until meter/SP full per [SPEC]; option greyed with reason.
+- TRN-01 P0 · Transform unavailable until meter/Ink full per [SPEC]; option greyed with reason.
 - TRN-02 P0 · Transform with each input · animation plays, stats/moveset change per [SPEC].
 - TRN-03 P0 · Transformation duration/turn count and revert · reverts at correct time; stats restored exactly.
 - TRN-04 P1 · Transformed-state special attack (incl. its own timing mechanic if any) · per [SPEC].
@@ -105,7 +105,7 @@ Timing windows are input- and latency-sensitive; test on real iPad only.
 ### 5.6 Town
 - TWN-01 P0 · Enter from world map; all buildings/exits reachable with each input.
 - TWN-02 P1 · NPC pathing does not block doors or the player permanently.
-- TWN-03 P1 · Inn/save point per [SPEC] restores HP/SP and saves.
+- TWN-03 P1 · Inn/save point per [SPEC] restores HP/Ink and saves.
 - TWN-04 P1 · Exit returns to correct world map node.
 
 ### 5.7 Dialogue

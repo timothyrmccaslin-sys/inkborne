@@ -1,0 +1,17 @@
+{
+  "key": "fx-death-mask",
+  "src": "fx/fx-death-mask.webp",
+  "w": 3584,
+  "h": 256,
+  "frames": 14,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    1.0
+  ],
+  "layer": "mask",
+  "note": "Alpha mask: draw the enemy frame, then this frame with globalCompositeOperation='destination-in' (white RGB, alpha = keep). Then draw fx-death-ink on top."
+}

@@ -2,7 +2,7 @@
   "members": [
     {
       "id": "itsuki",
-      "name": "Itsuki Hane",
+      "name": "Itsuki",
       "title": "Wandering Swordsman",
       "element": "gale",
       "lv": 5,
@@ -48,11 +48,11 @@
               "mult": 0.6
             },
             {
-              "gap_ms": 380,
+              "gap_ms": 420,
               "mult": 0.7
             },
             {
-              "gap_ms": 340,
+              "gap_ms": 420,
               "mult": 1.1
             }
           ],
@@ -269,7 +269,7 @@
     },
     {
       "id": "benika",
-      "name": "Benika Matsuo",
+      "name": "Benika",
       "title": "Shrine Archer",
       "element": "ember",
       "lv": 5,
@@ -319,7 +319,7 @@
               "mult": 0.6
             },
             {
-              "gap_ms": 400,
+              "gap_ms": 420,
               "mult": 0.9
             }
           ],
@@ -536,7 +536,7 @@
     },
     {
       "id": "gonzo",
-      "name": "Gonzō Kuraishi",
+      "name": "Gonzō",
       "title": "Retired Temple Monk",
       "element": "stone",
       "lv": 5,

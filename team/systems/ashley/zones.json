@@ -1,21 +1,21 @@
 {
-  "version": 1,
-  "about": "Inkborne encounter zones (Systems / Ashley). Read by encounters.js. Ids match the live data/world.json nodes and data/enemies.json enemies. `encounters` has the same shape as enemies.json `encounters` (SPEC 7); it keeps the existing 'mistcedar' entry unchanged, so it can be merged as-is.",
+  "version": 2,
+  "about": "Inkborne encounter zones (Systems / Ashley). Read by encounters.js. Ids match the live data/world.json nodes, data/pois/*.json and data/enemies.json enemies. Canon enemies only: blotling, hollow_lantern, smudge_ronin (Smudge Ronin is the fixed mini-boss and never appears in random tables). `encounters` has the same shape as enemies.json `encounters` (SPEC 7) and keeps the existing 'sumikage_c' and 'sumikage_boss' entries unchanged, so it can be merged as-is.",
   "rules": {
     "stepPx": {
-      "poi": 32,
+      "poi": 24,
       "world": 20
     },
     "graceStepsAfterBattle": 6,
     "graceStepsOnEnter": 4,
-    "note": "A step is stepPx of real travel. After minSteps, each step rolls 1/(avgSteps-minSteps); maxSteps forces an encounter. Standing still never rolls."
+    "note": "A step is stepPx of real travel. After minSteps, each step rolls 1/(avgSteps-minSteps); maxSteps forces an encounter. Standing still never rolls. Sumikage Wood is 1280 px wide, so one crossing is about 53 POI steps."
   },
   "zones": [
     {
-      "id": "world-trailhead-mistcedar",
-      "name": "Road from Mender's Hut to Mistcedar Path",
+      "id": "world-woods_edge-sumikage",
+      "name": "Road from Hakushi Clearing to Sumikage Wood",
       "scene": "world",
-      "path": ["trailhead", "mistcedar"],
+      "path": ["woods_edge", "sumikage"],
       "bg": "forest",
       "rate": {
         "avgSteps": 40,
@@ -25,20 +25,20 @@
       "ambush": 0.04,
       "table": [
         {
-          "encounter": "road-blotwolf",
+          "encounter": "road_blotling",
           "weight": 60
         },
         {
-          "encounter": "road-blotwolf-pair",
+          "encounter": "road_blotling_pair",
           "weight": 40
         }
       ]
     },
     {
-      "id": "world-mistcedar-hollowbell",
-      "name": "Road from Mistcedar Path to Hollowbell",
+      "id": "world-sumikage-hanshi",
+      "name": "Road from Sumikage Wood to Hanshi",
       "scene": "world",
-      "path": ["mistcedar", "hollowbell"],
+      "path": ["sumikage", "hanshi"],
       "bg": "forest",
       "rate": {
         "avgSteps": 34,
@@ -48,97 +48,93 @@
       "ambush": 0.05,
       "table": [
         {
-          "encounter": "road-blotwolf-pair",
+          "encounter": "road_blotling_pair",
           "weight": 45
         },
         {
-          "encounter": "road-kappa",
+          "encounter": "road_lantern",
           "weight": 35
         },
         {
-          "encounter": "road-wolf-kappa",
+          "encounter": "road_blotling_lantern",
           "weight": 20
         }
       ]
     },
     {
-      "id": "mistcedar-edge",
-      "name": "Mistcedar Path, outer trail",
+      "id": "sumikage-edge",
+      "name": "Sumikage Wood, outer trail",
       "scene": "poi",
       "poi": "forest",
-      "rectN": [0.0, 0.0, 0.38, 1.0],
+      "rectN": [0.0, 0.0, 0.4, 1.0],
       "priority": 1,
       "bg": "forest",
       "rate": {
-        "avgSteps": 32,
-        "minSteps": 12,
-        "maxSteps": 72
+        "avgSteps": 36,
+        "minSteps": 14,
+        "maxSteps": 80
       },
       "ambush": 0.05,
       "table": [
         {
-          "encounter": "wood-blotwolf",
-          "weight": 30
-        },
-        {
-          "encounter": "wood-blotwolf-pair",
+          "encounter": "wood_blotling",
           "weight": 40
         },
         {
-          "encounter": "wood-wolf-kappa",
-          "weight": 20
+          "encounter": "wood_blotling_pair",
+          "weight": 40
         },
         {
-          "encounter": "mistcedar",
-          "weight": 10
+          "encounter": "wood_blotling_lantern",
+          "weight": 20
         }
       ]
     },
     {
-      "id": "mistcedar-deep",
-      "name": "Mistcedar Path, deep cedars",
+      "id": "sumikage-deep",
+      "name": "Sumikage Wood, deep trees",
       "scene": "poi",
       "poi": "forest",
-      "rectN": [0.38, 0.0, 0.44, 1.0],
+      "rectN": [0.4, 0.0, 0.32, 1.0],
       "priority": 1,
       "bg": "forest",
       "rate": {
-        "avgSteps": 24,
-        "minSteps": 9,
-        "maxSteps": 55
+        "avgSteps": 28,
+        "minSteps": 10,
+        "maxSteps": 64
       },
       "ambush": 0.08,
       "table": [
         {
-          "encounter": "wood-blotwolf-pair",
-          "weight": 20
+          "encounter": "wood_blotling_pair",
+          "weight": 25
         },
         {
-          "encounter": "wood-wolf-kappa",
-          "weight": 30
+          "encounter": "wood_blotling_lantern",
+          "weight": 35
         },
         {
-          "encounter": "wood-kappa-pair",
-          "weight": 20
+          "encounter": "wood_lantern_pair",
+          "weight": 15
         },
         {
-          "encounter": "mistcedar",
-          "weight": 30
+          "encounter": "sumikage_c",
+          "weight": 25
         }
       ]
     },
     {
-      "id": "mistcedar-seal-clearing",
-      "name": "Broken seal-stone clearing (safe, before the boss)",
+      "id": "sumikage-ronin-clearing",
+      "name": "Clearing before the Smudge Ronin (safe)",
       "scene": "poi",
       "poi": "forest",
-      "rectN": [0.82, 0.0, 0.18, 1.0],
+      "rectN": [0.72, 0.0, 0.28, 1.0],
       "priority": 2,
       "safe": true
     },
     {
-      "id": "hollowbell",
-      "name": "Hollowbell (town, safe)",
+      "id": "hanshi",
+      "name": "Hanshi (town, safe)",
       "scene": "poi",
       "poi": "town",
       "rectN": [0.0, 0.0, 1.0, 1.0],
@@ -147,23 +143,29 @@
     }
   ],
   "fixed": {
-    "unwritten-duel": {
+    "sumikage_c": {
+      "bg": "forest",
+      "canFlee": true,
+      "music": "battle",
+      "note": "Already placed as the pois/forest.json 'ambush' trigger (once, flag won_ambush). Also in the deep-trees random table so the standard fight can repeat."
+    },
+    "sumikage_boss": {
       "bg": "forest",
       "canFlee": false,
       "music": "battle",
-      "note": "Boss. Place as a pois/forest.json trigger { kind: 'battle', ref: 'unwritten-duel', once: true } inside the seal clearing."
+      "note": "Mini-boss (Smudge Ronin). Already placed as the pois/forest.json 'ronin' trigger (once, needs won_ambush) inside the safe clearing."
     }
   },
   "encounters": {
-    "mistcedar": ["blotwolf", "kappa", "blotwolf"],
-    "road-blotwolf": ["blotwolf"],
-    "road-blotwolf-pair": ["blotwolf", "blotwolf"],
-    "road-kappa": ["kappa"],
-    "road-wolf-kappa": ["blotwolf", "kappa"],
-    "wood-blotwolf": ["blotwolf"],
-    "wood-blotwolf-pair": ["blotwolf", "blotwolf"],
-    "wood-wolf-kappa": ["blotwolf", "kappa"],
-    "wood-kappa-pair": ["kappa", "kappa"],
-    "unwritten-duel": ["unwritten"]
+    "sumikage_c": ["blotling", "hollow_lantern", "blotling"],
+    "sumikage_boss": ["smudge_ronin"],
+    "road_blotling": ["blotling"],
+    "road_blotling_pair": ["blotling", "blotling"],
+    "road_lantern": ["hollow_lantern"],
+    "road_blotling_lantern": ["blotling", "hollow_lantern"],
+    "wood_blotling": ["blotling"],
+    "wood_blotling_pair": ["blotling", "blotling"],
+    "wood_blotling_lantern": ["blotling", "hollow_lantern"],
+    "wood_lantern_pair": ["hollow_lantern", "hollow_lantern"]
   }
 }

@@ -1,0 +1,8 @@
+{ "id": "town", "name": "Hanshi", "node": "hanshi", "w": 1280, "h": 720, "spawn": [1180, 640], "ground": "wood", "art": "poi-town",
+  "exits": [ { "rect": [1254, 520, 26, 200], "to": "world", "node": "hanshi" }, { "rect": [0, 520, 26, 200], "to": "world", "node": "hanshi" } ],
+  "solids": [ [0, 0, 1280, 532], [790, 532, 120, 60], [60, 532, 120, 40] ],
+  "triggers": [
+    { "id": "hotaru", "rect": [190, 560, 170, 100], "kind": "dialogue", "ref": "hanshi_dusk", "npc": "hotaru" },
+    { "id": "shop", "rect": [545, 532, 150, 70], "kind": "shop", "ref": "kobo_tsuru" }
+  ],
+  "npcs": [ { "id": "hotaru", "x": 270, "y": 600, "name": "Old Hotaru", "face": 1 }, { "id": "tsuru", "x": 620, "y": 552, "name": "Grandmother Tsuru", "face": 1, "small": true } ] }

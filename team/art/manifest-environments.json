@@ -1,0 +1,109 @@
+{
+ "images": {
+  "world-bg": {
+   "src": "bg/world-bg.webp",
+   "w": 2560,
+   "h": 1440,
+   "frames": 1,
+   "fw": 2560,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-forest-far": {
+   "src": "bg/poi-forest-far.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-forest-mid": {
+   "src": "bg/poi-forest-mid.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-forest-near": {
+   "src": "bg/poi-forest-near.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-town-far": {
+   "src": "bg/poi-town-far.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-town-mid": {
+   "src": "bg/poi-town-mid.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "poi-town-near": {
+   "src": "bg/poi-town-near.webp",
+   "w": 3200,
+   "h": 1440,
+   "frames": 1,
+   "fw": 3200,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  },
+  "battle-forest": {
+   "src": "bg/battle-forest.webp",
+   "w": 2560,
+   "h": 1440,
+   "frames": 1,
+   "fw": 2560,
+   "fh": 1440,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    1
+   ]
+  }
+ },
+ "_note": "v2: POI layers are 3200x1440 (1.25 screens) per Creative Director, wider than SPEC 5's 2560. All three layers of a POI are the same size and left-aligned (x=0 matches)."
+}

@@ -1,12 +1,12 @@
-# Tabula Rasa glossary
+# Inkborne glossary
 
-Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Ollie's item list (Kekai-approved). `TBD` means not confirmed yet.
+Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Ollie's item list (Kekai-approved).
 
 ## title
 
 | id | name | status | description |
 |---|---|---|---|
-| `tabula_rasa` | Tabula Rasa | canon | Working title of the game (set by Timothy). SPEC header still says Inkborne. |
+| `inkborne` | Inkborne | canon | Title of the game. SPEC v1.1 says "the title is back to Inkborne". |
 
 ## place
 
@@ -93,7 +93,7 @@ Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Oll
 | `still_water` | Still Water | canon | Guard: halves damage taken and heals 10% HP. |
 | `six_inks` | Six Inks | canon | The elements: Ember/Tide, Gale/Stone, Dawn/Dusk. Opposites x2, same x0.5. |
 | `mon` | mon | canon | Currency. |
-| `transform_gauge` | TBD | TBD | Per-character 0-100 gauge filled by successful hits; a full gauge lets you Unfurl. SPEC says 'Spirit Ink'; Kekai asked Marc to rename (proposed 'Vermilion Ink'). Do not ship either until Marc confirms. UI key: battle.gauge.label. |
+| `transform_gauge` | Vermilion Ink | canon | Per-character 0-100 gauge filled by successful hits; a full gauge lets you Unfurl. UI key: battle.gauge.label. |
 
 ## element
 

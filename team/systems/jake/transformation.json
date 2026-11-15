@@ -1,6 +1,6 @@
 {
   "gauge": {
-    "display_name": "Vermilion Gauge",
+    "display_name": "Vermilion Ink",
     "field": "ink",
     "max": 100,
     "ui_pulse_at": [

@@ -25,7 +25,7 @@ extract_const() {
   # $1=file $2=CONST_NAME -> raw quoted value of the first `const NAME = '...'`
   local file="$1" name="$2" line=""
   [[ -f "$file" ]] || die "missing file: $file"
-  line="$(grep -E -m1 "^[[:space:]]*const ${name} = '" "$file" || true)"
+  line="$(grep -E -m1 "^[[:space:]]*(export[[:space:]]+)?const ${name} = '" "$file" || true)"
   [[ -n "$line" ]] || die "no 'const ${name} = '...' assignment in $file"
   if [[ "$line" =~ const[[:space:]]${name}[[:space:]]=[[:space:]]\'([^\']+)\' ]]; then
     printf '%s\n' "${BASH_REMATCH[1]}"

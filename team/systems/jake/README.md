@@ -1,4 +1,4 @@
-# team/systems/jake: party stats and Vermilion Gauge (Inkborne)
+# team/systems/jake: party stats and Vermilion Ink (Inkborne)
 Owner: Jake (Systems), lead Tim. This is a drop folder, so nothing here is loaded at runtime. Marc copies it into `data/` (SPEC section 9).
 
 ## Files
@@ -69,7 +69,7 @@ Gauge math with no floats: `dmg_fill = clamp((30*dmg*2 + max_hp) / (2*max_hp), 1
 
 ## Open questions and dependencies
 1. **MP (Tim and Marc):** the brief asked for MP, but SPEC v1 has no MP resource. Magic is Inkwing-gated Seal Arts. I left MP out. If we want out-of-form spells (for example, a Benika heal), SPEC needs an `mp` field and a spells list.
-2. **Gauge name conflict (Marc and Lisa):** SPEC calls it "Spirit Ink", but canon calls it the **Vermilion Gauge** and bans "Spirit" as a mechanic term. The SPEC header also still says "Tabula Rasa", `tabula_core`, and the save key `tabula-rasa-save-v1`, because it's byte-identical to `/workspace/tabula-rasa/SPEC.md`. I used `ink` as the key and "Vermilion Gauge" for display.
+2. **Gauge name (resolved):** SPEC v1.1 calls it **Vermilion Ink** (key `ink`), and that name is used here. Party `name` values are the canon names Itsuki, Benika and Gonzō (keep the ō glyph in the UI font).
 3. **Element names:** canon says Wind/Fire/Earth. I mapped those to SPEC's Gale/Ember/Stone, which matches the SPEC palette tints.
 4. **`transformation.json` isn't in SPEC section 7 (Marc):** add it as `data/transformation.json`, or the core hardcodes the numbers.
 5. **Enemy XP (Karen):** SPEC `enemies.json` has `mon` but no `xp`. My suggested values are in DESIGN.md. Karen also owns enemy stats; DESIGN.md has the damage examples I assumed (Blotling def 6, mdf 4).
@@ -77,3 +77,8 @@ Gauge math with no floats: `dmg_fill = clamp((30*dmg*2 + max_hp) / (2*max_hp), 1
 7. **Strokes and Seal Arts:** names follow canon (Falling Pine, Three Prayer Slips, Temple Bell). The second Strokes (Wet Edge, Lantern Volley, Mountain Gong) and the Seal Art names are mine. Lisa should approve them. `gap_ms` needs tuning with Rusty and QA on iPad.
 8. **Demo showcase:** if the demo has to guarantee one transformation, the integrator can set a member's starting `ink` to around 70 for the scripted fight.
 9. **Name with a macron:** `Gonzō` needs the UI font to have the ō glyph. The id is plain ASCII (`gonzo`).
+
+## Combo timing windows (Rusty)
+The core grades each press against its target time (previous press + `gap_ms`): clean within ±70 ms, good within ±150 ms (the core's current values per Richard's tests), and a miss otherwise (a miss ends the chain). Rusty keeps these in a data block `combo_windows { clean_ms, good_ms }` with optional per-hit overrides. They are placeholders until he and Richard test on iPad.
+
+Gap floor: no `gap_ms` is below 420 ms, per Richard's iPad timing analysis (`core/tests/combo-timing-findings.md`). He recommends widening the clean window to about 90–100 ms for touch input.

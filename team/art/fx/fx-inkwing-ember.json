@@ -1,0 +1,17 @@
+{
+  "key": "fx-inkwing-ember",
+  "src": "fx/fx-inkwing-ember.webp",
+  "w": 15360,
+  "h": 512,
+  "frames": 30,
+  "fw": 512,
+  "fh": 512,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.859375
+  ],
+  "layer": "behind",
+  "note": "Inkwing unfurl, Ember Kite. Anchor = character feet (sprite anchor). Draw BEHIND the battle sprite. Hand off to fx-inkwing-ember-loop."
+}

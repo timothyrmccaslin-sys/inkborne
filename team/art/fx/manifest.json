@@ -1,0 +1,256 @@
+{
+  "images": {
+    "fx-brushstroke-clean-line": {
+      "src": "fx/fx-brushstroke-clean-line.webp",
+      "w": 2048,
+      "h": 256,
+      "frames": 8,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "loop": false
+    },
+    "fx-brushstroke-fail": {
+      "src": "fx/fx-brushstroke-fail.webp",
+      "w": 1792,
+      "h": 256,
+      "frames": 7,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "loop": false
+    },
+    "fx-death-demo": {
+      "src": "fx/fx-death-demo.webp",
+      "w": 3584,
+      "h": 256,
+      "frames": 14,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        1.0
+      ],
+      "loop": false
+    },
+    "fx-death-ink": {
+      "src": "fx/fx-death-ink.webp",
+      "w": 3584,
+      "h": 256,
+      "frames": 14,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        1.0
+      ],
+      "loop": false
+    },
+    "fx-death-mask": {
+      "src": "fx/fx-death-mask.webp",
+      "w": 3584,
+      "h": 256,
+      "frames": 14,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        1.0
+      ],
+      "loop": false
+    },
+    "fx-hit-heavy": {
+      "src": "fx/fx-hit-heavy.webp",
+      "w": 2560,
+      "h": 256,
+      "frames": 10,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.4375,
+        0.5
+      ],
+      "loop": false
+    },
+    "fx-hit-light": {
+      "src": "fx/fx-hit-light.webp",
+      "w": 2304,
+      "h": 256,
+      "frames": 9,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.4375,
+        0.5
+      ],
+      "loop": false
+    },
+    "fx-inkwing-ember-loop": {
+      "src": "fx/fx-inkwing-ember-loop.webp",
+      "w": 6144,
+      "h": 512,
+      "frames": 12,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.859375
+      ],
+      "loop": true
+    },
+    "fx-inkwing-ember": {
+      "src": "fx/fx-inkwing-ember.webp",
+      "w": 15360,
+      "h": 512,
+      "frames": 30,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.859375
+      ],
+      "loop": false
+    },
+    "fx-inkwing-gale-loop": {
+      "src": "fx/fx-inkwing-gale-loop.webp",
+      "w": 6144,
+      "h": 512,
+      "frames": 12,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.859375
+      ],
+      "loop": true
+    },
+    "fx-inkwing-gale": {
+      "src": "fx/fx-inkwing-gale.webp",
+      "w": 15360,
+      "h": 512,
+      "frames": 30,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.859375
+      ],
+      "loop": false
+    },
+    "fx-inkwing-stone-loop": {
+      "src": "fx/fx-inkwing-stone-loop.webp",
+      "w": 6144,
+      "h": 512,
+      "frames": 12,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.859375
+      ],
+      "loop": true
+    },
+    "fx-inkwing-stone": {
+      "src": "fx/fx-inkwing-stone.webp",
+      "w": 15360,
+      "h": 512,
+      "frames": 30,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.859375
+      ],
+      "loop": false
+    },
+    "fx-seal-ember": {
+      "src": "fx/fx-seal-ember.webp",
+      "w": 9216,
+      "h": 512,
+      "frames": 18,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5859375,
+        0.80078125
+      ],
+      "loop": false
+    },
+    "fx-seal-gale": {
+      "src": "fx/fx-seal-gale.webp",
+      "w": 9216,
+      "h": 512,
+      "frames": 18,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5859375,
+        0.80078125
+      ],
+      "loop": false
+    },
+    "fx-seal-mark": {
+      "src": "fx/fx-seal-mark.webp",
+      "w": 1280,
+      "h": 256,
+      "frames": 5,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "loop": false
+    },
+    "fx-seal-pass": {
+      "src": "fx/fx-seal-pass.webp",
+      "w": 2048,
+      "h": 256,
+      "frames": 8,
+      "fw": 256,
+      "fh": 256,
+      "fps": 12,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "loop": false
+    },
+    "fx-seal-stone": {
+      "src": "fx/fx-seal-stone.webp",
+      "w": 9216,
+      "h": 512,
+      "frames": 18,
+      "fw": 512,
+      "fh": 512,
+      "fps": 12,
+      "anchor": [
+        0.5859375,
+        0.80078125
+      ],
+      "loop": false
+    }
+  }
+}

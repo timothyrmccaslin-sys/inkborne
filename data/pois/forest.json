@@ -1,0 +1,9 @@
+{ "id": "forest", "name": "Sumikage Wood", "node": "sumikage", "w": 1280, "h": 720, "spawn": [90, 640], "ground": "dirt", "art": "poi-forest",
+  "exits": [ { "rect": [0, 520, 26, 200], "to": "world", "node": "sumikage" }, { "rect": [1254, 520, 26, 200], "to": "world", "node": "sumikage" } ],
+  "solids": [ [0, 0, 1280, 548], [1040, 548, 240, 46], [0, 548, 120, 30] ],
+  "triggers": [
+    { "id": "ambush", "rect": [560, 548, 120, 172], "kind": "battle", "ref": "sumikage_c", "once": true, "flag": "won_ambush" },
+    { "id": "ronin", "rect": [940, 590, 110, 130], "kind": "battle", "ref": "sumikage_boss", "once": true, "flag": "won_ronin", "needs": "won_ambush" },
+    { "id": "stone", "rect": [255, 548, 90, 40], "kind": "sign", "ref": "forest.sign.stone" }
+  ],
+  "npcs": [] }

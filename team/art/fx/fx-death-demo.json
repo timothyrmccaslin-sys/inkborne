@@ -1,0 +1,17 @@
+{
+  "key": "fx-death-demo",
+  "src": "fx/fx-death-demo.webp",
+  "w": 3584,
+  "h": 256,
+  "frames": 14,
+  "fw": 256,
+  "fh": 256,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    1.0
+  ],
+  "layer": "over",
+  "note": "Demo/fallback: generic left-facing ink beast dissolving (mask + edge wash + overlay applied)."
+}

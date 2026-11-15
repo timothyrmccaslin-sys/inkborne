@@ -1,4 +1,4 @@
-# Party stats and the Vermilion Gauge: design notes
+# Party stats and the Vermilion Ink: design notes
 Owner: Jake (Systems). Lead: Tim. Status: v1 draft, matches SPEC v1 section 2 and section 7. Updated Nov 15, 2026.
 
 Names come from Lisa's canon (`/workspace/inkborne-creative/story/CANON.md`). Mechanics come from SPEC v1. Where the two use different names for the same thing, the data uses the SPEC field name and the canon display name (see README "Open questions").
@@ -48,7 +48,7 @@ Inkwing stat multipliers apply to `atk/def/mat/mdf/spd` before `raw()`. Max HP n
 
 **Taking damage:** an enemy with atk 12 hits Itsuki (def 10) for raw(12, 10) = 14. If he's in Still Water, that's 7, and he also heals 10% max HP (12). Gonzō takes 9.
 
-## 3. Vermilion Gauge (`ink`, 0 to 100 per character)
+## 3. Vermilion Ink (`ink`, 0 to 100 per character)
 **Fill sources** (all integers, clamped to 100):
 
 | Source | Ink |

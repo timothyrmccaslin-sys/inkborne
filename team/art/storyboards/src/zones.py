@@ -2,9 +2,9 @@
 # Every rect is (code, name, x, y, w, h, note). Reserved touch rects (SPEC s4) are drawn on EVERY board;
 # no other UI may overlap them.
 SAFE=(64,36)  # 5% title-safe each side, applied on top of env(safe-area-inset-*)
-RESERVED=[("T1","touch stick",64,496,192,188,"virtual stick, lower left (SPEC s4). Reserved on every screen."),
-          ("T2","touch A / B",1024,496,192,188,"A = confirm / timed press, B = cancel / Still Water. Reserved on every screen."),
-          ("M","menu ☰",1152,36,64,64,"menu button, top right. Reserved on every screen.")]
+RESERVED=[("T1","touch stick",64,496,192,188,"virtual stick, lower left. PROPOSED rect: SPEC s4 names the corner only. Reserved on every screen."),
+          ("T2","touch A / B",1024,496,192,188,"A = confirm / timed press, B = cancel / Still Water. PROPOSED rect (SPEC s4: lower right). Reserved on every screen."),
+          ("M","menu ☰",1152,36,64,64,"☰ menu button, top right. PROPOSED rect (SPEC s4: top right). Reserved on every screen.")]
 Z={
 "world":[("W1","location plate",64,36,400,64,"node name; red seal dot when the node opens a POI"),
          ("W2","node prompt",400,600,480,84,"'Enter Sumikage Wood  [A]'; shows while the token rests on a node"),
@@ -36,7 +36,8 @@ Z={
           ("B5","command menu",64,232,232,248,"title row + 5 rows x 44: Brushstroke, Unfurl, Still Water, Items, Flee"),
           ("B6","press ring",904,234,192,192,"floats on the target hit point (shown on Smudge Ronin)"),
           ("B7","stroke pips",904,436,192,36,"one pip per Stroke; red = Clean Line, grey = good, cracked = miss"),
-          ("B8","seal stamp",544,232,192,192,"perfect-chain finisher, near centre")],
+          ("B8","seal stamp",544,232,192,192,"perfect-chain finisher, near centre"),
+          ("B9","results panel",340,176,600,300,"victory: mon, ink kept, drops; party lines up below it")],
 }
 STAGE={"benika":(340,430),"itsuki":(470,495),"gonzo":(615,565),"lantern":(860,300),"ronin":(1010,440),"blotling":(1150,455)}
 WORLD_NODES={"start":(230,470),"forest":(560,360),"town":(930,450),"locked":(1110,210)}  # positions from data/world.json

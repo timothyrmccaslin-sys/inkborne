@@ -1,4 +1,4 @@
-"""Rough sumi-e storyboard drawing kit (PIL). Helen / storyboard, Tabula Rasa demo."""
+"""Rough sumi-e storyboard drawing kit (PIL). Helen / storyboard, Inkborne demo."""
 import math, random
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -272,7 +272,7 @@ def board(title,subtitle,panels,cols,out,pw=768,cap_h=150,seed=7):
     # header seal
     sp=Panel(110,110,110,seed); sp.im=Image.new("RGBA",(110,110),(0,0,0,0)); sp.seal(55,55,84,True,240,0.05)
     B.alpha_composite(sp.im,(W-M-110,22))
-    d.text((W-M-130,70),"Helen · storyboard v1",font=font(15,"sans"),fill=W2,anchor="rm")
+    d.text((W-M-55,136),"Helen · storyboard v1",font=font(14,"sans"),fill=W2,anchor="ma")
     d.line([(M,135),(W-M-150,135)],fill=INK,width=3)
     for i,(p,head,cap) in enumerate(panels):
         r,c=divmod(i,cols); x=M+c*(pw+M); y=150+r*(ph+cap_h+M)
