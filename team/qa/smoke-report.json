@@ -1,4 +1,1000 @@
 {
   "generated": "2026-11-15T21:55:34.363Z",
-  "configs": []
+  "configs": [
+    {
+      "config": "chromium-1280x720",
+      "input": "keyboard",
+      "url": "https://timothyrmccaslin-sys.github.io/inkborne/",
+      "steps": {
+        "boot": {
+          "ok": true
+        },
+        "title": {
+          "ok": true,
+          "scene": "title",
+          "version": "ib-0.1.0"
+        },
+        "new-game": {
+          "ok": true
+        },
+        "world": {
+          "ok": true,
+          "node": "woods_edge",
+          "gold": 120
+        },
+        "world-forest-node": {
+          "ok": true,
+          "via": "tap-node",
+          "node": "sumikage"
+        },
+        "forest-poi": {
+          "ok": true
+        },
+        "battle-trigger": {
+          "ok": false,
+          "error": "page.waitForFunction: Timeout 8000ms exceeded.",
+          "state": {
+            "ready": true,
+            "boot": null,
+            "version": "ib-0.1.0",
+            "scene": "world",
+            "stack": [
+              "world"
+            ],
+            "wipe": false,
+            "gold": 120,
+            "node": "hanshi",
+            "hasSave": true,
+            "flags": {},
+            "save": {
+              "gold": 120,
+              "inv": {
+                "inkstone_chip": 1,
+                "paper_cracker": 1,
+                "rice_cake": 3
+              },
+              "hp": {
+                "benika": 177,
+                "gonzo": 288,
+                "itsuki": 214
+              },
+              "ink": {
+                "benika": 30,
+                "gonzo": 20,
+                "itsuki": 85
+              },
+              "flags": {},
+              "node": "sumikage"
+            },
+            "inv": {
+              "gold": 120,
+              "items": [
+                {
+                  "count": 3,
+                  "desc": "Sweet and filling. Restores 50 HP to one ally.",
+                  "id": "rice_cake",
+                  "kind": "heal",
+                  "name": "Rice Cake",
+                  "price": 15,
+                  "sell": 7
+                },
+                {
+                  "count": 0,
+                  "desc": "Sour enough to wake the dead, nearly. Restores 200 HP to one ally.",
+                  "id": "plum_tonic",
+                  "kind": "heal",
+                  "name": "Plum Tonic",
+                  "price": 60,
+                  "sell": 30
+                },
+                {
+                  "count": 0,
+                  "desc": "One pot, three cups. Restores 80 HP to the whole party.",
+                  "id": "pine_tea",
+                  "kind": "healall",
+                  "name": "Pot of Pine Tea",
+                  "price": 120,
+                  "sell": 60
+                },
+                {
+                  "count": 0,
+                  "desc": "Packed for a feast that never came. Restores 250 HP to the whole party.",
+                  "id": "festival_bento",
+                  "kind": "healall",
+                  "name": "Festival Bento",
+                  "price": 280,
+                  "sell": 140
+                },
+                {
+                  "count": 1,
+                  "desc": "Grind it, wet it, and the brush drinks. Adds 20 red ink to one ally.",
+                  "id": "inkstone_chip",
+                  "kind": "ink",
+                  "name": "Inkstone Chip",
+                  "price": 40,
+                  "sell": 20
+                },
+                {
+                  "count": 0,
+                  "desc": "Rich and dark, still smelling of pine soot. Adds 50 red ink to one ally.",
+                  "id": "fresh_ink_pot",
+                  "kind": "ink",
+                  "name": "Pot of Fresh Ink",
+                  "price": 110,
+                  "sell": 55
+                },
+                {
+                  "count": 1,
+                  "desc": "Festival leftovers. Bursts for 60 Ember damage on one foe.",
+                  "id": "paper_cracker",
+                  "kind": "bomb",
+                  "name": "Paper Firecracker",
+                  "price": 50,
+                  "sell": 25
+                },
+                {
+                  "count": 0,
+                  "desc": "Grandmother Tsuru won't say what's inside. Bursts for 150 Gale damage on one foe.",
+                  "id": "thunder_jar",
+                  "kind": "bomb",
+                  "name": "Thunder Jar",
+                  "price": 150,
+                  "sell": 75
+                }
+              ]
+            },
+            "party": [
+              {
+                "element": "gale",
+                "hp": 214,
+                "id": "itsuki",
+                "ink": 85,
+                "lv": 5,
+                "maxHp": 214,
+                "name": "Itsuki",
+                "seal": {
+                  "element": "gale",
+                  "mult": 0.55,
+                  "name": "Gale Crane Script",
+                  "seals": 4,
+                  "stat": "atk"
+                },
+                "strokes": [
+                  {
+                    "finish_mult": 1.3,
+                    "hits": [
+                      {
+                        "gap_ms": 700,
+                        "mult": 0.7
+                      },
+                      {
+                        "gap_ms": 520,
+                        "mult": 0.8
+                      },
+                      {
+                        "gap_ms": 460,
+                        "mult": 1
+                      }
+                    ],
+                    "id": "falling_pine",
+                    "name": "Falling Pine"
+                  },
+                  {
+                    "finish_mult": 1.5,
+                    "hits": [
+                      {
+                        "gap_ms": 650,
+                        "mult": 0.5
+                      },
+                      {
+                        "gap_ms": 450,
+                        "mult": 0.6
+                      },
+                      {
+                        "gap_ms": 420,
+                        "mult": 0.7
+                      },
+                      {
+                        "gap_ms": 420,
+                        "mult": 1.1
+                      }
+                    ],
+                    "id": "wet_edge",
+                    "name": "Wet Edge"
+                  }
+                ],
+                "title": "Wandering Swordsman"
+              },
+              {
+                "element": "ember",
+                "hp": 177,
+                "id": "benika",
+                "ink": 30,
+                "lv": 5,
+                "maxHp": 177,
+                "name": "Benika",
+                "seal": {
+                  "element": "ember",
+                  "mult": 0.4,
+                  "name": "Ember Kite Litany",
+                  "seals": 5,
+                  "stat": "mat"
+                },
+                "strokes": [
+                  {
+                    "finish_mult": 1.25,
+                    "hits": [
+                      {
+                        "gap_ms": 760,
+                        "mult": 0.6
+                      },
+                      {
+                        "gap_ms": 560,
+                        "mult": 0.6
+                      },
+                      {
+                        "gap_ms": 520,
+                        "mult": 0.9
+                      }
+                    ],
+                    "id": "three_prayer_slips",
+                    "name": "Three Prayer Slips"
+                  }
+                ],
+                "title": "Shrine Archer"
+              },
+              {
+                "element": "stone",
+                "hp": 288,
+                "id": "gonzo",
+                "ink": 20,
+                "lv": 5,
+                "maxHp": 288,
+                "name": "Gonzō",
+                "seal": {
+                  "element": "stone",
+                  "mult": 0.8,
+                  "name": "Stone Owl Verse",
+                  "seals": 3,
+                  "stat": "atk"
+                },
+                "strokes": [
+                  {
+                    "finish_mult": 1.4,
+                    "hits": [
+                      {
+                        "gap_ms": 820,
+                        "mult": 1
+                      },
+                      {
+                        "gap_ms": 640,
+                        "mult": 1.3
+                      }
+                    ],
+                    "id": "temple_bell",
+                    "name": "Temple Bell"
+                  }
+                ],
+                "title": "Retired Temple Monk"
+              }
+            ],
+            "painted": 2172,
+            "scale": 1,
+            "ox": 0,
+            "oy": 0,
+            "dpr": 1,
+            "canvas": {
+              "backingW": 1280,
+              "backingH": 720,
+              "cssW": 1280,
+              "cssH": 720
+            },
+            "viewport": {
+              "w": 1280,
+              "h": 720,
+              "dpr": 1
+            },
+            "letterbox": {
+              "ox": 0,
+              "oy": 0,
+              "scale": 1,
+              "logical": [
+                1280,
+                720
+              ],
+              "fittedW": 1280,
+              "fittedH": 720
+            },
+            "touch": {
+              "stick": {
+                "x": 24,
+                "y": 540,
+                "w": 156,
+                "h": 156,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 24,
+                  "y": 540,
+                  "w": 156,
+                  "h": 156
+                }
+              },
+              "btn-a": {
+                "x": 1160,
+                "y": 596,
+                "w": 96,
+                "h": 96,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 1160,
+                  "y": 596,
+                  "w": 96,
+                  "h": 96
+                }
+              },
+              "btn-b": {
+                "x": 1072,
+                "y": 622,
+                "w": 70,
+                "h": 70,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 1072,
+                  "y": 622,
+                  "w": 70,
+                  "h": 70
+                }
+              },
+              "menu-btn": {
+                "x": 1212,
+                "y": 14,
+                "w": 52,
+                "h": 52,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 1212,
+                  "y": 14,
+                  "w": 52,
+                  "h": 52
+                }
+              },
+              "touch": {
+                "x": 0,
+                "y": 0,
+                "w": 1280,
+                "h": 720,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 0,
+                  "y": 0,
+                  "w": 1280,
+                  "h": 720
+                }
+              }
+            },
+            "battle": null,
+            "comboLog": []
+          }
+        }
+      },
+      "passed": [
+        "boot",
+        "title",
+        "new-game",
+        "world",
+        "world-forest-node",
+        "forest-poi"
+      ],
+      "failed": [
+        "battle-trigger"
+      ],
+      "unreachable": [],
+      "fps": {
+        "forest-idle": {
+          "avg": 59.8,
+          "min": 29.94,
+          "max": 60.61,
+          "p1": 59.52,
+          "p5": 59.88,
+          "frames": 598,
+          "durationMs": 10000,
+          "below50": 2,
+          "below50pct": 0.3,
+          "sustainedBelow50": [],
+          "emulated": true
+        },
+        "forest-walk": {
+          "avg": 59.2,
+          "min": 12,
+          "max": 60.61,
+          "p1": 59.52,
+          "p5": 59.88,
+          "frames": 592,
+          "durationMs": 10000,
+          "below50": 4,
+          "below50pct": 0.7,
+          "sustainedBelow50": [],
+          "emulated": true
+        }
+      },
+      "hooksUsed": [
+        "input.keyHeld oscillation for forest walking FPS (safe x 120-480, avoid ambush)",
+        "walker_set(620, 634)"
+      ],
+      "canvas": {
+        "backingW": 1280,
+        "backingH": 720,
+        "cssW": 1280,
+        "cssH": 720,
+        "viewport": {
+          "w": 1280,
+          "h": 720,
+          "dpr": 1
+        },
+        "dprGame": 1,
+        "letterbox": {
+          "ox": 0,
+          "oy": 0,
+          "scale": 1,
+          "logical": [
+            1280,
+            720
+          ],
+          "fittedW": 1280,
+          "fittedH": 720
+        }
+      },
+      "letterbox": null,
+      "touchOverlap": null,
+      "save": {},
+      "battle": {},
+      "console": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "pageErrorCount": 0,
+        "failedRequestCount": 0,
+        "httpErrorCount": 0,
+        "errors": [],
+        "warnings": [],
+        "pageErrors": [],
+        "failedRequests": [],
+        "httpErrors": []
+      },
+      "notes": [
+        "world-forest-node via tap-node",
+        "fatal: page.waitForFunction: Timeout 8000ms exceeded."
+      ],
+      "navStatus": 200,
+      "startUrl": "https://timothyrmccaslin-sys.github.io/inkborne/",
+      "version": "ib-0.1.0",
+      "serviceWorker": {
+        "supported": true,
+        "scope": "https://timothyrmccaslin-sys.github.io/inkborne/",
+        "active": false,
+        "installing": true,
+        "waiting": false
+      },
+      "fatal": {
+        "message": "page.waitForFunction: Timeout 8000ms exceeded.",
+        "stack": "page.waitForFunction: Timeout 8000ms exceeded.\n    at waitStackHas (/workspace/inkborne/team/qa/smoke.spec.mjs:187:14)\n    at runConfig (/workspace/inkborne/team/qa/smoke.spec.mjs:616:13)\n    at async main (/workspace/inkborne/team/qa/smoke.spec.mjs:1015:19)"
+      }
+    },
+    {
+      "config": "webkit-ipad-landscape",
+      "input": "touch",
+      "url": "https://timothyrmccaslin-sys.github.io/inkborne/",
+      "steps": {
+        "boot": {
+          "ok": true
+        },
+        "title": {
+          "ok": true,
+          "scene": "title",
+          "version": "ib-0.1.0"
+        },
+        "new-game": {
+          "ok": true
+        },
+        "world": {
+          "ok": true,
+          "node": "woods_edge",
+          "gold": 120
+        },
+        "world-forest-node": {
+          "ok": true,
+          "via": "tap-node",
+          "node": "sumikage"
+        },
+        "forest-poi": {
+          "ok": true
+        },
+        "battle-trigger": {
+          "ok": false,
+          "error": "page.waitForFunction: Timeout 8000ms exceeded.",
+          "state": {
+            "ready": true,
+            "boot": null,
+            "version": "ib-0.1.0",
+            "scene": "world",
+            "stack": [
+              "world"
+            ],
+            "wipe": false,
+            "gold": 120,
+            "node": "hanshi",
+            "hasSave": true,
+            "flags": {},
+            "save": {
+              "gold": 120,
+              "inv": {
+                "inkstone_chip": 1,
+                "paper_cracker": 1,
+                "rice_cake": 3
+              },
+              "hp": {
+                "benika": 177,
+                "gonzo": 288,
+                "itsuki": 214
+              },
+              "ink": {
+                "benika": 30,
+                "gonzo": 20,
+                "itsuki": 85
+              },
+              "flags": {},
+              "node": "sumikage"
+            },
+            "inv": {
+              "gold": 120,
+              "items": [
+                {
+                  "count": 3,
+                  "desc": "Sweet and filling. Restores 50 HP to one ally.",
+                  "id": "rice_cake",
+                  "kind": "heal",
+                  "name": "Rice Cake",
+                  "price": 15,
+                  "sell": 7
+                },
+                {
+                  "count": 0,
+                  "desc": "Sour enough to wake the dead, nearly. Restores 200 HP to one ally.",
+                  "id": "plum_tonic",
+                  "kind": "heal",
+                  "name": "Plum Tonic",
+                  "price": 60,
+                  "sell": 30
+                },
+                {
+                  "count": 0,
+                  "desc": "One pot, three cups. Restores 80 HP to the whole party.",
+                  "id": "pine_tea",
+                  "kind": "healall",
+                  "name": "Pot of Pine Tea",
+                  "price": 120,
+                  "sell": 60
+                },
+                {
+                  "count": 0,
+                  "desc": "Packed for a feast that never came. Restores 250 HP to the whole party.",
+                  "id": "festival_bento",
+                  "kind": "healall",
+                  "name": "Festival Bento",
+                  "price": 280,
+                  "sell": 140
+                },
+                {
+                  "count": 1,
+                  "desc": "Grind it, wet it, and the brush drinks. Adds 20 red ink to one ally.",
+                  "id": "inkstone_chip",
+                  "kind": "ink",
+                  "name": "Inkstone Chip",
+                  "price": 40,
+                  "sell": 20
+                },
+                {
+                  "count": 0,
+                  "desc": "Rich and dark, still smelling of pine soot. Adds 50 red ink to one ally.",
+                  "id": "fresh_ink_pot",
+                  "kind": "ink",
+                  "name": "Pot of Fresh Ink",
+                  "price": 110,
+                  "sell": 55
+                },
+                {
+                  "count": 1,
+                  "desc": "Festival leftovers. Bursts for 60 Ember damage on one foe.",
+                  "id": "paper_cracker",
+                  "kind": "bomb",
+                  "name": "Paper Firecracker",
+                  "price": 50,
+                  "sell": 25
+                },
+                {
+                  "count": 0,
+                  "desc": "Grandmother Tsuru won't say what's inside. Bursts for 150 Gale damage on one foe.",
+                  "id": "thunder_jar",
+                  "kind": "bomb",
+                  "name": "Thunder Jar",
+                  "price": 150,
+                  "sell": 75
+                }
+              ]
+            },
+            "party": [
+              {
+                "element": "gale",
+                "hp": 214,
+                "id": "itsuki",
+                "ink": 85,
+                "lv": 5,
+                "maxHp": 214,
+                "name": "Itsuki",
+                "seal": {
+                  "element": "gale",
+                  "mult": 0.55,
+                  "name": "Gale Crane Script",
+                  "seals": 4,
+                  "stat": "atk"
+                },
+                "strokes": [
+                  {
+                    "finish_mult": 1.3,
+                    "hits": [
+                      {
+                        "gap_ms": 700,
+                        "mult": 0.7
+                      },
+                      {
+                        "gap_ms": 520,
+                        "mult": 0.8
+                      },
+                      {
+                        "gap_ms": 460,
+                        "mult": 1
+                      }
+                    ],
+                    "id": "falling_pine",
+                    "name": "Falling Pine"
+                  },
+                  {
+                    "finish_mult": 1.5,
+                    "hits": [
+                      {
+                        "gap_ms": 650,
+                        "mult": 0.5
+                      },
+                      {
+                        "gap_ms": 450,
+                        "mult": 0.6
+                      },
+                      {
+                        "gap_ms": 420,
+                        "mult": 0.7
+                      },
+                      {
+                        "gap_ms": 420,
+                        "mult": 1.1
+                      }
+                    ],
+                    "id": "wet_edge",
+                    "name": "Wet Edge"
+                  }
+                ],
+                "title": "Wandering Swordsman"
+              },
+              {
+                "element": "ember",
+                "hp": 177,
+                "id": "benika",
+                "ink": 30,
+                "lv": 5,
+                "maxHp": 177,
+                "name": "Benika",
+                "seal": {
+                  "element": "ember",
+                  "mult": 0.4,
+                  "name": "Ember Kite Litany",
+                  "seals": 5,
+                  "stat": "mat"
+                },
+                "strokes": [
+                  {
+                    "finish_mult": 1.25,
+                    "hits": [
+                      {
+                        "gap_ms": 760,
+                        "mult": 0.6
+                      },
+                      {
+                        "gap_ms": 560,
+                        "mult": 0.6
+                      },
+                      {
+                        "gap_ms": 520,
+                        "mult": 0.9
+                      }
+                    ],
+                    "id": "three_prayer_slips",
+                    "name": "Three Prayer Slips"
+                  }
+                ],
+                "title": "Shrine Archer"
+              },
+              {
+                "element": "stone",
+                "hp": 288,
+                "id": "gonzo",
+                "ink": 20,
+                "lv": 5,
+                "maxHp": 288,
+                "name": "Gonzō",
+                "seal": {
+                  "element": "stone",
+                  "mult": 0.8,
+                  "name": "Stone Owl Verse",
+                  "seals": 3,
+                  "stat": "atk"
+                },
+                "strokes": [
+                  {
+                    "finish_mult": 1.4,
+                    "hits": [
+                      {
+                        "gap_ms": 820,
+                        "mult": 1
+                      },
+                      {
+                        "gap_ms": 640,
+                        "mult": 1.3
+                      }
+                    ],
+                    "id": "temple_bell",
+                    "name": "Temple Bell"
+                  }
+                ],
+                "title": "Retired Temple Monk"
+              }
+            ],
+            "painted": 1368,
+            "scale": 0.9328125,
+            "ox": 0,
+            "oy": 81.1875,
+            "dpr": 2,
+            "canvas": {
+              "backingW": 2388,
+              "backingH": 1668,
+              "cssW": 1194,
+              "cssH": 834
+            },
+            "viewport": {
+              "w": 1194,
+              "h": 834,
+              "dpr": 2
+            },
+            "letterbox": {
+              "ox": 0,
+              "oy": 81.1875,
+              "scale": 0.9328125,
+              "logical": [
+                1280,
+                720
+              ],
+              "fittedW": 1194,
+              "fittedH": 671.625
+            },
+            "touch": {
+              "stick": {
+                "x": 24,
+                "y": 654,
+                "w": 156,
+                "h": 156,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 25.7286432160804,
+                  "y": 614.0703517587939,
+                  "w": 167.2361809045226,
+                  "h": 167.2361809045226
+                }
+              },
+              "btn-a": {
+                "x": 1074,
+                "y": 710,
+                "w": 96,
+                "h": 96,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 1151.356783919598,
+                  "y": 674.1038525963148,
+                  "w": 102.9145728643216,
+                  "h": 102.9145728643216
+                }
+              },
+              "btn-b": {
+                "x": 986,
+                "y": 736,
+                "w": 70,
+                "h": 70,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 1057.0184254606365,
+                  "y": 701.9765494137353,
+                  "w": 75.04187604690117,
+                  "h": 75.04187604690117
+                }
+              },
+              "menu-btn": {
+                "x": 1126,
+                "y": 14,
+                "w": 52,
+                "h": 52,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 1207.1021775544389,
+                  "y": -72.02680067001674,
+                  "w": 55.745393634840866,
+                  "h": 55.745393634840866
+                }
+              },
+              "touch": {
+                "x": 0,
+                "y": 0,
+                "w": 1194,
+                "h": 834,
+                "display": "block",
+                "visibility": "visible",
+                "logical": {
+                  "x": 0,
+                  "y": -87.03517587939699,
+                  "w": 1280,
+                  "h": 894.0703517587939
+                }
+              }
+            },
+            "battle": null,
+            "comboLog": []
+          }
+        }
+      },
+      "passed": [
+        "boot",
+        "title",
+        "new-game",
+        "world",
+        "world-forest-node",
+        "forest-poi"
+      ],
+      "failed": [
+        "battle-trigger"
+      ],
+      "unreachable": [],
+      "fps": {
+        "forest-idle": {
+          "avg": 31.3,
+          "min": 13.16,
+          "max": 41.67,
+          "p1": 20.41,
+          "p5": 25.64,
+          "frames": 313,
+          "durationMs": 10001,
+          "below50": 313,
+          "below50pct": 100,
+          "sustainedBelow50": [
+            {
+              "ms": 10001,
+              "fromOffsetMs": 0
+            }
+          ],
+          "emulated": true
+        },
+        "forest-walk": {
+          "avg": 38.43,
+          "min": 17.54,
+          "max": 62.5,
+          "p1": 20.41,
+          "p5": 27.03,
+          "frames": 385,
+          "durationMs": 10017,
+          "below50": 335,
+          "below50pct": 87,
+          "sustainedBelow50": [
+            {
+              "ms": 3950,
+              "fromOffsetMs": 0
+            },
+            {
+              "ms": 775,
+              "fromOffsetMs": 6372
+            },
+            {
+              "ms": 670,
+              "fromOffsetMs": 7208
+            },
+            {
+              "ms": 611,
+              "fromOffsetMs": 8519
+            }
+          ],
+          "emulated": true
+        }
+      },
+      "hooksUsed": [
+        "input.keyHeld oscillation for forest walking FPS (safe x 120-480, avoid ambush)",
+        "walker_set(620, 634)"
+      ],
+      "canvas": {
+        "backingW": 2388,
+        "backingH": 1668,
+        "cssW": 1194,
+        "cssH": 834,
+        "viewport": {
+          "w": 1194,
+          "h": 834,
+          "dpr": 2
+        },
+        "dprGame": 2,
+        "letterbox": {
+          "ox": 0,
+          "oy": 81.1875,
+          "scale": 0.9328125,
+          "logical": [
+            1280,
+            720
+          ],
+          "fittedW": 1194,
+          "fittedH": 671.625
+        }
+      },
+      "letterbox": null,
+      "touchOverlap": null,
+      "save": {},
+      "battle": {},
+      "console": {
+        "errorCount": 0,
+        "warningCount": 0,
+        "pageErrorCount": 1,
+        "failedRequestCount": 0,
+        "httpErrorCount": 0,
+        "errors": [],
+        "warnings": [],
+        "pageErrors": [
+          {
+            "message": "The object can not be found here.",
+            "stack": "NotFoundError: The object can not be found here.\n    at setPointerCapture (http://127.0.0.1:42369/inkborne/src/input.js:20:92)\n    at unknown (http://127.0.0.1:42369/inkborne/src/input.js:20:92)\n    at dispatchEvent ([native code]:0:0)\n    at unknown (:7:21)\n    at Promise ([native code]:0:0)\n    at unknown (:1:32)\n    at evaluate (:372:22)\n    at unknown (:1:52)"
+          }
+        ],
+        "failedRequests": [],
+        "httpErrors": []
+      },
+      "notes": [
+        "WebKit loaded the live GitHub Pages build through a local HTTP TLS-terminating proxy at http://127.0.0.1:42369/inkborne/ because this host WebKit has no TLS support. Content origin is still timothyrmccaslin-sys.github.io.",
+        "world-forest-node via tap-node",
+        "fatal: page.waitForFunction: Timeout 8000ms exceeded."
+      ],
+      "webkitProxyUrl": "http://127.0.0.1:42369/inkborne/",
+      "navStatus": 200,
+      "startUrl": "http://127.0.0.1:42369/inkborne/",
+      "version": "ib-0.1.0",
+      "serviceWorker": {
+        "supported": true,
+        "scope": "http://127.0.0.1:42369/inkborne/",
+        "active": true,
+        "installing": false,
+        "waiting": false
+      },
+      "fatal": {
+        "message": "page.waitForFunction: Timeout 8000ms exceeded.",
+        "stack": "page.waitForFunction: Timeout 8000ms exceeded.\n    at waitStackHas (/workspace/inkborne/team/qa/smoke.spec.mjs:187:14)\n    at runConfig (/workspace/inkborne/team/qa/smoke.spec.mjs:616:13)\n    at async main (/workspace/inkborne/team/qa/smoke.spec.mjs:1015:19)"
+      }
+    }
+  ]
 }

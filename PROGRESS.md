@@ -1,5 +1,5 @@
 # Inkborne progress (integrator)
-Updated: Sun Nov 15 2026, 4:00 PM CT. Releasing ib-0.1.1 (previous live: ib-0.1.0, commit 63923da)
+Updated: Sun Nov 15 2026, 4:00 PM CT. Live: https://timothyrmccaslin-sys.github.io/inkborne/ (ib-0.1.1, commit d290e2a; SW cache ib-0.1.1, offline reload verified)
 
 ## Done
 - All three views playable: world map -> Sumikage Wood / Hanshi POIs -> battle, dialogue (hanshi_dusk), shop (Kobo Tsuru).
