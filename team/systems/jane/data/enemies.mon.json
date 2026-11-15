@@ -1,0 +1,15 @@
+{
+  "_note": "Values for the `mon` field of each enemy in data/enemies.json (SPEC section 7). Only `mon` is mine; Jake owns the stats. Battle payout = sum of `mon` over every enemy in the encounter.",
+  "mon": {
+    "blotling": 12,
+    "hollow_lantern": 20,
+    "smudge_ronin": 150
+  },
+  "assumed_encounters": {
+    "sumikage_a": ["blotling", "blotling"],
+    "sumikage_b": ["blotling", "hollow_lantern"],
+    "sumikage_c": ["blotling", "blotling", "hollow_lantern"],
+    "sumikage_d": ["hollow_lantern", "hollow_lantern"],
+    "sumikage_boss": ["smudge_ronin"]
+  }
+}

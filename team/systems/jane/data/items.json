@@ -1,0 +1,14 @@
+{
+  "items": [
+    { "id": "pine_needle_tea", "name": "Pine Needle Tea", "desc": "Bitter green tea steeped from Sumikage pines. Restores 60 HP to one ally.", "kind": "heal", "power": 60, "price": 20 },
+    { "id": "plum_rice_ball", "name": "Plum Rice Ball", "desc": "Grandmother Tsuru's sour-plum onigiri, wrapped in paper. Restores 150 HP to one ally.", "kind": "heal", "power": 150, "price": 45 },
+    { "id": "lantern_incense", "name": "Lantern Incense", "desc": "A coil of shrine incense. Its warm smoke restores 70 HP to the whole party.", "kind": "healall", "power": 70, "price": 90 },
+    { "id": "vermilion_drop", "name": "Vermilion Drop", "desc": "One bead of red ink sealed in wax. Adds 35 to one ally's ink gauge.", "kind": "ink", "power": 35, "price": 60 },
+    { "id": "cinnabar_cake", "name": "Cinnabar Cake", "desc": "A pressed stick of pure red ink, rare and heavy. Adds 100 to one ally's ink gauge.", "kind": "ink", "power": 100, "price": 200 },
+    { "id": "ember_charm", "name": "Ember Charm", "desc": "A paper charm painted with a flame. Thrown, it bursts for Ember damage to one foe.", "kind": "bomb", "power": 45, "element": "ember", "price": 35 },
+    { "id": "tide_charm", "name": "Tide Charm", "desc": "A paper charm painted with a wave. Thrown, it bursts for Tide damage to one foe.", "kind": "bomb", "power": 45, "element": "tide", "price": 35 },
+    { "id": "gale_charm", "name": "Gale Charm", "desc": "A paper charm painted with a swirl of wind. Thrown, it bursts for Gale damage to one foe.", "kind": "bomb", "power": 45, "element": "gale", "price": 35 },
+    { "id": "stone_charm", "name": "Stone Charm", "desc": "A paper charm painted with a mountain. Thrown, it bursts for Stone damage to one foe.", "kind": "bomb", "power": 45, "element": "stone", "price": 35 },
+    { "id": "dawn_charm", "name": "Dawn Charm", "desc": "A gold-flecked charm painted with a sunrise. It burns away Blot-ink with Dawn damage.", "kind": "bomb", "power": 70, "element": "dawn", "price": 75 }
+  ]
+}

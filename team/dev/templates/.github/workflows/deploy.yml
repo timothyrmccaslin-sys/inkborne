@@ -1,0 +1,159 @@
+# Deploy Inkborne to GitHub Pages from Brandon's tested dist/ artifact.
+#
+# Trigger contract (document this with Brandon):
+#   - This workflow is intentionally separate from CI. Rick owns deploy;
+#     Brandon owns lint/test/build/PWA in .github/workflows/ci.yml.
+#   - Chosen hook: workflow_run (not a needs: [build] job inside CI), so
+#     deploy stays its own file and does not require a change to CI other
+#     than the name/artifact contract below.
+#   - His workflow MUST be named "CI" (`name: CI` at the top of ci.yml).
+#   - His build (or a final job that needs lint, test, build, and PWA)
+#     MUST upload an artifact literally named `dist` whose contents are
+#     the site root (index.html, sw.js, pkg/*.wasm, …).
+#   - Deploy runs only when that workflow finishes successfully on main.
+#   - workflow_dispatch redeploys a given CI run, or the latest successful
+#     CI run on main if run_id is omitted.
+#
+# No secrets are referenced other than the default GITHUB_TOKEN.
+
+name: Deploy
+
+"on":
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "CI run ID to deploy (default: latest successful CI on main)"
+        required: false
+        type: string
+
+# Default GITHUB_TOKEN only. `actions: read` is required to download the
+# CI artifact from the triggering workflow_run.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Resolve CI run id
+        id: src
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RUN_ID: ${{ github.event.inputs.run_id || '' }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$WORKFLOW_RUN_ID" ]]; then
+            rid="$WORKFLOW_RUN_ID"
+          elif [[ -n "$INPUT_RUN_ID" ]]; then
+            rid="$INPUT_RUN_ID"
+          else
+            rid="$(gh run list --workflow=CI --branch=main --status=success --limit=1 --json databaseId --jq '.[0].databaseId // empty')"
+            [[ -n "$rid" ]] || { echo "No successful CI run on main to deploy." >&2; exit 1; }
+          fi
+          echo "run_id=$rid" >> "$GITHUB_OUTPUT"
+          echo "Deploying dist/ from CI run $rid"
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ steps.src.outputs.run_id }}
+
+      - name: Check APP_VERSION matches sw.js VERSION
+        run: |
+          set -euo pipefail
+          checker=tools/check-version-sync.sh
+          [[ -x "$checker" ]] || { echo "missing $checker (copy it from team/dev/templates/tools/)" >&2; exit 1; }
+          # Prefer the artifact we are about to ship; fall back to source layout.
+          if [[ -f dist/src/main.js && -f dist/sw.js ]]; then
+            "$checker" dist/src/main.js dist/sw.js
+          elif [[ -f dist/main.js && -f dist/sw.js ]]; then
+            "$checker" dist/main.js dist/sw.js
+          elif [[ -f dist/sw.js ]]; then
+            app="$(find dist -name main.js -print | head -n1)"
+            [[ -n "$app" ]] || { echo "dist/ has sw.js but no main.js" >&2; exit 1; }
+            "$checker" "$app" dist/sw.js
+          else
+            echo "dist/ is missing sw.js; cannot version-check the artifact." >&2
+            find dist -maxdepth 3 -type f | head >&2 || true
+            exit 1
+          fi
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Post-deploy smoke check
+        env:
+          LIVE_URL: https://timothyrmccaslin-sys.github.io/inkborne/
+        run: |
+          set -euo pipefail
+          base="${LIVE_URL%/}"
+          # Pages can lag a few seconds after deploy-pages returns.
+          ok=""
+          for i in $(seq 1 24); do
+            code="$(curl -sS -L -o /dev/null -w '%{http_code}' "$base/" || true)"
+            if [[ "$code" == "200" ]]; then
+              ok=1
+              break
+            fi
+            echo "Attempt $i: $base/ -> HTTP $code; retrying..."
+            sleep 10
+          done
+          [[ -n "$ok" ]] || { echo "Live URL did not return 200: $base/" >&2; exit 1; }
+          echo "OK  $base/ -> 200"
+
+          sw_code="$(curl -sS -L -o /dev/null -w '%{http_code}' "$base/sw.js")"
+          [[ "$sw_code" == "200" ]] || { echo "sw.js not reachable: $base/sw.js -> HTTP $sw_code" >&2; exit 1; }
+          echo "OK  $base/sw.js -> 200"
+
+          wasm_rel="$(find dist -name '*.wasm' -type f | head -n1 || true)"
+          [[ -n "$wasm_rel" ]] || { echo "no .wasm file in dist/; cannot check MIME type" >&2; exit 1; }
+          wasm_rel="${wasm_rel#dist/}"
+          wasm_url="$base/$wasm_rel"
+          ctype="$(curl -sS -L -o /dev/null -w '%{content_type}' "$wasm_url")"
+          echo "GET $wasm_url  Content-Type: $ctype"
+          [[ "$ctype" == application/wasm* ]] || {
+            echo "expected Content-Type application/wasm, got: $ctype" >&2
+            exit 1
+          }
+          echo "OK  wasm MIME is application/wasm"

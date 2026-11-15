@@ -1,0 +1,106 @@
+{
+  "_note": "Battle barks, one picked at random per event. Mechanic words per SPEC section 2 (Brushstroke, Clean Line, Inkwing/Unfurl, Seal Arts, Still Water). The gauge is deliberately never named.",
+  "barks": {
+    "itsuki": {
+      "battle_start": [
+        "Stay behind me.",
+        "Let's make this quick."
+      ],
+      "brushstroke": [
+        "Cut.",
+        "One stroke.",
+        "Follow the line."
+      ],
+      "clean_line": [
+        "Clean Line. Not a drop wasted.",
+        "Every stroke true."
+      ],
+      "still_water": [
+        "Still water. Let them come."
+      ],
+      "hurt": [
+        "Hn. Barely a scratch.",
+        "That one stung."
+      ],
+      "ko": [
+        "Sorry... couldn't hold..."
+      ],
+      "unfurl": [
+        "Wind, carry me. Unfurl! Gale Crane!",
+        "Whatever I was, I'm this now. Unfurl!"
+      ],
+      "victory": [
+        "Done. Let's move.",
+        "Everyone breathing? Good."
+      ]
+    },
+    "benika": {
+      "battle_start": [
+        "Not one more step into Hanshi!",
+        "You picked the wrong shrine."
+      ],
+      "brushstroke": [
+        "Loose!",
+        "Got you!",
+        "Hold still!"
+      ],
+      "clean_line": [
+        "Clean Line! Did you see that?"
+      ],
+      "seal_arts": [
+        "Seal Arts! Mend what's torn!",
+        "By the red seal, be whole!"
+      ],
+      "still_water": [
+        "Still water... breathe, Benika."
+      ],
+      "hurt": [
+        "Rude!",
+        "Ow! Okay, now I'm angry."
+      ],
+      "ko": [
+        "The shrine... someone keep it lit..."
+      ],
+      "unfurl": [
+        "Burn bright for Hanshi! Unfurl! Ember Kite!",
+        "Fire on the wing. Unfurl!"
+      ],
+      "victory": [
+        "Ha! Told you.",
+        "Everyone up? Let me look at that cut."
+      ]
+    },
+    "gonzo": {
+      "battle_start": [
+        "Hm. Come, then.",
+        "Line up. One at a time is slow."
+      ],
+      "brushstroke": [
+        "Hrraah!",
+        "Down.",
+        "Iron and patience."
+      ],
+      "clean_line": [
+        "Clean Line. Like ringing the old bell."
+      ],
+      "still_water": [
+        "Still water. I've stood through worse."
+      ],
+      "hurt": [
+        "Is that all?",
+        "Gah. Felt that one."
+      ],
+      "ko": [
+        "Not again... not this time..."
+      ],
+      "unfurl": [
+        "Old stone, wake once more. Unfurl! Stone Owl!",
+        "This seal I will not lose. Unfurl!"
+      ],
+      "victory": [
+        "Good. Now, food.",
+        "Hm. Who's hungry? I am."
+      ]
+    }
+  }
+}

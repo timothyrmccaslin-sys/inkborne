@@ -1,0 +1,40 @@
+core/target/
+node_modules/
+*.log
+# Build outputs (CI publishes dist/; do not commit it)
+target/
+**/target/
+dist/
+
+# Python tools
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+# Secrets and keys — never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.crt
+*.cer
+*.keystore
+*.jks
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*credentials*
+*secret*
+auth.json
+secrets.yaml
+secrets.yml
+# Local / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

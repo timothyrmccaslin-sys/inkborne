@@ -1,0 +1,133 @@
+{
+  "gauge": {
+    "display_name": "Vermilion Gauge",
+    "field": "ink",
+    "max": 100,
+    "ui_pulse_at": [
+      25,
+      50,
+      75,
+      100
+    ],
+    "persists_between_battles": true,
+    "saved": true,
+    "decay_per_turn": 0
+  },
+  "fill": {
+    "stroke_hit": 5,
+    "clean_line_bonus": 4,
+    "chain_complete_bonus": 4,
+    "perfect_chain_bonus": 8,
+    "perfect_chain_replaces_complete": true,
+    "kill_bonus": 3,
+    "damage_taken": {
+      "per_pct_hp_lost": 0.3,
+      "min_if_damaged": 1,
+      "max_per_hit": 15,
+      "formula": "round(0.3 * 100 * dmg / max_hp), clamped 1..15"
+    },
+    "still_water_use": 6,
+    "still_water_damage_taken_mult": 1.5,
+    "seal_arts_fill": false,
+    "gain_while_inkwing": false,
+    "items": "items.json kind 'ink' adds `power` (owned by Jane)"
+  },
+  "reset": {
+    "on_ko": "keep",
+    "on_unfurl": 0,
+    "on_battle_end": "keep",
+    "on_flee": "keep",
+    "clamp": [
+      0,
+      100
+    ]
+  },
+  "unfurl": {
+    "command": "Unfurl",
+    "cost": 100,
+    "requires_full": true,
+    "uses_turn": true,
+    "heal_pct_max_hp": 15,
+    "duration_turns": 3,
+    "duration_counts": "the character's own turns AFTER the Unfurl turn",
+    "one_active_per_character": true,
+    "tiers": 1
+  },
+  "inkwing_rules": {
+    "commands": [
+      "seal_art",
+      "stroke",
+      "still_water",
+      "item"
+    ],
+    "stroke_element": "form element (normal-form Strokes are neutral)",
+    "still_water_heal_pct": 15,
+    "max_hp_unchanged": true,
+    "revert": "at the end of the 3rd Inkwing turn, on KO, or when the battle ends; stats return to normal, current HP kept (clamped to max), ink stays 0 (it was spent)",
+    "early_cancel": false
+  },
+  "forms": {
+    "itsuki": {
+      "form_name": "Gale Crane",
+      "element": "gale",
+      "mult": {
+        "atk": 1.5,
+        "def": 1.25,
+        "mat": 1.3,
+        "mdf": 1.25,
+        "spd": 1.2
+      },
+      "passive": {
+        "id": "tailwind",
+        "name": "Tailwind",
+        "desc": "Acts first each round while in Inkwing, regardless of speed.",
+        "effect": {
+          "kind": "act_first"
+        }
+      },
+      "strokes_element": "gale"
+    },
+    "benika": {
+      "form_name": "Ember Kite",
+      "element": "ember",
+      "mult": {
+        "atk": 1.25,
+        "def": 1.25,
+        "mat": 1.5,
+        "mdf": 1.4,
+        "spd": 1.15
+      },
+      "passive": {
+        "id": "kindling_prayer",
+        "name": "Kindling Prayer",
+        "desc": "Each Clean seal in her Seal Art also heals every living ally for 5% of their max HP.",
+        "effect": {
+          "kind": "heal_party_per_clean_seal",
+          "pct_max_hp": 5
+        }
+      },
+      "strokes_element": "ember"
+    },
+    "gonzo": {
+      "form_name": "Stone Owl",
+      "element": "stone",
+      "mult": {
+        "atk": 1.4,
+        "def": 1.6,
+        "mat": 1.2,
+        "mdf": 1.4,
+        "spd": 1.0
+      },
+      "passive": {
+        "id": "slate_mantle",
+        "name": "Slate Mantle",
+        "desc": "All allies take 15% less damage while Gonzō is in Inkwing.",
+        "effect": {
+          "kind": "party_damage_taken_mult",
+          "value": 0.85
+        }
+      },
+      "strokes_element": "stone"
+    }
+  }
+}

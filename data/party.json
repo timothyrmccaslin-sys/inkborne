@@ -1,0 +1,14 @@
+{ "members": [
+  { "id": "akane", "name": "Akane", "title": "Scroll-mender's apprentice", "element": "ember", "lv": 5,
+    "hp": 220, "atk": 34, "def": 18, "mat": 26, "mdf": 16, "spd": 14, "ink": 85,
+    "strokes": [ { "id": "threefold", "name": "Threefold Line", "hits": [ {"gap_ms": 700, "mult": 0.6}, {"gap_ms": 520, "mult": 0.7}, {"gap_ms": 460, "mult": 0.9} ], "finish_mult": 1.2 } ],
+    "seal": { "name": "Vermilion Comet", "seals": 5, "mult": 1.0, "element": "ember" } },
+  { "id": "yuzuru", "name": "Yuzuru", "title": "Ronin of the long spear", "element": "gale", "lv": 5,
+    "hp": 250, "atk": 38, "def": 20, "mat": 18, "mdf": 14, "spd": 11, "ink": 30,
+    "strokes": [ { "id": "reedwind", "name": "Reed-Wind Thrust", "hits": [ {"gap_ms": 760, "mult": 0.8}, {"gap_ms": 600, "mult": 1.0} ], "finish_mult": 1.15 } ],
+    "seal": { "name": "Cedar Gale", "seals": 4, "mult": 1.1, "element": "gale" } },
+  { "id": "tsubaki", "name": "Tsubaki", "title": "Keeper of the drowned bell", "element": "tide", "lv": 5,
+    "hp": 190, "atk": 24, "def": 15, "mat": 34, "mdf": 24, "spd": 12, "ink": 40,
+    "strokes": [ { "id": "bellchime", "name": "Bell-Chime Rhythm", "hits": [ {"gap_ms": 680, "mult": 0.5}, {"gap_ms": 420, "mult": 0.5}, {"gap_ms": 420, "mult": 0.6}, {"gap_ms": 540, "mult": 0.8} ], "finish_mult": 1.25 } ],
+    "seal": { "name": "Undertow Hymn", "seals": 5, "mult": 0.9, "element": "tide" } }
+] }

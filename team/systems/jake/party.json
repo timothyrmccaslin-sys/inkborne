@@ -1,0 +1,906 @@
+{
+  "members": [
+    {
+      "id": "itsuki",
+      "name": "Itsuki Hane",
+      "title": "Wandering Swordsman",
+      "element": "gale",
+      "lv": 5,
+      "hp": 214,
+      "atk": 32,
+      "def": 18,
+      "mat": 14,
+      "mdf": 14,
+      "spd": 17,
+      "ink": 60,
+      "strokes": [
+        {
+          "id": "falling_pine",
+          "name": "Falling Pine",
+          "unlock_lv": 1,
+          "hits": [
+            {
+              "gap_ms": 700,
+              "mult": 0.7
+            },
+            {
+              "gap_ms": 520,
+              "mult": 0.8
+            },
+            {
+              "gap_ms": 460,
+              "mult": 1.0
+            }
+          ],
+          "finish_mult": 1.3
+        },
+        {
+          "id": "wet_edge",
+          "name": "Wet Edge",
+          "unlock_lv": 5,
+          "hits": [
+            {
+              "gap_ms": 650,
+              "mult": 0.5
+            },
+            {
+              "gap_ms": 450,
+              "mult": 0.6
+            },
+            {
+              "gap_ms": 380,
+              "mult": 0.7
+            },
+            {
+              "gap_ms": 340,
+              "mult": 1.1
+            }
+          ],
+          "finish_mult": 1.5
+        }
+      ],
+      "seal": {
+        "id": "crane_gale_script",
+        "name": "Gale Crane Script",
+        "seals": 4,
+        "mult": 0.55,
+        "element": "gale",
+        "stat": "atk"
+      },
+      "role": "physical_dps",
+      "base": {
+        "hp": 150,
+        "atk": 22,
+        "def": 12,
+        "mat": 10,
+        "mdf": 10,
+        "spd": 14
+      },
+      "growth": {
+        "hp": 16,
+        "atk": 2.6,
+        "def": 1.4,
+        "mat": 1.0,
+        "mdf": 1.1,
+        "spd": 0.8
+      },
+      "stat_table": [
+        {
+          "lv": 1,
+          "hp": 150,
+          "atk": 22,
+          "def": 12,
+          "mat": 10,
+          "mdf": 10,
+          "spd": 14
+        },
+        {
+          "lv": 2,
+          "hp": 166,
+          "atk": 25,
+          "def": 13,
+          "mat": 11,
+          "mdf": 11,
+          "spd": 15
+        },
+        {
+          "lv": 3,
+          "hp": 182,
+          "atk": 27,
+          "def": 15,
+          "mat": 12,
+          "mdf": 12,
+          "spd": 16
+        },
+        {
+          "lv": 4,
+          "hp": 198,
+          "atk": 30,
+          "def": 16,
+          "mat": 13,
+          "mdf": 13,
+          "spd": 16
+        },
+        {
+          "lv": 5,
+          "hp": 214,
+          "atk": 32,
+          "def": 18,
+          "mat": 14,
+          "mdf": 14,
+          "spd": 17
+        },
+        {
+          "lv": 6,
+          "hp": 230,
+          "atk": 35,
+          "def": 19,
+          "mat": 15,
+          "mdf": 16,
+          "spd": 18
+        },
+        {
+          "lv": 7,
+          "hp": 246,
+          "atk": 38,
+          "def": 20,
+          "mat": 16,
+          "mdf": 17,
+          "spd": 19
+        },
+        {
+          "lv": 8,
+          "hp": 262,
+          "atk": 40,
+          "def": 22,
+          "mat": 17,
+          "mdf": 18,
+          "spd": 20
+        },
+        {
+          "lv": 9,
+          "hp": 278,
+          "atk": 43,
+          "def": 23,
+          "mat": 18,
+          "mdf": 19,
+          "spd": 20
+        },
+        {
+          "lv": 10,
+          "hp": 294,
+          "atk": 45,
+          "def": 25,
+          "mat": 19,
+          "mdf": 20,
+          "spd": 21
+        },
+        {
+          "lv": 11,
+          "hp": 310,
+          "atk": 48,
+          "def": 26,
+          "mat": 20,
+          "mdf": 21,
+          "spd": 22
+        },
+        {
+          "lv": 12,
+          "hp": 326,
+          "atk": 51,
+          "def": 27,
+          "mat": 21,
+          "mdf": 22,
+          "spd": 23
+        },
+        {
+          "lv": 13,
+          "hp": 342,
+          "atk": 53,
+          "def": 29,
+          "mat": 22,
+          "mdf": 23,
+          "spd": 24
+        },
+        {
+          "lv": 14,
+          "hp": 358,
+          "atk": 56,
+          "def": 30,
+          "mat": 23,
+          "mdf": 24,
+          "spd": 24
+        },
+        {
+          "lv": 15,
+          "hp": 374,
+          "atk": 58,
+          "def": 32,
+          "mat": 24,
+          "mdf": 25,
+          "spd": 25
+        },
+        {
+          "lv": 16,
+          "hp": 390,
+          "atk": 61,
+          "def": 33,
+          "mat": 25,
+          "mdf": 27,
+          "spd": 26
+        },
+        {
+          "lv": 17,
+          "hp": 406,
+          "atk": 64,
+          "def": 34,
+          "mat": 26,
+          "mdf": 28,
+          "spd": 27
+        },
+        {
+          "lv": 18,
+          "hp": 422,
+          "atk": 66,
+          "def": 36,
+          "mat": 27,
+          "mdf": 29,
+          "spd": 28
+        },
+        {
+          "lv": 19,
+          "hp": 438,
+          "atk": 69,
+          "def": 37,
+          "mat": 28,
+          "mdf": 30,
+          "spd": 28
+        },
+        {
+          "lv": 20,
+          "hp": 454,
+          "atk": 71,
+          "def": 39,
+          "mat": 29,
+          "mdf": 31,
+          "spd": 29
+        }
+      ]
+    },
+    {
+      "id": "benika",
+      "name": "Benika Matsuo",
+      "title": "Shrine Archer",
+      "element": "ember",
+      "lv": 5,
+      "hp": 177,
+      "atk": 22,
+      "def": 14,
+      "mat": 33,
+      "mdf": 24,
+      "spd": 20,
+      "ink": 0,
+      "strokes": [
+        {
+          "id": "three_prayer_slips",
+          "name": "Three Prayer Slips",
+          "unlock_lv": 1,
+          "hits": [
+            {
+              "gap_ms": 760,
+              "mult": 0.6
+            },
+            {
+              "gap_ms": 560,
+              "mult": 0.6
+            },
+            {
+              "gap_ms": 520,
+              "mult": 0.9
+            }
+          ],
+          "finish_mult": 1.25
+        },
+        {
+          "id": "lantern_volley",
+          "name": "Lantern Volley",
+          "unlock_lv": 6,
+          "hits": [
+            {
+              "gap_ms": 700,
+              "mult": 0.5
+            },
+            {
+              "gap_ms": 500,
+              "mult": 0.5
+            },
+            {
+              "gap_ms": 440,
+              "mult": 0.6
+            },
+            {
+              "gap_ms": 400,
+              "mult": 0.9
+            }
+          ],
+          "finish_mult": 1.4
+        }
+      ],
+      "seal": {
+        "id": "ember_kite_litany",
+        "name": "Ember Kite Litany",
+        "seals": 5,
+        "mult": 0.4,
+        "element": "ember",
+        "stat": "mat"
+      },
+      "role": "healer_support",
+      "base": {
+        "hp": 125,
+        "atk": 15,
+        "def": 10,
+        "mat": 22,
+        "mdf": 16,
+        "spd": 16
+      },
+      "growth": {
+        "hp": 13,
+        "atk": 1.8,
+        "def": 1.1,
+        "mat": 2.8,
+        "mdf": 1.9,
+        "spd": 0.9
+      },
+      "stat_table": [
+        {
+          "lv": 1,
+          "hp": 125,
+          "atk": 15,
+          "def": 10,
+          "mat": 22,
+          "mdf": 16,
+          "spd": 16
+        },
+        {
+          "lv": 2,
+          "hp": 138,
+          "atk": 17,
+          "def": 11,
+          "mat": 25,
+          "mdf": 18,
+          "spd": 17
+        },
+        {
+          "lv": 3,
+          "hp": 151,
+          "atk": 19,
+          "def": 12,
+          "mat": 28,
+          "mdf": 20,
+          "spd": 18
+        },
+        {
+          "lv": 4,
+          "hp": 164,
+          "atk": 20,
+          "def": 13,
+          "mat": 30,
+          "mdf": 22,
+          "spd": 19
+        },
+        {
+          "lv": 5,
+          "hp": 177,
+          "atk": 22,
+          "def": 14,
+          "mat": 33,
+          "mdf": 24,
+          "spd": 20
+        },
+        {
+          "lv": 6,
+          "hp": 190,
+          "atk": 24,
+          "def": 16,
+          "mat": 36,
+          "mdf": 26,
+          "spd": 21
+        },
+        {
+          "lv": 7,
+          "hp": 203,
+          "atk": 26,
+          "def": 17,
+          "mat": 39,
+          "mdf": 27,
+          "spd": 21
+        },
+        {
+          "lv": 8,
+          "hp": 216,
+          "atk": 28,
+          "def": 18,
+          "mat": 42,
+          "mdf": 29,
+          "spd": 22
+        },
+        {
+          "lv": 9,
+          "hp": 229,
+          "atk": 29,
+          "def": 19,
+          "mat": 44,
+          "mdf": 31,
+          "spd": 23
+        },
+        {
+          "lv": 10,
+          "hp": 242,
+          "atk": 31,
+          "def": 20,
+          "mat": 47,
+          "mdf": 33,
+          "spd": 24
+        },
+        {
+          "lv": 11,
+          "hp": 255,
+          "atk": 33,
+          "def": 21,
+          "mat": 50,
+          "mdf": 35,
+          "spd": 25
+        },
+        {
+          "lv": 12,
+          "hp": 268,
+          "atk": 35,
+          "def": 22,
+          "mat": 53,
+          "mdf": 37,
+          "spd": 26
+        },
+        {
+          "lv": 13,
+          "hp": 281,
+          "atk": 37,
+          "def": 23,
+          "mat": 56,
+          "mdf": 39,
+          "spd": 27
+        },
+        {
+          "lv": 14,
+          "hp": 294,
+          "atk": 38,
+          "def": 24,
+          "mat": 58,
+          "mdf": 41,
+          "spd": 28
+        },
+        {
+          "lv": 15,
+          "hp": 307,
+          "atk": 40,
+          "def": 25,
+          "mat": 61,
+          "mdf": 43,
+          "spd": 29
+        },
+        {
+          "lv": 16,
+          "hp": 320,
+          "atk": 42,
+          "def": 27,
+          "mat": 64,
+          "mdf": 45,
+          "spd": 30
+        },
+        {
+          "lv": 17,
+          "hp": 333,
+          "atk": 44,
+          "def": 28,
+          "mat": 67,
+          "mdf": 46,
+          "spd": 30
+        },
+        {
+          "lv": 18,
+          "hp": 346,
+          "atk": 46,
+          "def": 29,
+          "mat": 70,
+          "mdf": 48,
+          "spd": 31
+        },
+        {
+          "lv": 19,
+          "hp": 359,
+          "atk": 47,
+          "def": 30,
+          "mat": 72,
+          "mdf": 50,
+          "spd": 32
+        },
+        {
+          "lv": 20,
+          "hp": 372,
+          "atk": 49,
+          "def": 31,
+          "mat": 75,
+          "mdf": 52,
+          "spd": 33
+        }
+      ]
+    },
+    {
+      "id": "gonzo",
+      "name": "Gonzō Kuraishi",
+      "title": "Retired Temple Monk",
+      "element": "stone",
+      "lv": 5,
+      "hp": 288,
+      "atk": 30,
+      "def": 27,
+      "mat": 11,
+      "mdf": 20,
+      "spd": 10,
+      "ink": 0,
+      "strokes": [
+        {
+          "id": "temple_bell",
+          "name": "Temple Bell",
+          "unlock_lv": 1,
+          "hits": [
+            {
+              "gap_ms": 820,
+              "mult": 1.0
+            },
+            {
+              "gap_ms": 640,
+              "mult": 1.3
+            }
+          ],
+          "finish_mult": 1.4
+        },
+        {
+          "id": "mountain_gong",
+          "name": "Mountain Gong",
+          "unlock_lv": 7,
+          "hits": [
+            {
+              "gap_ms": 800,
+              "mult": 0.9
+            },
+            {
+              "gap_ms": 600,
+              "mult": 1.0
+            },
+            {
+              "gap_ms": 560,
+              "mult": 1.4
+            }
+          ],
+          "finish_mult": 1.6
+        }
+      ],
+      "seal": {
+        "id": "stone_owl_verse",
+        "name": "Stone Owl Verse",
+        "seals": 3,
+        "mult": 0.8,
+        "element": "stone",
+        "stat": "atk"
+      },
+      "role": "tank",
+      "base": {
+        "hp": 200,
+        "atk": 20,
+        "def": 18,
+        "mat": 8,
+        "mdf": 14,
+        "spd": 8
+      },
+      "growth": {
+        "hp": 22,
+        "atk": 2.4,
+        "def": 2.2,
+        "mat": 0.7,
+        "mdf": 1.6,
+        "spd": 0.5
+      },
+      "stat_table": [
+        {
+          "lv": 1,
+          "hp": 200,
+          "atk": 20,
+          "def": 18,
+          "mat": 8,
+          "mdf": 14,
+          "spd": 8
+        },
+        {
+          "lv": 2,
+          "hp": 222,
+          "atk": 22,
+          "def": 20,
+          "mat": 9,
+          "mdf": 16,
+          "spd": 9
+        },
+        {
+          "lv": 3,
+          "hp": 244,
+          "atk": 25,
+          "def": 22,
+          "mat": 9,
+          "mdf": 17,
+          "spd": 9
+        },
+        {
+          "lv": 4,
+          "hp": 266,
+          "atk": 27,
+          "def": 25,
+          "mat": 10,
+          "mdf": 19,
+          "spd": 10
+        },
+        {
+          "lv": 5,
+          "hp": 288,
+          "atk": 30,
+          "def": 27,
+          "mat": 11,
+          "mdf": 20,
+          "spd": 10
+        },
+        {
+          "lv": 6,
+          "hp": 310,
+          "atk": 32,
+          "def": 29,
+          "mat": 12,
+          "mdf": 22,
+          "spd": 11
+        },
+        {
+          "lv": 7,
+          "hp": 332,
+          "atk": 34,
+          "def": 31,
+          "mat": 12,
+          "mdf": 24,
+          "spd": 11
+        },
+        {
+          "lv": 8,
+          "hp": 354,
+          "atk": 37,
+          "def": 33,
+          "mat": 13,
+          "mdf": 25,
+          "spd": 12
+        },
+        {
+          "lv": 9,
+          "hp": 376,
+          "atk": 39,
+          "def": 36,
+          "mat": 14,
+          "mdf": 27,
+          "spd": 12
+        },
+        {
+          "lv": 10,
+          "hp": 398,
+          "atk": 42,
+          "def": 38,
+          "mat": 14,
+          "mdf": 28,
+          "spd": 13
+        },
+        {
+          "lv": 11,
+          "hp": 420,
+          "atk": 44,
+          "def": 40,
+          "mat": 15,
+          "mdf": 30,
+          "spd": 13
+        },
+        {
+          "lv": 12,
+          "hp": 442,
+          "atk": 46,
+          "def": 42,
+          "mat": 16,
+          "mdf": 32,
+          "spd": 14
+        },
+        {
+          "lv": 13,
+          "hp": 464,
+          "atk": 49,
+          "def": 44,
+          "mat": 16,
+          "mdf": 33,
+          "spd": 14
+        },
+        {
+          "lv": 14,
+          "hp": 486,
+          "atk": 51,
+          "def": 47,
+          "mat": 17,
+          "mdf": 35,
+          "spd": 15
+        },
+        {
+          "lv": 15,
+          "hp": 508,
+          "atk": 54,
+          "def": 49,
+          "mat": 18,
+          "mdf": 36,
+          "spd": 15
+        },
+        {
+          "lv": 16,
+          "hp": 530,
+          "atk": 56,
+          "def": 51,
+          "mat": 19,
+          "mdf": 38,
+          "spd": 16
+        },
+        {
+          "lv": 17,
+          "hp": 552,
+          "atk": 58,
+          "def": 53,
+          "mat": 19,
+          "mdf": 40,
+          "spd": 16
+        },
+        {
+          "lv": 18,
+          "hp": 574,
+          "atk": 61,
+          "def": 55,
+          "mat": 20,
+          "mdf": 41,
+          "spd": 17
+        },
+        {
+          "lv": 19,
+          "hp": 596,
+          "atk": 63,
+          "def": 58,
+          "mat": 21,
+          "mdf": 43,
+          "spd": 17
+        },
+        {
+          "lv": 20,
+          "hp": 618,
+          "atk": 66,
+          "def": 60,
+          "mat": 21,
+          "mdf": 44,
+          "spd": 18
+        }
+      ]
+    }
+  ],
+  "progression": {
+    "level_cap": 20,
+    "stat_formula": "stat(lv) = base + floor(growth * (lv - 1) + 0.5)",
+    "xp_formula": "to_next(lv) = floor(20 * lv^1.5 + 10); 0 at level_cap",
+    "xp_share": "every member alive at victory gets the full encounter XP; KO'd members get 0",
+    "on_level_up": "max stats recomputed from stat_table; current HP rises by the max HP gained",
+    "xp_table": [
+      {
+        "lv": 1,
+        "total": 0,
+        "to_next": 30
+      },
+      {
+        "lv": 2,
+        "total": 30,
+        "to_next": 66
+      },
+      {
+        "lv": 3,
+        "total": 96,
+        "to_next": 113
+      },
+      {
+        "lv": 4,
+        "total": 209,
+        "to_next": 170
+      },
+      {
+        "lv": 5,
+        "total": 379,
+        "to_next": 233
+      },
+      {
+        "lv": 6,
+        "total": 612,
+        "to_next": 303
+      },
+      {
+        "lv": 7,
+        "total": 915,
+        "to_next": 380
+      },
+      {
+        "lv": 8,
+        "total": 1295,
+        "to_next": 462
+      },
+      {
+        "lv": 9,
+        "total": 1757,
+        "to_next": 550
+      },
+      {
+        "lv": 10,
+        "total": 2307,
+        "to_next": 642
+      },
+      {
+        "lv": 11,
+        "total": 2949,
+        "to_next": 739
+      },
+      {
+        "lv": 12,
+        "total": 3688,
+        "to_next": 841
+      },
+      {
+        "lv": 13,
+        "total": 4529,
+        "to_next": 947
+      },
+      {
+        "lv": 14,
+        "total": 5476,
+        "to_next": 1057
+      },
+      {
+        "lv": 15,
+        "total": 6533,
+        "to_next": 1171
+      },
+      {
+        "lv": 16,
+        "total": 7704,
+        "to_next": 1290
+      },
+      {
+        "lv": 17,
+        "total": 8994,
+        "to_next": 1411
+      },
+      {
+        "lv": 18,
+        "total": 10405,
+        "to_next": 1537
+      },
+      {
+        "lv": 19,
+        "total": 11942,
+        "to_next": 1666
+      },
+      {
+        "lv": 20,
+        "total": 13608,
+        "to_next": 0
+      }
+    ]
+  }
+}

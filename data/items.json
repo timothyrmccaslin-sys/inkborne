@@ -1,0 +1,7 @@
+{ "items": [
+  { "id": "lotus", "name": "Lotus Salve", "desc": "Restores 80 HP to one ally.", "kind": "heal", "power": 80, "price": 30 },
+  { "id": "suntea", "name": "Sun-Steeped Tea", "desc": "Restores 50 HP to the whole party.", "kind": "healall", "power": 50, "price": 70 },
+  { "id": "phial", "name": "Ink Phial", "desc": "Adds 30 Vermilion Ink to one ally.", "kind": "ink", "power": 30, "price": 90 },
+  { "id": "embercharm", "name": "Ember Charm", "desc": "Bursts for 90 Ember damage on one foe.", "kind": "bomb", "power": 90, "element": "ember", "price": 60 },
+  { "id": "tidecharm", "name": "Tide Charm", "desc": "Bursts for 90 Tide damage on one foe.", "kind": "bomb", "power": 90, "element": "tide", "price": 60 }
+] }

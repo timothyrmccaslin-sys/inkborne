@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "about": "Inkborne encounter zones (Systems / Ashley). Read by encounters.js. Ids match the live data/world.json nodes and data/enemies.json enemies. `encounters` has the same shape as enemies.json `encounters` (SPEC 7); it keeps the existing 'mistcedar' entry unchanged, so it can be merged as-is.",
+  "rules": {
+    "stepPx": {
+      "poi": 32,
+      "world": 20
+    },
+    "graceStepsAfterBattle": 6,
+    "graceStepsOnEnter": 4,
+    "note": "A step is stepPx of real travel. After minSteps, each step rolls 1/(avgSteps-minSteps); maxSteps forces an encounter. Standing still never rolls."
+  },
+  "zones": [
+    {
+      "id": "world-trailhead-mistcedar",
+      "name": "Road from Mender's Hut to Mistcedar Path",
+      "scene": "world",
+      "path": ["trailhead", "mistcedar"],
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 40,
+        "minSteps": 14,
+        "maxSteps": 90
+      },
+      "ambush": 0.04,
+      "table": [
+        {
+          "encounter": "road-blotwolf",
+          "weight": 60
+        },
+        {
+          "encounter": "road-blotwolf-pair",
+          "weight": 40
+        }
+      ]
+    },
+    {
+      "id": "world-mistcedar-hollowbell",
+      "name": "Road from Mistcedar Path to Hollowbell",
+      "scene": "world",
+      "path": ["mistcedar", "hollowbell"],
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 34,
+        "minSteps": 12,
+        "maxSteps": 80
+      },
+      "ambush": 0.05,
+      "table": [
+        {
+          "encounter": "road-blotwolf-pair",
+          "weight": 45
+        },
+        {
+          "encounter": "road-kappa",
+          "weight": 35
+        },
+        {
+          "encounter": "road-wolf-kappa",
+          "weight": 20
+        }
+      ]
+    },
+    {
+      "id": "mistcedar-edge",
+      "name": "Mistcedar Path, outer trail",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.0, 0.0, 0.38, 1.0],
+      "priority": 1,
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 32,
+        "minSteps": 12,
+        "maxSteps": 72
+      },
+      "ambush": 0.05,
+      "table": [
+        {
+          "encounter": "wood-blotwolf",
+          "weight": 30
+        },
+        {
+          "encounter": "wood-blotwolf-pair",
+          "weight": 40
+        },
+        {
+          "encounter": "wood-wolf-kappa",
+          "weight": 20
+        },
+        {
+          "encounter": "mistcedar",
+          "weight": 10
+        }
+      ]
+    },
+    {
+      "id": "mistcedar-deep",
+      "name": "Mistcedar Path, deep cedars",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.38, 0.0, 0.44, 1.0],
+      "priority": 1,
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 24,
+        "minSteps": 9,
+        "maxSteps": 55
+      },
+      "ambush": 0.08,
+      "table": [
+        {
+          "encounter": "wood-blotwolf-pair",
+          "weight": 20
+        },
+        {
+          "encounter": "wood-wolf-kappa",
+          "weight": 30
+        },
+        {
+          "encounter": "wood-kappa-pair",
+          "weight": 20
+        },
+        {
+          "encounter": "mistcedar",
+          "weight": 30
+        }
+      ]
+    },
+    {
+      "id": "mistcedar-seal-clearing",
+      "name": "Broken seal-stone clearing (safe, before the boss)",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.82, 0.0, 0.18, 1.0],
+      "priority": 2,
+      "safe": true
+    },
+    {
+      "id": "hollowbell",
+      "name": "Hollowbell (town, safe)",
+      "scene": "poi",
+      "poi": "town",
+      "rectN": [0.0, 0.0, 1.0, 1.0],
+      "priority": 2,
+      "safe": true
+    }
+  ],
+  "fixed": {
+    "unwritten-duel": {
+      "bg": "forest",
+      "canFlee": false,
+      "music": "battle",
+      "note": "Boss. Place as a pois/forest.json trigger { kind: 'battle', ref: 'unwritten-duel', once: true } inside the seal clearing."
+    }
+  },
+  "encounters": {
+    "mistcedar": ["blotwolf", "kappa", "blotwolf"],
+    "road-blotwolf": ["blotwolf"],
+    "road-blotwolf-pair": ["blotwolf", "blotwolf"],
+    "road-kappa": ["kappa"],
+    "road-wolf-kappa": ["blotwolf", "kappa"],
+    "wood-blotwolf": ["blotwolf"],
+    "wood-blotwolf-pair": ["blotwolf", "blotwolf"],
+    "wood-wolf-kappa": ["blotwolf", "kappa"],
+    "wood-kappa-pair": ["kappa", "kappa"],
+    "unwritten-duel": ["unwritten"]
+  }
+}

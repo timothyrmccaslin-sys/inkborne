@@ -1,0 +1,8 @@
+{ "enemies": [
+  { "id": "blotwolf", "name": "Blotwolf", "element": "gale", "hp": 150, "atk": 26, "def": 12, "mat": 14, "mdf": 10, "spd": 13, "mon": 40,
+    "moves": [ {"id": "bite", "name": "Smear Bite", "kind": "phys", "power": 1.0, "weight": 3}, {"id": "howl", "name": "Hollow Howl", "kind": "elem", "power": 1.3, "element": "gale", "weight": 1} ] },
+  { "id": "kappa", "name": "Paper Kappa", "element": "tide", "hp": 190, "atk": 22, "def": 16, "mat": 22, "mdf": 14, "spd": 9, "mon": 60,
+    "moves": [ {"id": "slap", "name": "Wet Slap", "kind": "phys", "power": 1.0, "weight": 2}, {"id": "spout", "name": "Ink Spout", "kind": "elem", "power": 1.2, "element": "tide", "weight": 1} ] },
+  { "id": "unwritten", "name": "The Unwritten", "element": "dusk", "hp": 420, "atk": 30, "def": 18, "mat": 30, "mdf": 20, "spd": 10, "mon": 200,
+    "moves": [ {"id": "erase", "name": "Erasure", "kind": "elem", "power": 1.4, "element": "dusk", "weight": 1}, {"id": "claw", "name": "Blank Claw", "kind": "phys", "power": 1.1, "weight": 2} ] }
+], "encounters": { "mistcedar": ["blotwolf", "kappa", "blotwolf"] } }

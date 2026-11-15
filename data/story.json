@@ -1,0 +1,3 @@
+{ "title": "Inkborne",
+  "hook": "The world of Kasane was painted onto one endless scroll by the First Brush. Now its edges are going white. Villages forget their names, rivers lose their banks, and the Blank creeps inward like morning fog that never lifts. Akane, apprentice to the last scroll-mender, wakes to find her master gone and his brush in her hand - still wet with a red ink the Blank cannot erase.",
+  "chapters": [ { "id": "c1", "name": "The Wet Brush", "goal": "Cross Mistcedar Path to Hollowbell and learn where the master went." } ] }

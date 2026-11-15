@@ -1,0 +1,7 @@
+{
+  "kobo_tsuru": {
+    "name": "Kōbō Tsuru",
+    "keeper": "tsuru",
+    "stock": ["pine_needle_tea", "plum_rice_ball", "lantern_incense", "vermilion_drop", "ember_charm", "tide_charm", "gale_charm", "stone_charm", "dawn_charm"]
+  }
+}

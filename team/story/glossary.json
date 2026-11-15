@@ -1,0 +1,456 @@
+{
+  "_note": "Tabula Rasa glossary. status canon = from Lisa's CANON.md, SPEC section 2, or Kekai-approved Ollie item text; TBD = not yet confirmed. Item names and ids follow Ollie's list per Kekai; Systems numbers map onto those ids.",
+  "entries": [
+    {
+      "id": "tabula_rasa",
+      "name": "Tabula Rasa",
+      "category": "title",
+      "desc": "Working title of the game (set by Timothy). SPEC header still says Inkborne.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "shirofuda",
+      "name": "Shirofuda",
+      "category": "place",
+      "desc": "The world, painted into being by the First Brush; everything in it is ink on living paper.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "first_brush",
+      "name": "First Brush",
+      "category": "lore",
+      "desc": "The brush that painted Shirofuda. Each party member carries a fragment of its red ink.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "the_blot",
+      "name": "the Blot",
+      "category": "lore",
+      "desc": "A creeping smear soaking through cracked seals, unwriting what it touches into blank paper and ink-beasts.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "red_seals",
+      "name": "red seals",
+      "category": "lore",
+      "desc": "Seals of the old shrines that keep the painting true. They are cracking.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "hanshi",
+      "name": "Hanshi",
+      "category": "place",
+      "desc": "Border town of paper-walled houses and red lanterns, named for calligraphy paper. World node and POI `town`.",
+      "source": "CANON",
+      "status": "canon",
+      "ids": {
+        "world_node": "hanshi",
+        "poi": "town"
+      }
+    },
+    {
+      "id": "sumikage",
+      "name": "Sumikage Wood",
+      "category": "place",
+      "desc": "\"Ink-shadow wood\": bamboo, old pines, mist, and broken seal-stones along the path. World node and POI `forest`.",
+      "source": "CANON",
+      "status": "canon",
+      "ids": {
+        "world_node": "sumikage",
+        "poi": "forest"
+      }
+    },
+    {
+      "id": "kobo_tsuru",
+      "name": "Kōbō Tsuru",
+      "category": "shop",
+      "desc": "General store in Hanshi run by Grandmother Tsuru. Shop id `kobo_tsuru`.",
+      "source": "CANON",
+      "status": "canon",
+      "ascii": "Kobo Tsuru"
+    },
+    {
+      "id": "tsuru",
+      "name": "Grandmother Tsuru",
+      "category": "npc",
+      "desc": "Old shopkeeper of Kōbō Tsuru. Keeper id `tsuru`.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "lantern_keeper",
+      "name": "Old Hotaru",
+      "category": "npc",
+      "desc": "Hanshi's lamplighter, a stooped, soft-spoken old man who relights the red lanterns every dusk and talks to each flame like a grandchild. First to notice the flames are greying.",
+      "source": "CANON",
+      "status": "canon"
+    },
+    {
+      "id": "itsuki",
+      "name": "Itsuki Hane",
+      "category": "character",
+      "desc": "Wandering Swordsman. Lead, physical. Calm, guarded, no memory before waking in Sumikage Wood with a blank seal on his palm. Gale ink.",
+      "source": "CANON",
+      "status": "canon",
+      "title": "Wandering Swordsman",
+      "element": "gale"
+    },
+    {
+      "id": "benika",
+      "name": "Benika Matsuo",
+      "category": "character",
+      "desc": "Shrine Archer. Healer and support. Bright, stubborn keeper of Hanshi's shrine. Ember ink.",
+      "source": "CANON",
+      "status": "canon",
+      "title": "Shrine Archer",
+      "element": "ember"
+    },
+    {
+      "id": "gonzo",
+      "name": "Gonzō Kuraishi",
+      "category": "character",
+      "desc": "Retired Temple Monk. Tank and heavy hitter. Gruff, kind, haunted by a seal he failed to protect. Stone ink.",
+      "source": "CANON",
+      "status": "canon",
+      "title": "Retired Temple Monk",
+      "element": "stone",
+      "ascii": "Gonzo Kuraishi"
+    },
+    {
+      "id": "gale_crane",
+      "name": "Gale Crane",
+      "category": "inkwing",
+      "desc": "Itsuki's Inkwing: long white-and-grey crane wings, muted pale jade tint.",
+      "source": "CANON",
+      "status": "canon",
+      "owner": "itsuki"
+    },
+    {
+      "id": "ember_kite",
+      "name": "Ember Kite",
+      "category": "inkwing",
+      "desc": "Benika's Inkwing: wide kite-bird wings smoldering at the tips, muted ochre tint, drifting ash.",
+      "source": "CANON",
+      "status": "canon",
+      "owner": "benika"
+    },
+    {
+      "id": "stone_owl",
+      "name": "Stone Owl",
+      "category": "inkwing",
+      "desc": "Gonzō's Inkwing: heavy owl wings like layered slate, cracks glowing faintly red.",
+      "source": "CANON",
+      "status": "canon",
+      "owner": "gonzo"
+    },
+    {
+      "id": "falling_pine",
+      "name": "Falling Pine",
+      "category": "stroke",
+      "desc": "Itsuki's signature Stroke chain.",
+      "source": "CANON",
+      "status": "canon",
+      "owner": "itsuki"
+    },
+    {
+      "id": "three_prayer_slips",
+      "name": "Three Prayer Slips",
+      "category": "stroke",
+      "desc": "Benika's signature Stroke chain.",
+      "source": "CANON",
+      "status": "canon",
+      "owner": "benika"
+    },
+    {
+      "id": "temple_bell",
+      "name": "Temple Bell",
+      "category": "stroke",
+      "desc": "Gonzō's signature Stroke chain.",
+      "source": "CANON",
+      "status": "canon",
+      "owner": "gonzo"
+    },
+    {
+      "id": "wet_edge",
+      "name": "Wet Edge",
+      "category": "stroke",
+      "desc": "Itsuki's second Stroke.",
+      "source": "CANON (Jake, approved by Lisa)",
+      "status": "canon",
+      "owner": "itsuki"
+    },
+    {
+      "id": "lantern_volley",
+      "name": "Lantern Volley",
+      "category": "stroke",
+      "desc": "Benika's second Stroke.",
+      "source": "CANON (Jake, approved by Lisa)",
+      "status": "canon",
+      "owner": "benika"
+    },
+    {
+      "id": "mountain_gong",
+      "name": "Mountain Gong",
+      "category": "stroke",
+      "desc": "Gonzō's second Stroke.",
+      "source": "CANON (Jake, approved by Lisa)",
+      "status": "canon",
+      "owner": "gonzo"
+    },
+    {
+      "id": "crane_gale_script",
+      "name": "Gale Crane Script",
+      "category": "seal_art",
+      "desc": "Itsuki's Seal Art while Unfurled.",
+      "source": "CANON (Jake, approved by Lisa)",
+      "status": "canon",
+      "owner": "itsuki"
+    },
+    {
+      "id": "ember_kite_litany",
+      "name": "Ember Kite Litany",
+      "category": "seal_art",
+      "desc": "Benika's Seal Art while Unfurled.",
+      "source": "CANON (Jake, approved by Lisa)",
+      "status": "canon",
+      "owner": "benika"
+    },
+    {
+      "id": "stone_owl_verse",
+      "name": "Stone Owl Verse",
+      "category": "seal_art",
+      "desc": "Gonzō's Seal Art while Unfurled.",
+      "source": "CANON (Jake, approved by Lisa)",
+      "status": "canon",
+      "owner": "gonzo"
+    },
+    {
+      "id": "blotling",
+      "name": "Blotling",
+      "category": "enemy",
+      "desc": "A small puddle of living ink with one blinking eye. Splits when struck hard.",
+      "source": "CANON",
+      "status": "canon",
+      "flavor": "A puddle that learned to look back at you."
+    },
+    {
+      "id": "hollow_lantern",
+      "name": "Hollow Lantern",
+      "category": "enemy",
+      "desc": "A torn paper lantern on ink smoke, its red flame going grey. Casts a dimming curse that lowers accuracy.",
+      "source": "CANON",
+      "status": "canon",
+      "flavor": "Its flame remembers being red."
+    },
+    {
+      "id": "smudge_ronin",
+      "name": "Smudge Ronin",
+      "category": "enemy",
+      "desc": "Demo mini-boss. A samurai half-unwritten by the Blot, with a dripping blade and only a wet brushstroke for a face.",
+      "source": "CANON",
+      "status": "canon",
+      "flavor": "Whoever he was, the Blot kept only the sword."
+    },
+    {
+      "id": "brushstroke",
+      "name": "Brushstroke",
+      "category": "mechanic",
+      "desc": "Timed multi-hit combo: press as the ring closes. Each press is a Stroke; named chains are also Strokes.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "stroke",
+      "name": "Stroke",
+      "category": "mechanic",
+      "desc": "One press in a Brushstroke, or a character's named chain.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "clean_line",
+      "name": "Clean Line",
+      "category": "mechanic",
+      "desc": "Perfect press in a tight window: x1.25 hit damage and extra ink.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "inkwing",
+      "name": "Inkwing",
+      "category": "mechanic",
+      "desc": "Winged elemental form. Costs a full gauge, lasts 3 of that character's turns.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "unfurl",
+      "name": "Unfurl",
+      "category": "mechanic",
+      "desc": "The act and battle command that transforms a character into their Inkwing.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "seal_arts",
+      "name": "Seal Arts",
+      "category": "mechanic",
+      "desc": "Timed magic while Unfurled: press as the brush passes each red seal.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "still_water",
+      "name": "Still Water",
+      "category": "mechanic",
+      "desc": "Guard: halves damage taken and heals 10% HP.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "six_inks",
+      "name": "Six Inks",
+      "category": "mechanic",
+      "desc": "The elements: Ember/Tide, Gale/Stone, Dawn/Dusk. Opposites x2, same x0.5.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "mon",
+      "name": "mon",
+      "category": "mechanic",
+      "desc": "Currency.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "transform_gauge",
+      "name": "TBD",
+      "category": "mechanic",
+      "desc": "Per-character 0-100 gauge filled by successful hits; a full gauge lets you Unfurl. SPEC says 'Spirit Ink'; Kekai asked Marc to rename (proposed 'Vermilion Ink'). Do not ship either until Marc confirms. UI key: battle.gauge.label.",
+      "source": "SPEC §2",
+      "status": "TBD",
+      "candidates": [
+        "Spirit Ink",
+        "Vermilion Ink"
+      ]
+    },
+    {
+      "id": "ember",
+      "name": "Ember",
+      "category": "element",
+      "desc": "One of the Six Inks.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "tide",
+      "name": "Tide",
+      "category": "element",
+      "desc": "One of the Six Inks.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "gale",
+      "name": "Gale",
+      "category": "element",
+      "desc": "One of the Six Inks.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "stone",
+      "name": "Stone",
+      "category": "element",
+      "desc": "One of the Six Inks.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "dawn",
+      "name": "Dawn",
+      "category": "element",
+      "desc": "One of the Six Inks.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "dusk",
+      "name": "Dusk",
+      "category": "element",
+      "desc": "One of the Six Inks.",
+      "source": "SPEC §2",
+      "status": "canon"
+    },
+    {
+      "id": "rice_cake",
+      "name": "Rice Cake",
+      "category": "item",
+      "desc": "Sweet and filling. Restores a little HP to one ally.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "plum_tonic",
+      "name": "Plum Tonic",
+      "category": "item",
+      "desc": "Sour enough to wake the dead, nearly. Restores a lot of HP to one ally.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "shared_tea",
+      "name": "Pot of Pine Tea",
+      "category": "item",
+      "desc": "One pot, three cups. Restores some HP to the whole party.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "festival_bento",
+      "name": "Festival Bento",
+      "category": "item",
+      "desc": "Packed for a feast that never came. Restores a lot of HP to the whole party.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "inkstone_chip",
+      "name": "Inkstone Chip",
+      "category": "item",
+      "desc": "Grind it, wet it, and the brush drinks. Restores a little ink.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "vermilion_pot",
+      "name": "Pot of Fresh Ink",
+      "category": "item",
+      "desc": "Rich and dark, still smelling of pine soot. Restores a lot of ink.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "paper_cracker",
+      "name": "Paper Firecracker",
+      "category": "item",
+      "desc": "Festival leftovers. Bangs loudly enough to scatter a Blotling.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    },
+    {
+      "id": "thunder_jar",
+      "name": "Thunder Jar",
+      "category": "item",
+      "desc": "Grandmother Tsuru won't say what's in it. Hits all enemies.",
+      "source": "Ollie (approved by Kekai)",
+      "status": "canon"
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Inkborne ambient + encounters demo</title>
+<style>
+  html,body{margin:0;height:100%;background:#1b1813;color:#ece6d8;font:13px/1.35 system-ui,sans-serif;overflow:hidden;touch-action:none}
+  canvas{position:absolute;left:0;top:0}
+  #ui{position:absolute;top:calc(env(safe-area-inset-top) + 8px);left:calc(env(safe-area-inset-left) + 8px);display:flex;gap:6px;flex-wrap:wrap;z-index:2}
+  #ui button,#ui select{background:#3b3730;color:#ece6d8;border:1px solid #6d675b;border-radius:6px;padding:6px 10px;font:inherit}
+  #ui button.on{background:#b3261e;border-color:#b3261e}
+  #log{position:absolute;right:calc(env(safe-area-inset-right) + 8px);top:calc(env(safe-area-inset-top) + 8px);width:300px;max-height:45%;overflow:auto;background:rgba(27,24,19,.78);padding:8px;border-radius:6px;white-space:pre-wrap;z-index:2}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <button data-scene="forest" class="on">Forest</button><button data-scene="town">Town</button><button data-scene="world">World map</button>
+  <select id="q"><option>full</option><option>lite</option><option>reduced</option></select>
+  <button id="zones" class="on">Zones</button><button id="gust">Gust</button><button id="walk">Auto-walk</button>
+</div>
+<pre id="log"></pre>
+<script type="module">
+// Standalone harness for ambient.js + encounters.js. Serve this folder's repo root over HTTP
+// (python3 -m http.server) and open team/systems/ashley/demo.html. Not loaded by the game.
+// Move: WASD/arrows, touch-drag anywhere. ?selftest=1 runs a scripted perf/behaviour check.
+import { createAmbient } from './ambient.js';
+import { createEncounters, zoneRect } from './encounters.js';
+
+const W = 1280, H = 720, cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const logEl = document.getElementById('log'), lines = [];
+const log = (s) => { lines.unshift(s); lines.length = Math.min(lines.length, 14); logEl.textContent = lines.join('\n'); };
+const get = async (u, fb) => { try { const r = await fetch(u); if (r.ok) return await r.json(); } catch {} return fb; };
+const zones = await get('./zones.json');
+const worldData = await get('../../../data/world.json', { start: 'trailhead', nodes: [{ id: 'trailhead', name: "Mender's Hut", x: 230, y: 470 }, { id: 'mistcedar', name: 'Mistcedar Path', x: 560, y: 360, poi: 'forest' }, { id: 'hollowbell', name: 'Hollowbell', x: 930, y: 450, poi: 'town' }], paths: [['trailhead', 'mistcedar', [[360, 520], [430, 340]]], ['mistcedar', 'hollowbell', [[700, 300], [800, 520]]]] });
+// Placeholder POIs: same fields as SPEC 7 pois/<id>.json; no ambient props, so the module uses its presets.
+const POIS = { forest: { id: 'forest', name: 'Mistcedar Path', w: 3200, h: 1080, spawn: [200, 700], props: [] },
+               town: { id: 'town', name: 'Hollowbell', w: 2400, h: 900, spawn: [300, 640], props: [] } };
+
+const sfxCount = { wind: 0, lantern: 0 };
+const amb = createAmbient({ quality: 'full', sfx: (k) => { sfxCount[k]++; log(`sfx: ${k}`); } });
+const enc = createEncounters(zones, { seed: 1234 });
+const P = { x: 0, y: 0, vx: 0, vy: 0 }, cam = { x: 0, y: 0 };
+let scene = 'forest', poi = POIS.forest, showZones = true, autoWalk = false, flash = 0, battles = 0;
+let wt = 0, wPath = 0; // world token: param t on path index wPath
+
+function enter(s) {
+  scene = s; enc.reset();
+  document.querySelectorAll('[data-scene]').forEach((b) => b.classList.toggle('on', b.dataset.scene === s));
+  if (s !== 'world') { poi = POIS[s]; amb.load(poi); [P.x, P.y] = poi.spawn; log(`enter ${poi.name}: ${JSON.stringify(amb.info)}`); }
+  else { wt = 0; wPath = 0; log('enter world map'); }
+}
+
+// --- input: keyboard + touch drag (stand-in for src/input.js) ---
+const keys = new Set(); let drag = null;
+addEventListener('keydown', (e) => keys.add(e.key.toLowerCase())); addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+cv.addEventListener('pointerdown', (e) => (drag = { x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY }));
+addEventListener('pointermove', (e) => { if (drag) { drag.cx = e.clientX; drag.cy = e.clientY; } });
+addEventListener('pointerup', () => (drag = null));
+function axis() {
+  let ax = (keys.has('d') || keys.has('arrowright')) - (keys.has('a') || keys.has('arrowleft'));
+  let ay = (keys.has('s') || keys.has('arrowdown')) - (keys.has('w') || keys.has('arrowup'));
+  if (drag) { const dx = drag.cx - drag.x, dy = drag.cy - drag.y, m = Math.hypot(dx, dy); if (m > 10) { ax = dx / Math.max(m, 60); ay = dy / Math.max(m, 60); } }
+  if (autoWalk) { ax = Math.cos(performance.now() / 4000) > -0.2 ? 1 : -1; ay = Math.sin(performance.now() / 1300) * 0.6; }
+  return [ax, ay];
+}
+
+// --- placeholder backdrops (the real ones come from the renderer / art team) ---
+function backdrop(t) {
+  ctx.fillStyle = '#ece6d8'; ctx.fillRect(0, 0, W, H);
+  if (scene === 'world') return;
+  const forest = scene === 'forest';
+  for (let i = 0; i < 3; i++) { // parallax silhouettes: cedars or rooftops
+    const par = 0.3 + i * 0.3, col = ['rgba(163,156,140,.5)', 'rgba(109,103,91,.55)', 'rgba(59,55,48,.6)'][i];
+    ctx.fillStyle = col; ctx.beginPath();
+    for (let x = -((cam.x * par) % 160) - 160; x < W + 160; x += 160) {
+      const base = H * (0.55 + i * 0.08) - cam.y * par * 0.3;
+      if (forest) { ctx.moveTo(x + 40, base); ctx.lineTo(x + 80, base - 180 + i * 30); ctx.lineTo(x + 120, base); }
+      else { ctx.rect(x + 20, base - 70, 110, 70); ctx.moveTo(x + 5, base - 70); ctx.lineTo(x + 75, base - 110); ctx.lineTo(x + 145, base - 70); }
+    }
+    ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(217,208,188,.8)'; ctx.fillRect(0, H * 0.62 - cam.y * 0.5, W, H);
+}
+function drawZones() {
+  if (!showZones || scene === 'world') return;
+  for (const z of zones.zones) {
+    if (z.scene !== 'poi' || z.poi !== poi.id) continue;
+    const R = zoneRect(z, poi), cur = enc.zone === z.id;
+    ctx.fillStyle = z.safe ? 'rgba(95,138,106,.10)' : `rgba(179,38,30,${cur ? 0.12 : 0.06})`;
+    ctx.fillRect(R[0] - cam.x, R[1] - cam.y, R[2], R[3]);
+    ctx.fillStyle = '#3b3730'; ctx.font = '14px system-ui'; ctx.fillText(z.name, R[0] - cam.x + 10, R[1] - cam.y + 70);
+  }
+}
+const node = (id) => worldData.nodes.find((n) => n.id === id);
+function bez(p, t) { const a = node(p[0]), b = node(p[1]), [c1, c2] = p[2], u = 1 - t;
+  return [u * u * u * a.x + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * b.x, u * u * u * a.y + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * b.y]; }
+function drawWorld() {
+  ctx.lineCap = 'round';
+  for (const p of worldData.paths) { if (!node(p[0]) || !node(p[1])) continue;
+    const z = zones.zones.find((z) => z.scene === 'world' && ((z.path[0] === p[0] && z.path[1] === p[1]) || (z.path[0] === p[1] && z.path[1] === p[0])));
+    ctx.strokeStyle = z && showZones ? 'rgba(179,38,30,.55)' : '#3b3730'; ctx.lineWidth = 9; ctx.beginPath();
+    for (let i = 0; i <= 30; i++) { const [x, y] = bez(p, i / 30); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+  for (const n of worldData.nodes) { ctx.fillStyle = n.locked ? '#a39c8c' : '#1b1813'; ctx.beginPath(); ctx.arc(n.x, n.y, 16, 0, 6.29); ctx.fill();
+    ctx.fillStyle = '#1b1813'; ctx.font = '18px system-ui'; ctx.fillText(n.name, n.x - 40, n.y + 40); }
+  const [x, y] = bez(worldData.paths[wPath], wt); ctx.fillStyle = '#b3261e'; ctx.beginPath(); ctx.arc(x, y, 11, 0, 6.29); ctx.fill();
+}
+
+function onHit(hit) { battles++; flash = 0.6; enc.afterBattle(); log(`BATTLE in ${hit.zone}: ${hit.encounter} [${hit.enemies.join(', ')}]${hit.first ? ' (ambush)' : ''}`); }
+
+function update(dt) {
+  const [ax, ay] = axis(), sp = 220;
+  if (scene === 'world') {
+    const p = worldData.paths[wPath], before = bez(p, wt);
+    wt += (ax || (autoWalk ? 1 : 0)) * dt * 0.12;
+    if (wt > 1) { wt = 0; wPath = (wPath + 1) % worldData.paths.length; } if (wt < 0) wt = 0;
+    const after = bez(p, Math.min(1, wt)), hit = enc.move({ scene: 'world', path: [p[0], p[1]], dist: Math.hypot(after[0] - before[0], after[1] - before[1]) });
+    if (hit) onHit(hit);
+  } else {
+    const ox = P.x, oy = P.y;
+    P.x = Math.max(20, Math.min(poi.w - 20, P.x + ax * sp * dt)); P.y = Math.max(poi.h * 0.5, Math.min(poi.h - 20, P.y + ay * sp * dt));
+    cam.x = Math.max(0, Math.min(poi.w - W, P.x - W / 2)); cam.y = Math.max(0, Math.min(poi.h - H, P.y - H * 0.6));
+    const hit = enc.move({ scene: 'poi', poi, x: P.x, y: P.y, dist: Math.hypot(P.x - ox, P.y - oy) });
+    if (hit) onHit(hit);
+    amb.update(dt, cam, { player: P });
+  }
+  flash = Math.max(0, flash - dt);
+}
+function draw(t) {
+  backdrop(t);
+  if (scene === 'world') drawWorld();
+  else {
+    amb.drawBack(ctx, cam); drawZones();
+    ctx.fillStyle = '#1b1813'; ctx.beginPath(); ctx.ellipse(P.x - cam.x, P.y - cam.y - 22, 10, 22, 0, 0, 6.29); ctx.fill(); // walker stand-in
+    amb.drawFront(ctx, cam);
+  }
+  if (flash) { ctx.fillStyle = `rgba(27,24,19,${flash})`; ctx.fillRect(0, 0, W, H); }
+  ctx.fillStyle = '#1b1813'; ctx.font = '14px system-ui';
+  ctx.fillText(`${scene}  zone: ${enc.zone || '-'}  steps: ${enc.steps}  battles: ${battles}  quality: ${amb.quality}  ${fps.toFixed(0)} fps`, 16, H - 16);
+}
+
+// --- letterboxed, DPR-aware 1280x720 (as SPEC 1) ---
+let scale = 1;
+function fit() { const dpr = Math.min(devicePixelRatio || 1, 2); scale = Math.min(innerWidth / W, innerHeight / H);
+  cv.style.width = W * scale + 'px'; cv.style.height = H * scale + 'px'; cv.style.left = (innerWidth - W * scale) / 2 + 'px'; cv.style.top = (innerHeight - H * scale) / 2 + 'px';
+  cv.width = Math.round(W * scale * dpr); cv.height = Math.round(H * scale * dpr); ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0); }
+addEventListener('resize', fit); fit();
+
+document.querySelectorAll('[data-scene]').forEach((b) => (b.onclick = () => enter(b.dataset.scene)));
+document.getElementById('q').onchange = (e) => amb.setQuality(e.target.value);
+document.getElementById('zones').onclick = (e) => { showZones = !showZones; e.target.classList.toggle('on', showZones); };
+document.getElementById('gust').onclick = () => amb.gust(1);
+document.getElementById('walk').onclick = (e) => { autoWalk = !autoWalk; e.target.classList.toggle('on', autoWalk); };
+
+let fps = 60, last = performance.now();
+const selftest = new URLSearchParams(location.search).has('selftest');
+enter('forest');
+if (selftest) runSelftest(); else requestAnimationFrame(function loop(now) { const dt = Math.min(0.1, (now - last) / 1000); last = now; fps += (1 / Math.max(dt, 1e-3) - fps) * 0.05; update(dt); draw(now / 1000); requestAnimationFrame(loop); });
+
+// Scripted check: 600 fixed-step frames per scene and quality, timing update+draw on the CPU side.
+function runSelftest() {
+  autoWalk = true; const res = { ok: true, scenes: {} };
+  try {
+    for (const s of ['forest', 'town', 'world']) for (const q of (s === 'world' ? ['full'] : ['full', 'lite', 'reduced'])) {
+      enter(s); amb.setQuality(q); battles = 0; amb.gust(1); let ms = 0, worst = 0;
+      for (let i = 0; i < 600; i++) { const t0 = performance.now(); update(1 / 60); draw(i / 60); const d = performance.now() - t0; ms += d; worst = Math.max(worst, d); }
+      res.scenes[`${s}/${q}`] = { avgMs: +(ms / 600).toFixed(3), worstMs: +worst.toFixed(2), battles, info: s === 'world' ? null : amb.info };
+    }
+    res.sfx = sfxCount;
+  } catch (e) { res.ok = false; res.error = String(e.stack || e); }
+  window.SELFTEST = res; document.title = 'SELFTEST ' + JSON.stringify(res); logEl.textContent = JSON.stringify(res, null, 1);
+  enter('forest'); autoWalk = false; draw(0);
+}
+</script>
+</body></html>

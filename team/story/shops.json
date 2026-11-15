@@ -1,0 +1,16 @@
+{
+  "kobo_tsuru": {
+    "name": "Kōbō Tsuru",
+    "keeper": "tsuru",
+    "stock": [
+      "rice_cake",
+      "plum_tonic",
+      "pine_tea",
+      "festival_bento",
+      "inkstone_chip",
+      "fresh_ink_pot",
+      "paper_cracker",
+      "thunder_jar"
+    ]
+  }
+}

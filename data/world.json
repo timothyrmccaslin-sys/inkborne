@@ -1,0 +1,8 @@
+{ "start": "trailhead",
+  "nodes": [
+    { "id": "trailhead", "name": "Mender's Hut", "x": 230, "y": 470 },
+    { "id": "mistcedar", "name": "Mistcedar Path", "x": 560, "y": 360, "poi": "forest" },
+    { "id": "hollowbell", "name": "Hollowbell", "x": 930, "y": 450, "poi": "town" },
+    { "id": "palegate", "name": "The Pale Gate", "x": 1110, "y": 210, "locked": true }
+  ],
+  "paths": [ ["trailhead", "mistcedar", [[360, 520], [430, 340]]], ["mistcedar", "hollowbell", [[700, 300], [800, 520]]], ["hollowbell", "palegate", [[1040, 420], [1020, 250]]] ] }
