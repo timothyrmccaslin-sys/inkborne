@@ -459,6 +459,149 @@
     0.5,
     0.5
    ]
+  },
+  "icon-washi_vest": {
+   "src": "icons/icon-washi_vest.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-paper_charm": {
+   "src": "icons/icon-paper_charm.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-redcord_katana": {
+   "src": "icons/icon-redcord_katana.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-prayerslip_bow": {
+   "src": "icons/icon-prayerslip_bow.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-ironband_staff": {
+   "src": "icons/icon-ironband_staff.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-prayer_mala": {
+   "src": "icons/icon-prayer_mala.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-sealedge_katana": {
+   "src": "icons/icon-sealedge_katana.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-cranefeather_bow": {
+   "src": "icons/icon-cranefeather_bow.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-bellbronze_staff": {
+   "src": "icons/icon-bellbronze_staff.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-lacquer_haori": {
+   "src": "icons/icon-lacquer_haori.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
+  },
+  "icon-lantern_bell": {
+   "src": "icons/icon-lantern_bell.webp",
+   "w": 128,
+   "h": 128,
+   "frames": 1,
+   "fw": 128,
+   "fh": 128,
+   "fps": 0,
+   "anchor": [
+    0.5,
+    0.5
+   ]
   }
  },
  "_note": "v2: POI layers are 3200x1440 (1.25 screens) per Creative Director, wider than SPEC 5's 2560. All three layers of a POI are the same size and left-aligned (x=0 matches)."

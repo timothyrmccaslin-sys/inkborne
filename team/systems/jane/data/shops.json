@@ -2,6 +2,17 @@
   "kobo_tsuru": {
     "name": "Kōbō Tsuru",
     "keeper": "tsuru",
-    "stock": ["pine_needle_tea", "plum_rice_ball", "lantern_incense", "vermilion_drop", "ember_charm", "tide_charm", "gale_charm", "stone_charm", "dawn_charm"]
+    "stock": [
+      "rice_cake",
+      "plum_tonic",
+      "pine_tea",
+      "festival_bento",
+      "inkstone_chip",
+      "fresh_ink_pot",
+      "paper_cracker",
+      "thunder_jar",
+      "washi_vest",
+      "paper_charm"
+    ]
   }
 }

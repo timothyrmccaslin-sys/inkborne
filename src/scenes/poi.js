@@ -2,6 +2,8 @@
 import { PAL, paper, stroke, wash, grassTuft, lantern, splat, rng } from '../ink.js';
 import { drawPerson } from '../figures.js';
 import { T, text, panel, FONT } from '../ui.js';
+import { createAmbient } from '../ambient.js';
+import { startBattle } from '../encounters.js';
 const SPEED = 210, LEADER = 'itsuki', FOLLOW = ['benika', 'gonzo'];
 export function create(game, params) {
   const def = game.data.pois[params.id], raw = game.data.poiRaw[params.id];
@@ -19,14 +21,17 @@ export function create(game, params) {
     if (tr.kind === 'sign') { banner = 3; signText = T(tr.ref, {}, 'A broken seal-stone. Its red mark has gone grey at the edges.'); }
   }
   let signText = null;
+  const amb = createAmbient({ quality: 'auto', sfx: (k) => game.audio.play(k, { gain: 0.3 }) }); // Ashley: grass, mist, leaves, lanterns
   return {
-    enter() { game.audio.setScene(def.id); enterWalker(); game.core.set_node(def.node); },
+    enter() { game.audio.setScene(def.id); enterWalker(); game.core.set_node(def.node); amb.load(def); },
     resume() { game.audio.setScene(def.id); enterWalker(); cool = 0.6; },
-    onResult(res) { if (res && res.lose) { px = def.spawn[0]; py = def.spawn[1]; enterWalker(); } game.save(); },
+    onResult(res) { game.enc.afterBattle(); if (res && res.lose) { px = def.spawn[0]; py = def.spawn[1]; enterWalker(); } game.save(); },
     update(dt, inp) {
       banner = Math.max(0, banner - dt); cool = Math.max(0, cool - dt);
       const [mx, my] = inp.move(); moving = Math.hypot(mx, my) > 0.05;
-      if (moving) { const p = game.core.walker_step(mx * SPEED, my * SPEED * 0.75, dt); px = p[0]; py = p[1]; if (Math.abs(mx) > 0.1) face = mx > 0 ? 1 : -1; walkPh = (walkPh + dt * 1.6 * Math.hypot(mx, my)) % 1; stepAcc += dt * Math.hypot(mx, my); if (stepAcc > 0.31) { stepAcc = 0; game.audio.play('step', { wood: def.ground === 'wood' }); } }
+      amb.update(dt, { x: 0, y: 0 }, { player: { x: px, y: py } });
+      if (moving) { const ox = px, oy = py; const p = game.core.walker_step(mx * SPEED, my * SPEED * 0.75, dt); px = p[0]; py = p[1];
+        const hit = cool > 0 ? null : game.enc.move({ scene: 'poi', poi: def, x: px, y: py, dist: Math.hypot(px - ox, py - oy) }); if (hit) { startBattle(game, hit); return; } if (Math.abs(mx) > 0.1) face = mx > 0 ? 1 : -1; walkPh = (walkPh + dt * 1.6 * Math.hypot(mx, my)) % 1; stepAcc += dt * Math.hypot(mx, my); if (stepAcc > 0.31) { stepAcc = 0; game.audio.play('step', { wood: def.ground === 'wood' }); } }
       if (!trail.length || Math.hypot(trail[0][0] - px, trail[0][1] - py) > 4) { trail.unshift([px, py, face]); trail.length = Math.min(trail.length, 60); }
       const ids = game.core.walker_triggers().split(',').filter(Boolean); prompt = null;
       for (const id of ids) {
@@ -44,8 +49,7 @@ export function create(game, params) {
       const par = (px - 640) / 640;
       // far layer (parallax 0.2)
       if (layer('far')) ctx.drawImage(layer('far'), -16 - par * 12, -6, 1312, 738); else { ctx.drawImage(paper(1280, 720), 0, 0); /* TODO(art) */ }
-      // FX slot A: drifting mist
-      for (let i = 0; i < 5; i++) wash(ctx, ((t * (10 + i * 4) + i * 330) % 1600) - 160, 300 + i * 40, 260, 34, PAL.paper, isForest ? 0.42 : 0.25);
+      amb.drawBack(ctx, { x: 0, y: 0 }); // Ashley ambient (back): mist bands, far grass
       if (layer('mid')) ctx.drawImage(layer('mid'), -12 - par * 22, -4, 1304, 733);
       // FX slot B: lantern glow (town) / ground mist (forest)
       if (!isForest) for (const [lx, ly] of [[425, 270], [518, 340], [735, 349]]) { const fl = 0.7 + 0.3 * Math.sin(t * 7 + lx) * Math.sin(t * 3.1 + ly); wash(ctx, lx - par * 22, ly + 6, 48, 48, '#e9a33c', 0.32 * fl); }
@@ -58,10 +62,7 @@ export function create(game, params) {
       actors.sort((a, b) => a.y - b.y).forEach((a) => a.d());
       // near layer (parallax 1.1) + swaying grass
       if (layer('near')) ctx.drawImage(layer('near'), -20 - par * 34, -10 + Math.sin(t * 0.8) * 1.5, 1320, 742);
-      for (const g of tufts) grassTuft(ctx, g.x - par * 30, g.y, g.h, t, g.x | 0, PAL.ink, 0.55);
-      // FX slot C: falling leaves / ash
-      for (const l of leaves) { l.y += l.sp * 0.016; l.x += Math.sin(t + l.ph) * 0.4 - 0.15; if (l.y > 730) { l.y = -10; l.x = Math.random() * 1280; }
-        stroke(ctx, [[l.x, l.y], [l.x + 7 * l.s * Math.cos(t * 2 + l.ph), l.y + 4 * l.s]], { w: 5 * l.s, color: isForest ? PAL.w1 : PAL.w2, alpha: 0.6, seed: l.ph * 10 | 0, dry: 0, bleed: false }); }
+      amb.drawFront(ctx, { x: 0, y: 0 }); // Ashley ambient (front): near grass, leaves, lanterns
       // UI
       if (banner > 0) { const a = Math.min(1, banner); panel(ctx, 440, 26, 400, 60, { seed: 5, alpha: a }); text(ctx, signText || def.name, 640, 66, { size: signText ? 20 : 34, align: 'center', font: signText ? undefined : FONT.title, alpha: a }); if (banner <= 0.05) signText = null; }
       if (prompt && prompt.kind !== 'battle') { const lbl = prompt.kind === 'shop' ? 'A: Enter Kōbō Tsuru' : prompt.kind === 'dialogue' ? 'A: Talk to Old Hotaru' : 'A: Look'; panel(ctx, px - 120, py - 150, 240, 40, { seed: 8 }); text(ctx, lbl, px, py - 123, { size: 20, align: 'center' }); }

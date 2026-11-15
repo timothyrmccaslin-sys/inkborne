@@ -35,15 +35,15 @@
     {
       "id": "inkstone_chip",
       "name": "Inkstone Chip",
-      "desc": "Grind it, wet it, and the brush drinks. Adds 20 red ink to one ally.",
+      "desc": "Grind it, wet it, and the brush drinks. Adds 25 Vermilion Ink to one ally.",
       "kind": "ink",
-      "power": 20,
+      "power": 25,
       "price": 40
     },
     {
       "id": "fresh_ink_pot",
       "name": "Pot of Fresh Ink",
-      "desc": "Rich and dark, still smelling of pine soot. Adds 50 red ink to one ally.",
+      "desc": "Rich and dark, still smelling of pine soot. Adds 50 Vermilion Ink to one ally.",
       "kind": "ink",
       "power": 50,
       "price": 110
@@ -65,6 +65,199 @@
       "power": 150,
       "element": "gale",
       "price": 150
+    }
+  ],
+  "equipment": [
+    {
+      "id": "redcord_katana",
+      "name": "Red-Cord Katana",
+      "desc": "A brush-handled blade bound with a red cord. Every cut leaves a trail of ink.",
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 4
+      },
+      "element": null,
+      "price": 40,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki"
+      ],
+      "starting_for": "itsuki"
+    },
+    {
+      "id": "prayerslip_bow",
+      "name": "Prayer-Slip Bow",
+      "desc": "A tall shrine bow hung with prayer slips that flutter when it sings.",
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 4
+      },
+      "element": null,
+      "price": 40,
+      "in_shop": false,
+      "equippable_by": [
+        "benika"
+      ],
+      "starting_for": "benika"
+    },
+    {
+      "id": "ironband_staff",
+      "name": "Iron-Banded Staff",
+      "desc": "Old temple oak bound in iron. Heavy, honest, and hard to break.",
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 4
+      },
+      "element": null,
+      "price": 40,
+      "in_shop": false,
+      "equippable_by": [
+        "gonzo"
+      ],
+      "starting_for": "gonzo"
+    },
+    {
+      "id": "sealedge_katana",
+      "name": "Seal-Edge Katana",
+      "desc": "Its blade is stamped with a fresh red seal. It cuts clean through smudge.",
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 9
+      },
+      "element": null,
+      "price": 180,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki"
+      ]
+    },
+    {
+      "id": "cranefeather_bow",
+      "name": "Crane-Feather Bow",
+      "desc": "Fletched with feathers shed by the shrine's paper cranes. Its arrows never wander.",
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 9
+      },
+      "element": null,
+      "price": 180,
+      "in_shop": false,
+      "equippable_by": [
+        "benika"
+      ]
+    },
+    {
+      "id": "bellbronze_staff",
+      "name": "Bell-Bronze Staff",
+      "desc": "Capped with bronze from a cracked temple bell. It hums when it strikes.",
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 9
+      },
+      "element": null,
+      "price": 180,
+      "in_shop": false,
+      "equippable_by": [
+        "gonzo"
+      ]
+    },
+    {
+      "id": "washi_vest",
+      "name": "Layered Washi Vest",
+      "desc": "Oiled paper, folded and stitched in layers. Tougher than it looks.",
+      "slot": "armor",
+      "tier": 1,
+      "mods": {
+        "def": 4,
+        "mdf": 2
+      },
+      "element": null,
+      "price": 40,
+      "in_shop": true,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
+    },
+    {
+      "id": "lacquer_haori",
+      "name": "Lacquered Haori",
+      "desc": "A coat lacquered black and lined with blessed paper. Ink beads right off it.",
+      "slot": "armor",
+      "tier": 2,
+      "mods": {
+        "def": 9,
+        "mdf": 5
+      },
+      "element": null,
+      "price": 180,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
+    },
+    {
+      "id": "prayer_mala",
+      "name": "Prayer-Bead Mala",
+      "desc": "Beads the size of plums. Counting them steadies the breath.",
+      "slot": "accessory",
+      "tier": 1,
+      "mods": {
+        "hp": 20
+      },
+      "element": null,
+      "price": 60,
+      "in_shop": false,
+      "equippable_by": [
+        "gonzo"
+      ],
+      "starting_for": "gonzo"
+    },
+    {
+      "id": "paper_charm",
+      "name": "Folded Paper Charm",
+      "desc": "A shrine charm folded into a crane. Clip it somewhere it can see you.",
+      "slot": "accessory",
+      "tier": 1,
+      "mods": {
+        "hp": 20
+      },
+      "element": null,
+      "price": 60,
+      "in_shop": true,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
+    },
+    {
+      "id": "lantern_bell",
+      "name": "Lantern Bell",
+      "desc": "A tiny brass bell from a shrine lantern. Its ring keeps the grey at bay.",
+      "slot": "accessory",
+      "tier": 2,
+      "mods": {
+        "spd": 3,
+        "mdf": 3
+      },
+      "element": null,
+      "price": 150,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
     }
   ]
 }

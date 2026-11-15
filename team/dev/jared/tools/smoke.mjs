@@ -1,0 +1,27 @@
+import fs from 'node:fs';
+import init, { Game } from './core/pkg/inkborne_core.js';
+const D = (f) => fs.readFileSync(new URL('./data/' + f, import.meta.url), 'utf8');
+await init({ module_or_path: fs.readFileSync(new URL('./core/pkg/inkborne_core_bg.wasm', import.meta.url)) });
+const mem = new Map(); let quota = false; const warns = [];
+globalThis.localStorage = { getItem: (k) => mem.has(k) ? mem.get(k) : null, setItem: (k, v) => { if (quota) { const e = new Error('full'); e.name = 'QuotaExceededError'; throw e; } mem.set(k, String(v)); }, removeItem: (k) => mem.delete(k) };
+console.warn = (...a) => warns.push(a.join(' '));
+const S = await import('./save.js') /* copy team/dev/jared/src/save.js next to this file */;
+const items = D('items.json'); const it = JSON.parse(items);
+const itemsCore = JSON.stringify({ items: [...it.items, ...(it.equipment || []).map((e) => ({ id: e.id, name: e.name, desc: e.desc, kind: 'gear', power: 0, price: e.price || 0 }))] });
+const mk = () => { const g = new Game(D('party.json'), D('enemies.json'), itemsCore, 7); g.set_rules(D('transformation.json')); g.set_equipment(items); return g; };
+const a = mk(); a.buy('rice_cake', 1); a.set_node('hanshi');
+console.log('write', S.writeSave(a), 'key', [...mem.keys()]);
+const saved = mem.get('inkborne-save-v1'); console.log(saved);
+const b = mk(); console.log('hasSave', S.hasSave(), 'load', S.loadSave(b), 'same', b.save_json() === saved, 'warns', warns.length);
+quota = true; a.buy('rice_cake', 1); console.log('quota write', S.writeSave(a), 'kept old', mem.get('inkborne-save-v1') === saved); quota = false;
+const v = JSON.parse(saved); v.inv.mystery = 3; v.ink.itsuki = 400; v.equipped.benika.weapon = 'redcord_katana'; mem.set('inkborne-save-v1', JSON.stringify(v));
+console.log('tampered load', S.loadSave(b)); console.log(warns.slice(-4).join('\n'));
+mem.set('inkborne-save-v1', '{"gold": 5'); const before = b.save_json(); console.log('malformed load', S.loadSave(b), 'state kept', b.save_json() === before, 'storage kept', mem.get('inkborne-save-v1') === '{"gold": 5');
+console.log(warns.slice(-2).join('\n'));
+// unknown / missing node -> world.start (fixNode via loadSave(core, world))
+const world = JSON.parse(D('world.json'));
+const n1 = JSON.parse(saved); n1.node = 'atlantis'; mem.set('inkborne-save-v1', JSON.stringify(n1));
+const c = mk(); console.log('unknown node load', S.loadSave(c, world), 'node ->', c.node(), 'is start', c.node() === world.start); console.log(warns.slice(-1)[0]);
+const n2 = JSON.parse(saved); delete n2.node; mem.set('inkborne-save-v1', JSON.stringify(n2));
+console.log('missing node load', S.loadSave(c, world), 'node ->', c.node()); console.log(warns.slice(-1)[0]);
+const before2 = warns.length; mem.set('inkborne-save-v1', saved); console.log('valid node load', S.loadSave(c, world), 'node ->', c.node(), 'new warnings', warns.length - before2);

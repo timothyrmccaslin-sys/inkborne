@@ -1,0 +1,104 @@
+{
+  "_note": "Equipment is PROPOSED STRUCTURE ONLY. Ollie's items.json has no weapons, armor or accessories, so every entry id/name is null and flagged for Ollie. Numbers are Jane's budget per tier; Jake owns base stats (party.json). Stat modifiers are additive to base stats; element is a Six Inks key or null (weapons: stroke element).",
+  "slots": [
+    "weapon",
+    "armor",
+    "accessory"
+  ],
+  "equippable_by": [
+    "itsuki",
+    "benika",
+    "gonzo"
+  ],
+  "stat_keys": [
+    "hp",
+    "atk",
+    "def",
+    "mat",
+    "mdf",
+    "spd"
+  ],
+  "equipment": [
+    {
+      "id": null,
+      "name": null,
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 4
+      },
+      "element": null,
+      "price": 40,
+      "in_shop": false,
+      "flag": "MISSING: needs id/name/desc from Ollie"
+    },
+    {
+      "id": null,
+      "name": null,
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 9
+      },
+      "element": null,
+      "price": 180,
+      "in_shop": false,
+      "flag": "MISSING: needs id/name/desc from Ollie"
+    },
+    {
+      "id": null,
+      "name": null,
+      "slot": "armor",
+      "tier": 1,
+      "mods": {
+        "def": 4,
+        "mdf": 2
+      },
+      "element": null,
+      "price": 40,
+      "in_shop": false,
+      "flag": "MISSING: needs id/name/desc from Ollie"
+    },
+    {
+      "id": null,
+      "name": null,
+      "slot": "armor",
+      "tier": 2,
+      "mods": {
+        "def": 9,
+        "mdf": 5
+      },
+      "element": null,
+      "price": 180,
+      "in_shop": false,
+      "flag": "MISSING: needs id/name/desc from Ollie"
+    },
+    {
+      "id": null,
+      "name": null,
+      "slot": "accessory",
+      "tier": 1,
+      "mods": {
+        "hp": 20
+      },
+      "element": null,
+      "price": 60,
+      "in_shop": false,
+      "flag": "MISSING: needs id/name/desc from Ollie"
+    },
+    {
+      "id": null,
+      "name": null,
+      "slot": "accessory",
+      "tier": 2,
+      "mods": {
+        "spd": 3,
+        "mdf": 3
+      },
+      "element": null,
+      "price": 150,
+      "in_shop": false,
+      "flag": "MISSING: needs id/name/desc from Ollie"
+    }
+  ]
+}

@@ -111,7 +111,8 @@ which gives a `performance.now()` timestamp so the judgement is not quantized to
 ## 7. Data (`data/*.json`, loaded at boot and passed to the core as strings)
 - **`party.json`** `{ "members": [ { "id", "name", "title", "element", "lv", "hp", "atk", "def", "mat", "mdf", "spd", "ink", "strokes": [ { "id", "name", "hits": [ { "gap_ms", "mult" } ], "finish_mult" } ], "seal": { "name", "seals", "mult", "element" } } ] }`
   - `gap_ms` is how long the ring takes to close for that hit. The first hit is measured from the start.
-- **`enemies.json`** `{ "enemies": [ { "id", "name", "element", "hp", "atk", "def", "mat", "mdf", "spd", "mon", "moves": [ { "id", "name", "kind": "phys|elem", "power", "element?", "weight" } ] } ], "encounters": { "<id>": ["enemyId", ...] } }`
+- **`enemies.json`** `{ "enemies": [ { "id", "name", "element", "hp", "atk", "def", "mat", "mdf", "spd", "mon", "xp", "moves": [ { "id", "name", "kind": "phys|elem", "power", "element?", "weight" } ] } ], "encounters": { "<id>": ["enemyId", ...] } }`
+  `xp` (int, optional, default 0): experience granted to each surviving party member on victory.
 - **`items.json`** `{ "items": [ { "id", "name", "desc", "kind": "heal|healall|ink|bomb", "power", "element?", "price" } ] }`. The sell price is `floor(price/2)`.
 - **`shops.json`** `{ "<shopId>": { "name", "keeper", "stock": ["itemId", ...] } }`
 - **`world.json`** `{ "nodes": [ { "id", "name", "x", "y", "poi?", "locked?" } ], "paths": [ ["a", "b", [ [x, y] ...bezier ctrl ] ] ], "start": "nodeId" }`

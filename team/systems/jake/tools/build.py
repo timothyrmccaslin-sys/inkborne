@@ -136,10 +136,10 @@ def build_transformation():
             "decay_per_turn": 0,
         },
         "fill": {
-            "stroke_hit": 5,
+            "stroke_hit": 4,
             "clean_line_bonus": 4,
-            "chain_complete_bonus": 4,
-            "perfect_chain_bonus": 8,
+            "chain_complete_bonus": 6,
+            "perfect_chain_bonus": 10,
             "perfect_chain_replaces_complete": True,
             "kill_bonus": 3,
             "damage_taken": {"per_pct_hp_lost": 0.3, "min_if_damaged": 1, "max_per_hit": 15,
@@ -151,7 +151,7 @@ def build_transformation():
             "items": "items.json kind 'ink' adds `power` (owned by Jane)",
         },
         "reset": {
-            "on_ko": "keep",
+            "on_ko": 0,
             "on_unfurl": 0,
             "on_battle_end": "keep",
             "on_flee": "keep",

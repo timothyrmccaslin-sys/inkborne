@@ -21,7 +21,7 @@
       "id": "first_brush",
       "name": "First Brush",
       "category": "lore",
-      "desc": "The brush that painted Shirofuda. Each party member carries a fragment of its red ink.",
+      "desc": "The brush that painted Shirofuda. Each party member carries a fragment of its Vermilion Ink.",
       "source": "CANON",
       "status": "canon"
     },
@@ -388,7 +388,7 @@
       "id": "rice_cake",
       "name": "Rice Cake",
       "category": "item",
-      "desc": "Sweet and filling. Restores a little HP to one ally.",
+      "desc": "Sweet and filling. Restores 50 HP to one ally.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
@@ -396,15 +396,15 @@
       "id": "plum_tonic",
       "name": "Plum Tonic",
       "category": "item",
-      "desc": "Sour enough to wake the dead, nearly. Restores a lot of HP to one ally.",
+      "desc": "Sour enough to wake the dead, nearly. Restores 200 HP to one ally.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
     {
-      "id": "shared_tea",
+      "id": "pine_tea",
       "name": "Pot of Pine Tea",
       "category": "item",
-      "desc": "One pot, three cups. Restores some HP to the whole party.",
+      "desc": "One pot, three cups. Restores 80 HP to the whole party.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
@@ -412,7 +412,7 @@
       "id": "festival_bento",
       "name": "Festival Bento",
       "category": "item",
-      "desc": "Packed for a feast that never came. Restores a lot of HP to the whole party.",
+      "desc": "Packed for a feast that never came. Restores 250 HP to the whole party.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
@@ -420,15 +420,15 @@
       "id": "inkstone_chip",
       "name": "Inkstone Chip",
       "category": "item",
-      "desc": "Grind it, wet it, and the brush drinks. Restores a little ink.",
+      "desc": "Grind it, wet it, and the brush drinks. Adds 25 Vermilion Ink to one ally.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
     {
-      "id": "vermilion_pot",
+      "id": "fresh_ink_pot",
       "name": "Pot of Fresh Ink",
       "category": "item",
-      "desc": "Rich and dark, still smelling of pine soot. Restores a lot of ink.",
+      "desc": "Rich and dark, still smelling of pine soot. Adds 50 Vermilion Ink to one ally.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
@@ -436,7 +436,7 @@
       "id": "paper_cracker",
       "name": "Paper Firecracker",
       "category": "item",
-      "desc": "Festival leftovers. Bangs loudly enough to scatter a Blotling.",
+      "desc": "Festival leftovers. Bursts for 60 Ember damage on one foe.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
     },
@@ -444,9 +444,149 @@
       "id": "thunder_jar",
       "name": "Thunder Jar",
       "category": "item",
-      "desc": "Grandmother Tsuru won't say what's in it. Hits all enemies.",
+      "desc": "Grandmother Tsuru won't say what's inside. Bursts for 150 Gale damage on one foe.",
       "source": "Ollie (approved by Kekai)",
       "status": "canon"
+    },
+    {
+      "id": "redcord_katana",
+      "name": "Red-Cord Katana",
+      "category": "equipment",
+      "desc": "A brush-handled blade bound with a red cord. Every cut leaves a trail of ink.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "weapon",
+      "equippable_by": [
+        "itsuki"
+      ]
+    },
+    {
+      "id": "prayerslip_bow",
+      "name": "Prayer-Slip Bow",
+      "category": "equipment",
+      "desc": "A tall shrine bow hung with prayer slips that flutter when it sings.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "weapon",
+      "equippable_by": [
+        "benika"
+      ]
+    },
+    {
+      "id": "ironband_staff",
+      "name": "Iron-Banded Staff",
+      "category": "equipment",
+      "desc": "Old temple oak bound in iron. Heavy, honest, and hard to break.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "weapon",
+      "equippable_by": [
+        "gonzo"
+      ]
+    },
+    {
+      "id": "sealedge_katana",
+      "name": "Seal-Edge Katana",
+      "category": "equipment",
+      "desc": "Its blade is stamped with a fresh red seal. It cuts clean through smudge.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "weapon",
+      "equippable_by": [
+        "itsuki"
+      ]
+    },
+    {
+      "id": "cranefeather_bow",
+      "name": "Crane-Feather Bow",
+      "category": "equipment",
+      "desc": "Fletched with feathers shed by the shrine's paper cranes. Its arrows never wander.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "weapon",
+      "equippable_by": [
+        "benika"
+      ]
+    },
+    {
+      "id": "bellbronze_staff",
+      "name": "Bell-Bronze Staff",
+      "category": "equipment",
+      "desc": "Capped with bronze from a cracked temple bell. It hums when it strikes.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "weapon",
+      "equippable_by": [
+        "gonzo"
+      ]
+    },
+    {
+      "id": "washi_vest",
+      "name": "Layered Washi Vest",
+      "category": "equipment",
+      "desc": "Oiled paper, folded and stitched in layers. Tougher than it looks.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "armor",
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
+    },
+    {
+      "id": "lacquer_haori",
+      "name": "Lacquered Haori",
+      "category": "equipment",
+      "desc": "A coat lacquered black and lined with blessed paper. Ink beads right off it.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "armor",
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
+    },
+    {
+      "id": "prayer_mala",
+      "name": "Prayer-Bead Mala",
+      "category": "equipment",
+      "desc": "Beads the size of plums. Counting them steadies the breath.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "accessory",
+      "equippable_by": [
+        "gonzo"
+      ]
+    },
+    {
+      "id": "paper_charm",
+      "name": "Folded Paper Charm",
+      "category": "equipment",
+      "desc": "A shrine charm folded into a crane. Clip it somewhere it can see you.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "accessory",
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
+    },
+    {
+      "id": "lantern_bell",
+      "name": "Lantern Bell",
+      "category": "equipment",
+      "desc": "A tiny brass bell from a shrine lantern. Its ring keeps the grey at bay.",
+      "source": "Ollie",
+      "status": "canon",
+      "slot": "accessory",
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ]
     }
   ]
 }

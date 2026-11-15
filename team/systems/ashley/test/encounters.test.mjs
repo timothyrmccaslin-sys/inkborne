@@ -8,7 +8,7 @@ const data = JSON.parse(readFileSync(new URL('../zones.json', import.meta.url)))
 const live = (f) => { try { return JSON.parse(readFileSync(new URL('../../../../data/' + f, import.meta.url))); } catch { return null; } };
 const ENEMIES = (live('enemies.json')?.enemies || [{ id: 'blotling' }, { id: 'hollow_lantern' }, { id: 'smudge_ronin' }]).map((e) => e.id);
 const WORLD = live('world.json');
-const BANNED = /dragoon|addition|wingly|spirit/i;
+const BANNED = /drag[o]on|addition|wingly|spirit/i;
 const CANON = ['blotling', 'hollow_lantern', 'smudge_ronin']; // canon rule (Marc via Tim): only these enemies
 const BOSS = 'smudge_ronin';
 let pass = 0; const ok = (m) => { pass++; console.log('ok -', m); };
@@ -37,7 +37,7 @@ for (const k of Object.keys(data.fixed)) assert(data.encounters[k], 'fixed ' + k
 const liveEnc = live('enemies.json')?.encounters || {};
 for (const [k, v] of Object.entries(liveEnc)) if (data.encounters[k]) assert.deepEqual(data.encounters[k], v, 'merge would change existing encounter ' + k);
 assert(!BANNED.test(JSON.stringify(data)), 'banned term in zones.json');
-for (const f of ['../ambient.js', '../encounters.js', '../demo.html', '../README.md']) assert(!/dragoon/i.test(readFileSync(new URL(f, import.meta.url), 'utf8')), 'banned word in ' + f);
+for (const f of ['../ambient.js', '../encounters.js', '../demo.html', '../README.md']) assert(!/drag[o]on/i.test(readFileSync(new URL(f, import.meta.url), 'utf8')), 'banned word in ' + f);
 ok(`zones.json schema, refs, enemy ids (${WORLD ? 'checked against live data/' : 'built-in list'}), IP terms`);
 
 // rates: simulate long walks per zone and check the mean / bounds
@@ -85,11 +85,35 @@ const DEEP_X = (() => { const R = zoneRect(data.zones.find((z) => z.id === 'sumi
   ok('seeded determinism, state()/restore(), post-battle grace, fixed mini-boss');
 }
 
+// Full forest crossing: walk straight from the live spawn to the safe Smudge Ronin clearing at walking
+// speed (220 px/s, 60 fps), fighting the scripted 'ambush' trigger on the way (afterBattle after every
+// fight). Tim's target: about 1 random fight per crossing on top of the 2 fixed ones.
+{
+  const fp = live('pois/forest.json') || { id: 'forest', w: 1280, h: 720, spawn: [90, 640], triggers: [{ id: 'ambush', rect: [560, 548, 120, 172] }] };
+  const poi = { id: 'forest', w: fp.w, h: fp.h }, ambX = fp.triggers.find((t) => t.id === 'ambush').rect[0];
+  const endX = zoneRect(data.zones.find((z) => z.id === 'sumikage-ronin-clearing'), poi)[0], y = fp.spawn[1];
+  const N = 20000; let fights = 0, none = 0;
+  for (let s = 0; s < N; s++) {
+    const e = createEncounters(data, { seed: s + 1 }); let x = fp.spawn[0], fixed = false, mine = 0;
+    while (x < endX) { const nx = x + 220 / 60; if (!fixed && nx >= ambX) { fixed = true; e.afterBattle(); } if (e.move({ scene: 'poi', poi, x: nx, y, dist: nx - x })) { mine++; e.afterBattle(); } x = nx; }
+    fights += mine; if (!mine) none++;
+  }
+  const avg = fights / N; globalThis.CROSSING_AVG = avg;
+  assert(avg > 0.8 && avg < 1.25, 'crossing average ' + avg);
+  assert.equal(zoneRect(data.zones.find((z) => z.id === 'sumikage-trailhead'), poi)[0], 0);
+  const deep = data.zones.find((z) => z.id === 'sumikage-deep'), tot = deep.table.reduce((a, b) => a + b.weight, 0);
+  assert.equal(deep.table.find((t) => t.encounter === 'sumikage_c').weight / tot, 0.25, 'sumikage_c is a 25% repeat in the deep trees');
+  ok(`forest crossing (spawn x ${fp.spawn[0]} to clearing x ${Math.round(endX)}, ${N} seeds): ${avg.toFixed(2)} random fights on average + 2 fixed; ${(100 * none / N).toFixed(0)}% of crossings have none`);
+}
+
 // startBattle shape
 {
   const { startBattle } = await import('../encounters.js');
   let got; startBattle({ push: (n, p) => (got = [n, p]) }, createEncounters(data, { seed: 1 }).fixed('wood_lantern_pair'));
-  assert.equal(got[0], 'battle'); assert.equal(got[1].encounter, 'wood_lantern_pair'); assert.deepEqual(got[1].enemies, ['hollow_lantern', 'hollow_lantern']);
+  assert.equal(got[0], 'battle');
+  assert.deepEqual(got[1], { enc: 'wood_lantern_pair', bg: 'battle-forest', boss: false, canFlee: true }, 'params are the battle.js contract { enc, bg, boss } + optional extras only');
+  { let g2; startBattle({ push: (n, p) => (g2 = p) }, createEncounters(data, { seed: 1 }).fixed('sumikage_boss')); assert.equal(g2.boss, true); assert.equal(g2.enc, 'sumikage_boss'); assert.equal(g2.canFlee, false); }
+  { let g3; startBattle({ push: (n, p) => (g3 = p) }, { encounter: 'wood_blotling', bg: 'forest', canFlee: true, first: 'enemy' }); assert.equal(g3.first, 'enemy'); assert(!('music' in g3) && !('enemies' in g3)); }
   ok('startBattle pushes the battle action screen with encounter params');
 }
 console.log(`\n${pass} checks passed`);

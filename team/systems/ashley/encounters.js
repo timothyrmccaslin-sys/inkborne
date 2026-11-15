@@ -6,7 +6,7 @@
 //   // POI scene, each update while the walker moves:
 //   const hit = enc.move({ scene: 'poi', poi: poiJson, x, y, dist });
 //   // world scene, while the party token travels along a path:
-//   const hit = enc.move({ scene: 'world', path: ['trailhead', 'mistcedar'], dist });
+//   const hit = enc.move({ scene: 'world', path: ['woods_edge', 'sumikage'], dist });
 //   if (hit) startBattle(game, hit);
 //   // battle over (POI onResult / world resume):
 //   enc.afterBattle();
@@ -74,7 +74,7 @@ export function createEncounters(data, opts = {}) {
     const first = z && z.ambush && r() < z.ambush ? 'enemy' : null;
     return Object.assign({
       zone: z ? z.id : null, encounter: encId, enemies: (data.encounters[encId] || []).slice(),
-      bg: fixed.bg || (z && z.bg) || 'forest', music: fixed.music || 'battle', canFlee: fixed.canFlee ?? true, first,
+      bg: fixed.bg || (z && z.bg) || 'forest', canFlee: fixed.canFlee ?? true, first,
     }, extra);
   }
 
@@ -110,11 +110,15 @@ export function createEncounters(data, opts = {}) {
 }
 
 // Hands an encounter to the battle screen per SPEC 3: push the action screen over the current view.
-// The battle scene reads params.encounter (an enemies.json encounters id) and passes it to the core.
+// Params are the live src/scenes/battle.js contract: `enc` (an enemies.json encounters id; the core
+// resolves the group itself via core.start_battle), `bg` (art key 'battle-<poi>') and `boss` (hides Flee).
+// `first` ('enemy' = ambush) and `canFlee` are optional extras battle.js may ignore. Music is left to the scene.
 export function startBattle(game, hit, extra = {}) {
-  if (game.audio && game.audio.sfx) try { game.audio.sfx('wipe'); } catch (e) { /* audio optional */ }
-  return game.push('battle', Object.assign({
-    encounter: hit.encounter, enemies: hit.enemies, bg: hit.bg, music: hit.music,
-    canFlee: hit.canFlee, first: hit.first, zone: hit.zone,
-  }, extra));
+  const a = game.audio;
+  try { if (a && a.play) a.play('ring'); } catch (e) { /* audio optional */ }
+  const bg = hit.bg ? (hit.bg.startsWith('battle-') ? hit.bg : 'battle-' + hit.bg) : 'battle-forest';
+  const params = { enc: hit.encounter, bg, boss: hit.canFlee === false };
+  if (hit.first) params.first = hit.first;
+  if (hit.canFlee !== undefined) params.canFlee = hit.canFlee;
+  return game.push('battle', Object.assign(params, extra));
 }

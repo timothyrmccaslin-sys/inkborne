@@ -67,7 +67,7 @@
     "text": "And this young man? A stranger, with his hand wrapped.",
     "choices": [
      {
-      "text": "I need somewhere to sleep. Hard to sleep with ink-beasts at the door.",
+      "text": "I need somewhere to sleep.",
       "next": "n12"
      },
      {
@@ -133,10 +133,15 @@
    },
    "n12b": {
     "who": "itsuki",
-    "mood": "calm",
+    "mood": "angry",
     "text": "Point me at whatever's breaking the seals. I'd like a word with it.",
-    "next": "n13",
-    "_todo": "integrator line, pending Ollie"
+    "next": "n13b"
+   },
+   "n13b": {
+    "who": "benika",
+    "mood": "smile",
+    "text": "Careful, Hotaru. He's almost friendly when there's something to cut.",
+    "next": "n14"
    }
   },
   "start": "n01"

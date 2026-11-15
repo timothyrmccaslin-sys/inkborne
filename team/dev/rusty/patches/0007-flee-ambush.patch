@@ -1,0 +1,188 @@
+diff --git a/core/src/lib.rs b/core/src/lib.rs
+index dc994ee..31f1fe6 100644
+--- a/core/src/lib.rs
++++ b/core/src/lib.rs
+@@ -139,6 +139,20 @@ impl InkRules {
+ struct GuardRules { damage_mult: f64, heal_pct: f64, heal_pct_inkwing: f64 }
+ impl Default for GuardRules { fn default() -> Self { GuardRules { damage_mult: 0.5, heal_pct: 10.0, heal_pct_inkwing: 15.0 } } }
+ 
++/// Flee chance (seeded, deterministic): p = clamp(base + per_spd * (avg party SPD - avg enemy SPD)
++/// + per_fail * failed_attempts_this_battle, min, max), using living fighters' effective SPD (Inkwing applied).
++/// Success iff rng.next() < p. Data: optional `flee {base, per_spd, per_fail, min, max}` in set_rules / set_flee_rules.
++#[derive(Clone)]
++struct FleeRules { base: f64, per_spd: f64, per_fail: f64, min: f64, max: f64 }
++impl Default for FleeRules { fn default() -> Self { FleeRules { base: 0.5, per_spd: 0.05, per_fail: 0.25, min: 0.25, max: 0.95 } } }
++impl FleeRules {
++    fn apply(&mut self, v: &Value) {
++        let f = |k: &str, d: f64| v[k].as_f64().filter(|x| x.is_finite()).unwrap_or(d);
++        self.base = f("base", self.base); self.per_spd = f("per_spd", self.per_spd); self.per_fail = f("per_fail", self.per_fail);
++        self.min = f("min", self.min).clamp(0.0, 1.0); self.max = f("max", self.max).clamp(self.min, 1.0);
++    }
++}
++
+ #[derive(Clone)]
+ struct Combo { actor: usize, target: usize, stroke_idx: usize, stroke_id: String, name: String, hits: Vec<(f64, f64, f64)>, next: usize, anchor: f64, grades: Vec<u8>, presses: Vec<f64> }
+ 
+@@ -169,6 +183,8 @@ pub struct Game {
+     chart: Option<BTreeMap<String, BTreeMap<String, f64>>>,
+     guard_rules: GuardRules,
+     enemy_dmg_mult: f64,
++    // encounter flags (Ashley's zones.json `fixed.<id>.canFlee`, encounters.js `first`)
++    can_flee: bool, first: Option<String>, flee_fails: u32, flee_rules: FleeRules,
+ }
+ /// Inkwing multipliers [atk, def, mat, mdf, spd] from transformation.json (Jake).
+ fn forms_of(f: &BTreeMap<String, (String, String, [f64; 5])>, id: &str) -> [f64; 5] { f.get(id).map(|x| x.2).unwrap_or([1.5, 1.25, 1.3, 1.25, 1.0]) }
+@@ -190,7 +206,7 @@ impl Game {
+         st.inv.insert("rice_cake".into(), 3); st.inv.insert("paper_cracker".into(), 1); st.inv.insert("inkstone_chip".into(), 1);
+         for m in &p.members { st.hp.insert(m.id.clone(), m.hp); st.ink.insert(m.id.clone(), m.ink); }
+         Ok(Game { party: p.members, enemies: e.enemies, encounters: e.encounters, items: i.items, st, rng: Rng(seed as u64 * 2654435761 + 1),
+-            fighters: vec![], order: vec![], turn_pos: 0, round: 0, battle_over: None, walk: Walker::default(), forms: BTreeMap::new(), win: Windows::default(), combo: None, ink: InkRules::default(), chart: None, guard_rules: GuardRules::default(), enemy_dmg_mult: 0.8 })
++            fighters: vec![], order: vec![], turn_pos: 0, round: 0, battle_over: None, walk: Walker::default(), forms: BTreeMap::new(), win: Windows::default(), combo: None, ink: InkRules::default(), chart: None, guard_rules: GuardRules::default(), enemy_dmg_mult: 0.8, can_flee: true, first: None, flee_fails: 0, flee_rules: FleeRules::default() })
+     }
+ 
+     /// Load Inkwing forms from transformation.json (optional; defaults otherwise).
+@@ -201,6 +217,7 @@ impl Game {
+             self.forms.insert(id.clone(), (x["form_name"].as_str().unwrap_or("").into(), x["passive"]["id"].as_str().unwrap_or("").into(), [g("atk"), g("def"), g("mat"), g("mdf"), g("spd")]));
+         } }
+         if v["combo_windows"].is_object() { self.win.apply(&v["combo_windows"]); }
++        if v["flee"].is_object() { self.flee_rules.apply(&v["flee"]); }
+         self.ink.apply(&v);
+         if let Some(x) = v["inkwing_rules"]["still_water_heal_pct"].as_f64() { self.guard_rules.heal_pct_inkwing = x.max(0.0) }
+         if let Some(x) = v["still_water"]["heal_pct"].as_f64() { self.guard_rules.heal_pct = x.max(0.0) }
+@@ -341,7 +358,53 @@ impl Game {
+     pub fn cancel_combo(&mut self) -> bool { if self.combo.as_ref().map(|c| c.grades.is_empty()).unwrap_or(false) { self.combo = None; true } else { false } }
+ 
+     // ---------- battle ----------
+-    pub fn start_battle(&mut self, encounter: &str) -> String {
++    /// Start a battle with optional encounter flags: `{ "first": "enemy"|"party"|null, "canFlee": bool }`
++    /// (`can_flee` also accepted). `first` reorders round 1 only (ambush: that side acts first, each side by speed).
++    /// `canFlee:false` makes `flee()` refuse with reason "cannot_flee" (bosses). Missing flags = normal start, Flee allowed.
++    pub fn start_battle_opts(&mut self, encounter: &str, opts_json: &str) -> String {
++        let o: Value = serde_json::from_str(opts_json).unwrap_or(Value::Null);
++        let can = o["canFlee"].as_bool().or(o["can_flee"].as_bool()).unwrap_or(true);
++        let first = o["first"].as_str().filter(|s| *s == "enemy" || *s == "party").map(|s| s.to_string());
++        self.start_inner(encounter, can, first)
++    }
++    /// Override the flee formula: `{ base, per_spd, per_fail, min, max }` (any subset).
++    pub fn set_flee_rules(&mut self, j: &str) -> bool {
++        let Ok(v) = serde_json::from_str::<Value>(j) else { return false };
++        if !v.is_object() { return false } self.flee_rules.apply(&v); true
++    }
++    /// Whether Flee is allowed in this battle (false for `canFlee:false` encounters or when over).
++    pub fn can_flee(&self) -> bool { self.can_flee && self.battle_over.is_none() }
++    /// Current flee success chance 0..1 (what the next `flee()` rolls against).
++    pub fn flee_chance(&self) -> f64 {
++        let avg = |side: u8| { let v: Vec<f64> = (0..self.fighters.len()).filter(|&i| self.fighters[i].side == side && self.fighters[i].alive).map(|i| self.st(i, 4)).collect(); if v.is_empty() { 0.0 } else { v.iter().sum::<f64>() / v.len() as f64 } };
++        let r = &self.flee_rules;
++        (r.base + r.per_spd * (avg(0) - avg(1)) + r.per_fail * self.flee_fails as f64).clamp(r.min, r.max)
++    }
++    /// Flee (party command, uses the turn). Refuses with `reason`: "over", "cannot_flee", "bad_index", "not_party_actor",
++    /// "not_your_turn". On success the battle ends with outcome "fled" (HP and Vermilion Ink kept, no mon/XP);
++    /// on failure the turn passes and the next attempt gets +per_fail. Returns `{kind:"flee", ok, fled, chance, roll}`.
++    pub fn flee(&mut self, actor: usize) -> String {
++        let bad = |r: &str| json!({"kind": "flee", "ok": false, "reason": r}).to_string();
++        if self.battle_over.is_some() { return bad("over") }
++        if !self.can_flee { return bad("cannot_flee") }
++        let Some(a) = self.fighters.get(actor) else { return bad("bad_index") };
++        if a.side != 0 || !a.alive { return bad("not_party_actor") }
++        if self.current() != actor as i32 { return bad("not_your_turn") }
++        if self.combo.is_some() { return bad("combo_in_progress") }
++        let chance = self.flee_chance(); let roll = self.rng.next();
++        if roll < chance {
++            self.battle_over = Some("fled".into());
++            for f in self.fighters.iter().filter(|f| f.side == 0) { self.st.hp.insert(f.id.clone(), f.hp.max(1.0)); self.st.ink.insert(f.id.clone(), f.ink); }
++            json!({"kind": "flee", "ok": true, "fled": true, "actor": actor, "chance": chance, "roll": roll}).to_string()
++        } else {
++            self.flee_fails += 1;
++            let out = json!({"kind": "flee", "ok": true, "fled": false, "actor": actor, "chance": chance, "roll": roll});
++            self.tick_inkwing(actor); self.advance(); out.to_string()
++        }
++    }
++    pub fn start_battle(&mut self, encounter: &str) -> String { self.start_inner(encounter, true, None) }
++    fn start_inner(&mut self, encounter: &str, can_flee: bool, first: Option<String>) -> String {
++        self.can_flee = can_flee; self.first = first; self.flee_fails = 0;
+         self.fighters.clear(); self.battle_over = None; self.round = 0; self.combo = None;
+         for (i, m) in self.party.iter().enumerate() {
+             let hp = self.st.hp[&m.id].max(1.0);
+@@ -364,10 +427,15 @@ impl Game {
+         let mut o: Vec<usize> = (0..self.fighters.len()).filter(|&i| self.fighters[i].alive).collect();
+         let key = |i: usize| { let f = &self.fighters[i]; let tw = f.inkwing > 0 && self.forms.get(&f.id).map(|x| x.1 == "tailwind").unwrap_or(false); if tw { 1e6 } else { self.st(i, 4) } };
+         o.sort_by(|&a, &b| key(b).partial_cmp(&key(a)).unwrap().then(a.cmp(&b)));
++        if self.round == 1 { if let Some(side) = self.first.as_deref() { // ambush: that side acts first in round 1 (stable, keeps speed order)
++            let s = if side == "enemy" { 1 } else { 0 };
++            let (mut a, b): (Vec<usize>, Vec<usize>) = o.iter().partition(|&&i| self.fighters[i].side == s); a.extend(b); o = a;
++        } }
+         self.order = o; self.turn_pos = 0;
+     }
+     pub fn battle_json(&self) -> String {
+-        json!({"fighters": self.fighters, "turn": self.current(), "round": self.round, "over": self.battle_over}).to_string()
++        json!({"fighters": self.fighters, "turn": self.current(), "round": self.round, "over": self.battle_over,
++               "canFlee": self.can_flee, "first": self.first, "fleeChance": self.flee_chance()}).to_string()
+     }
+     /// Index of the fighter whose turn it is (-1 when over).
+     pub fn current(&self) -> i32 {
+@@ -911,3 +979,64 @@ mod rusty_tests {
+         assert_eq!(g.battle_over.as_deref(), Some("lose")); assert_eq!(g.current(), -1);
+     }
+ }
++
++/// Patch 0007 tests: Flee + ambush flags.
++#[cfg(test)]
++mod flee_tests {
++    use super::*;
++    fn rd(p: &str) -> String { std::fs::read_to_string(p).unwrap() }
++    fn fresh(seed: u32) -> Game { let mut g = Game::new(&rd("../data/party.json"), &rd("../data/enemies.json"), &rd("../data/items.json"), seed).unwrap(); g.set_rules(&rd("../data/transformation.json")); g }
++    fn v(s: &str) -> Value { serde_json::from_str(s).unwrap() }
++    fn party_turn(g: &mut Game) -> usize { while g.current() >= 0 && g.fighters[g.current() as usize].side == 1 { g.enemy_turn(); } g.current() as usize }
++    #[test] fn ambush_enemy_first_then_speed_order() {
++        let mut g = fresh(3); g.start_battle_opts("sumikage_c", r#"{"first":"enemy","canFlee":true}"#);
++        let sides: Vec<u8> = g.order.iter().map(|&i| g.fighters[i].side).collect();
++        let k = sides.iter().position(|&s| s == 0).unwrap(); assert!(sides[k..].iter().all(|&s| s == 0), "enemies all before party: {sides:?}");
++        assert_eq!(g.fighters[g.current() as usize].side, 1);
++        let e: Vec<f64> = g.order[..k].iter().map(|&i| g.st(i, 4)).collect(); assert!(e.windows(2).all(|w| w[0] >= w[1]));
++        assert_eq!(v(&g.battle_json())["first"], "enemy");
++        // round 2 goes back to pure speed order
++        g.order = vec![g.order[0]]; g.turn_pos = 0; g.new_round(); assert_eq!(g.round, 2);
++        let spd: Vec<f64> = g.order.iter().map(|&i| g.st(i, 4)).collect(); assert!(spd.windows(2).all(|w| w[0] >= w[1]));
++    }
++    #[test] fn party_first_and_bad_flag_ignored() {
++        let mut g = fresh(3); g.start_battle_opts("sumikage_c", r#"{"first":"party"}"#);
++        assert!(g.order[..3].iter().all(|&i| g.fighters[i].side == 0));
++        let mut g2 = fresh(3); g2.start_battle_opts("sumikage_c", r#"{"first":"sideways"}"#); let mut g3 = fresh(3); g3.start_battle("sumikage_c");
++        assert_eq!(g2.order, g3.order); assert!(g2.first.is_none());
++        let mut g4 = fresh(3); g4.start_battle_opts("sumikage_c", "not json"); assert!(g4.can_flee());
++    }
++    #[test] fn cannot_flee_blocks_with_reason() {
++        let mut g = fresh(5); g.start_battle_opts("sumikage_boss", r#"{"canFlee":false}"#);
++        let a = party_turn(&mut g); assert!(!g.can_flee());
++        let r = v(&g.flee(a)); assert_eq!(r["ok"], false); assert_eq!(r["reason"], "cannot_flee"); assert_eq!(g.current(), a as i32);
++        assert_eq!(v(&g.battle_json())["canFlee"], false);
++    }
++    #[test] fn flee_rejects_wrong_actor() {
++        let mut g = fresh(5); g.start_battle("sumikage_c"); let a = party_turn(&mut g);
++        let other = (0..3).find(|&i| i != a).unwrap(); assert_eq!(v(&g.flee(other))["reason"], "not_your_turn");
++        let e = (0..g.fighters.len()).find(|&i| g.fighters[i].side == 1).unwrap(); assert_eq!(v(&g.flee(e))["reason"], "not_party_actor");
++    }
++    #[test] fn flee_success_ends_battle_keeps_hp_ink_no_rewards() {
++        let mut g = fresh(5); g.set_flee_rules(r#"{"min":1,"max":1}"#); g.start_battle("sumikage_c"); let a = party_turn(&mut g);
++        g.fighters[a].hp = 50.0; g.fighters[a].ink = 42.0; let gold = g.gold();
++        let r = v(&g.flee(a)); assert_eq!(r["fled"], true); assert_eq!(g.current(), -1);
++        assert_eq!(g.battle_over.as_deref(), Some("fled")); assert_eq!(g.gold(), gold);
++        assert_eq!(g.st.hp[&g.fighters[a].id], 50.0); assert_eq!(g.st.ink[&g.fighters[a].id], 42.0);
++        assert_eq!(v(&g.flee(a))["reason"], "over");
++    }
++    #[test] fn flee_failure_passes_turn_and_raises_chance() {
++        let mut g = fresh(5); g.set_flee_rules(r#"{"base":0,"per_spd":0,"per_fail":0.1,"min":0,"max":1}"#); g.start_battle("sumikage_c");
++        let a = party_turn(&mut g); assert_eq!(g.flee_chance(), 0.0);
++        let r = v(&g.flee(a)); assert_eq!(r["fled"], false); assert_ne!(g.current(), a as i32);
++        assert!((g.flee_chance() - 0.1).abs() < 1e-9);
++    }
++    #[test] fn flee_formula_and_determinism() {
++        let mut g = fresh(9); g.start_battle("sumikage_c");
++        let avg = |s: u8| { let v: Vec<f64> = (0..g.fighters.len()).filter(|&i| g.fighters[i].side == s).map(|i| g.st(i, 4)).collect(); v.iter().sum::<f64>() / v.len() as f64 };
++        let want = (0.5 + 0.05 * (avg(0) - avg(1))).clamp(0.25, 0.95); assert!((g.flee_chance() - want).abs() < 1e-9);
++        let run = |seed| { let mut g = fresh(seed); g.start_battle("sumikage_c"); let a = party_turn(&mut g); g.flee(a) };
++        assert_eq!(run(77), run(77));
++        g.set_rules(r#"{"flee":{"base":0.1,"per_spd":0,"min":0,"max":1}}"#); assert!((g.flee_chance() - 0.1).abs() < 1e-9);
++    }
++}

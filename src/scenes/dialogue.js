@@ -54,7 +54,7 @@ export function create(game, params) {
         const ls = wrap(ctx, c.text, 380, 19); ls.slice(0, 2).forEach((l, k) => text(ctx, l, 456, y + (ls.length > 1 ? 24 : 35) + k * 21, { size: 19 }));
         if (i === sel) { seal(ctx, 440, y + 28, 14, '', PAL.red); stroke(ctx, [[452, y + 52], [840, y + 50]], { w: 4, color: PAL.red, seed: 9 + i, dry: 0.5 }); }
       });
-      text(ctx, T('dialogue.advance', { confirm: 'A' }), 1000, 676, { size: 15, align: 'right', color: PAL.w2 });
+      text(ctx, T('dialogue.advance'), 1000, 676, { size: 15, align: 'right', color: PAL.w2 });
     },
   };
 }

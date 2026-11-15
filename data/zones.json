@@ -1,0 +1,178 @@
+{
+  "version": 3,
+  "about": "Inkborne encounter zones (Systems / Ashley). Read by encounters.js. Ids match the live data/world.json nodes, data/pois/*.json and data/enemies.json enemies. Canon enemies only: blotling, hollow_lantern, smudge_ronin (Smudge Ronin is the fixed mini-boss and never appears in random tables). `encounters` has the same shape as enemies.json `encounters` (SPEC 7) and keeps the existing 'sumikage_c' and 'sumikage_boss' entries unchanged, so it can be merged as-is. Recommended path for the integrator: data/zones.json (a separate file, not folded into enemies.json).",
+  "rules": {
+    "stepPx": {
+      "poi": 10,
+      "world": 20
+    },
+    "graceStepsAfterBattle": 6,
+    "graceStepsOnEnter": 4,
+    "note": "A step is stepPx of real travel. After minSteps, each step rolls 1/(avgSteps-minSteps); maxSteps forces an encounter. Standing still never rolls. Sumikage Wood is 1280 px wide; a straight crossing from the spawn to the Smudge Ronin clearing averages about 1 random fight on top of the 2 fixed ones (sim in test/encounters.test.mjs)."
+  },
+  "zones": [
+    {
+      "id": "world-woods_edge-sumikage",
+      "name": "Road from Hakushi Clearing to Sumikage Wood",
+      "scene": "world",
+      "path": ["woods_edge", "sumikage"],
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 40,
+        "minSteps": 14,
+        "maxSteps": 90
+      },
+      "ambush": 0.04,
+      "table": [
+        {
+          "encounter": "road_blotling",
+          "weight": 60
+        },
+        {
+          "encounter": "road_blotling_pair",
+          "weight": 40
+        }
+      ]
+    },
+    {
+      "id": "world-sumikage-hanshi",
+      "name": "Road from Sumikage Wood to Hanshi",
+      "scene": "world",
+      "path": ["sumikage", "hanshi"],
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 34,
+        "minSteps": 12,
+        "maxSteps": 80
+      },
+      "ambush": 0.05,
+      "table": [
+        {
+          "encounter": "road_blotling_pair",
+          "weight": 45
+        },
+        {
+          "encounter": "road_lantern",
+          "weight": 35
+        },
+        {
+          "encounter": "road_blotling_lantern",
+          "weight": 20
+        }
+      ]
+    },
+    {
+      "id": "sumikage-trailhead",
+      "name": "Sumikage Wood, trail entrance to the seal-stone (safe)",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.0, 0.0, 0.2, 1.0],
+      "priority": 2,
+      "safe": true
+    },
+    {
+      "id": "sumikage-edge",
+      "name": "Sumikage Wood, outer trail",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.2, 0.0, 0.2, 1.0],
+      "priority": 1,
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 36,
+        "minSteps": 14,
+        "maxSteps": 80
+      },
+      "ambush": 0.05,
+      "table": [
+        {
+          "encounter": "wood_blotling",
+          "weight": 40
+        },
+        {
+          "encounter": "wood_blotling_pair",
+          "weight": 40
+        },
+        {
+          "encounter": "wood_blotling_lantern",
+          "weight": 20
+        }
+      ]
+    },
+    {
+      "id": "sumikage-deep",
+      "name": "Sumikage Wood, deep trees",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.4, 0.0, 0.32, 1.0],
+      "priority": 1,
+      "bg": "forest",
+      "rate": {
+        "avgSteps": 28,
+        "minSteps": 10,
+        "maxSteps": 64
+      },
+      "ambush": 0.08,
+      "table": [
+        {
+          "encounter": "wood_blotling_pair",
+          "weight": 25
+        },
+        {
+          "encounter": "wood_blotling_lantern",
+          "weight": 35
+        },
+        {
+          "encounter": "wood_lantern_pair",
+          "weight": 15
+        },
+        {
+          "encounter": "sumikage_c",
+          "weight": 25
+        }
+      ]
+    },
+    {
+      "id": "sumikage-ronin-clearing",
+      "name": "Clearing before the Smudge Ronin (safe)",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.72, 0.0, 0.28, 1.0],
+      "priority": 2,
+      "safe": true
+    },
+    {
+      "id": "hanshi",
+      "name": "Hanshi (town, safe)",
+      "scene": "poi",
+      "poi": "town",
+      "rectN": [0.0, 0.0, 1.0, 1.0],
+      "priority": 2,
+      "safe": true
+    }
+  ],
+  "fixed": {
+    "sumikage_c": {
+      "bg": "forest",
+      "canFlee": true,
+      "note": "Already placed as the pois/forest.json 'ambush' trigger (once, flag won_ambush). Also in the deep-trees random table so the standard fight can repeat."
+    },
+    "sumikage_boss": {
+      "bg": "forest",
+      "canFlee": false,
+      "note": "Mini-boss (Smudge Ronin). Already placed as the pois/forest.json 'ronin' trigger (once, needs won_ambush) inside the safe clearing."
+    }
+  },
+  "encounters": {
+    "sumikage_c": ["blotling", "hollow_lantern", "blotling"],
+    "sumikage_boss": ["smudge_ronin"],
+    "road_blotling": ["blotling"],
+    "road_blotling_pair": ["blotling", "blotling"],
+    "road_lantern": ["hollow_lantern"],
+    "road_blotling_lantern": ["blotling", "hollow_lantern"],
+    "wood_blotling": ["blotling"],
+    "wood_blotling_pair": ["blotling", "blotling"],
+    "wood_blotling_lantern": ["blotling", "hollow_lantern"],
+    "wood_lantern_pair": ["hollow_lantern", "hollow_lantern"]
+  }
+}

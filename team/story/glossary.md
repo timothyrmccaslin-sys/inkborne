@@ -1,6 +1,6 @@
 # Inkborne glossary
 
-Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Ollie's item list (Kekai-approved).
+Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Ollie's items.json (items and equipment).
 
 ## title
 
@@ -20,7 +20,7 @@ Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Oll
 
 | id | name | status | description |
 |---|---|---|---|
-| `first_brush` | First Brush | canon | The brush that painted Shirofuda. Each party member carries a fragment of its red ink. |
+| `first_brush` | First Brush | canon | The brush that painted Shirofuda. Each party member carries a fragment of its Vermilion Ink. |
 | `the_blot` | the Blot | canon | A creeping smear soaking through cracked seals, unwriting what it touches into blank paper and ink-beasts. |
 | `red_seals` | red seals | canon | Seals of the old shrines that keep the painting true. They are cracking. |
 
@@ -110,11 +110,27 @@ Generated from glossary.json. Names come from CANON.md (Lisa), SPEC §2, and Oll
 
 | id | name | status | description |
 |---|---|---|---|
-| `rice_cake` | Rice Cake | canon | Sweet and filling. Restores a little HP to one ally. |
-| `plum_tonic` | Plum Tonic | canon | Sour enough to wake the dead, nearly. Restores a lot of HP to one ally. |
-| `shared_tea` | Pot of Pine Tea | canon | One pot, three cups. Restores some HP to the whole party. |
-| `festival_bento` | Festival Bento | canon | Packed for a feast that never came. Restores a lot of HP to the whole party. |
-| `inkstone_chip` | Inkstone Chip | canon | Grind it, wet it, and the brush drinks. Restores a little ink. |
-| `vermilion_pot` | Pot of Fresh Ink | canon | Rich and dark, still smelling of pine soot. Restores a lot of ink. |
-| `paper_cracker` | Paper Firecracker | canon | Festival leftovers. Bangs loudly enough to scatter a Blotling. |
-| `thunder_jar` | Thunder Jar | canon | Grandmother Tsuru won't say what's in it. Hits all enemies. |
+| `rice_cake` | Rice Cake | canon | Sweet and filling. Restores 50 HP to one ally. |
+| `plum_tonic` | Plum Tonic | canon | Sour enough to wake the dead, nearly. Restores 200 HP to one ally. |
+| `pine_tea` | Pot of Pine Tea | canon | One pot, three cups. Restores 80 HP to the whole party. |
+| `festival_bento` | Festival Bento | canon | Packed for a feast that never came. Restores 250 HP to the whole party. |
+| `inkstone_chip` | Inkstone Chip | canon | Grind it, wet it, and the brush drinks. Adds 25 Vermilion Ink to one ally. |
+| `fresh_ink_pot` | Pot of Fresh Ink | canon | Rich and dark, still smelling of pine soot. Adds 50 Vermilion Ink to one ally. |
+| `paper_cracker` | Paper Firecracker | canon | Festival leftovers. Bursts for 60 Ember damage on one foe. |
+| `thunder_jar` | Thunder Jar | canon | Grandmother Tsuru won't say what's inside. Bursts for 150 Gale damage on one foe. |
+
+## equipment
+
+| id | name | status | description |
+|---|---|---|---|
+| `redcord_katana` | Red-Cord Katana | canon | A brush-handled blade bound with a red cord. Every cut leaves a trail of ink. |
+| `prayerslip_bow` | Prayer-Slip Bow | canon | A tall shrine bow hung with prayer slips that flutter when it sings. |
+| `ironband_staff` | Iron-Banded Staff | canon | Old temple oak bound in iron. Heavy, honest, and hard to break. |
+| `sealedge_katana` | Seal-Edge Katana | canon | Its blade is stamped with a fresh red seal. It cuts clean through smudge. |
+| `cranefeather_bow` | Crane-Feather Bow | canon | Fletched with feathers shed by the shrine's paper cranes. Its arrows never wander. |
+| `bellbronze_staff` | Bell-Bronze Staff | canon | Capped with bronze from a cracked temple bell. It hums when it strikes. |
+| `washi_vest` | Layered Washi Vest | canon | Oiled paper, folded and stitched in layers. Tougher than it looks. |
+| `lacquer_haori` | Lacquered Haori | canon | A coat lacquered black and lined with blessed paper. Ink beads right off it. |
+| `prayer_mala` | Prayer-Bead Mala | canon | Beads the size of plums. Counting them steadies the breath. |
+| `paper_charm` | Folded Paper Charm | canon | A shrine charm folded into a crane. Clip it somewhere it can see you. |
+| `lantern_bell` | Lantern Bell | canon | A tiny brass bell from a shrine lantern. Its ring keeps the grey at bay. |

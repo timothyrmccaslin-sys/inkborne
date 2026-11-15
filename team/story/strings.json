@@ -145,5 +145,16 @@
   "tutorial.six_inks.1": "Six Inks, three pairs: Ember and Tide, Gale and Stone, Dawn and Dusk. Strike with the opposite ink for double damage.",
   "tutorial.dismiss": "{confirm} Got it",
   "tutorial.next": "{confirm} Next",
-  "tutorial.back": "{cancel} Back"
+  "tutorial.back": "{cancel} Back",
+  "pause.equipment": "Equipment",
+  "equip.slot.weapon": "Weapon",
+  "equip.slot.armor": "Armor",
+  "equip.slot.accessory": "Accessory",
+  "equip.equip": "Equip",
+  "equip.remove": "Remove",
+  "equip.empty": "(empty)",
+  "equip.cannot_use": "{name} can't use this.",
+  "equip.equipped": "{name} equips {item}.",
+  "shop.can_equip": "Can equip",
+  "shop.cannot_equip": "Can't equip"
 }

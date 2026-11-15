@@ -1,14 +1,70 @@
 {
   "items": [
-    { "id": "pine_needle_tea", "name": "Pine Needle Tea", "desc": "Bitter green tea steeped from Sumikage pines. Restores 60 HP to one ally.", "kind": "heal", "power": 60, "price": 20 },
-    { "id": "plum_rice_ball", "name": "Plum Rice Ball", "desc": "Grandmother Tsuru's sour-plum onigiri, wrapped in paper. Restores 150 HP to one ally.", "kind": "heal", "power": 150, "price": 45 },
-    { "id": "lantern_incense", "name": "Lantern Incense", "desc": "A coil of shrine incense. Its warm smoke restores 70 HP to the whole party.", "kind": "healall", "power": 70, "price": 90 },
-    { "id": "vermilion_drop", "name": "Vermilion Drop", "desc": "One bead of red ink sealed in wax. Adds 35 to one ally's ink gauge.", "kind": "ink", "power": 35, "price": 60 },
-    { "id": "cinnabar_cake", "name": "Cinnabar Cake", "desc": "A pressed stick of pure red ink, rare and heavy. Adds 100 to one ally's ink gauge.", "kind": "ink", "power": 100, "price": 200 },
-    { "id": "ember_charm", "name": "Ember Charm", "desc": "A paper charm painted with a flame. Thrown, it bursts for Ember damage to one foe.", "kind": "bomb", "power": 45, "element": "ember", "price": 35 },
-    { "id": "tide_charm", "name": "Tide Charm", "desc": "A paper charm painted with a wave. Thrown, it bursts for Tide damage to one foe.", "kind": "bomb", "power": 45, "element": "tide", "price": 35 },
-    { "id": "gale_charm", "name": "Gale Charm", "desc": "A paper charm painted with a swirl of wind. Thrown, it bursts for Gale damage to one foe.", "kind": "bomb", "power": 45, "element": "gale", "price": 35 },
-    { "id": "stone_charm", "name": "Stone Charm", "desc": "A paper charm painted with a mountain. Thrown, it bursts for Stone damage to one foe.", "kind": "bomb", "power": 45, "element": "stone", "price": 35 },
-    { "id": "dawn_charm", "name": "Dawn Charm", "desc": "A gold-flecked charm painted with a sunrise. It burns away Blot-ink with Dawn damage.", "kind": "bomb", "power": 70, "element": "dawn", "price": 75 }
+    {
+      "id": "rice_cake",
+      "name": "Rice Cake",
+      "desc": "Sweet and filling. Restores 50 HP to one ally.",
+      "kind": "heal",
+      "power": 50,
+      "price": 15
+    },
+    {
+      "id": "plum_tonic",
+      "name": "Plum Tonic",
+      "desc": "Sour enough to wake the dead, nearly. Restores 200 HP to one ally.",
+      "kind": "heal",
+      "power": 200,
+      "price": 60
+    },
+    {
+      "id": "pine_tea",
+      "name": "Pot of Pine Tea",
+      "desc": "One pot, three cups. Restores 80 HP to the whole party.",
+      "kind": "healall",
+      "power": 80,
+      "price": 120
+    },
+    {
+      "id": "festival_bento",
+      "name": "Festival Bento",
+      "desc": "Packed for a feast that never came. Restores 250 HP to the whole party.",
+      "kind": "healall",
+      "power": 250,
+      "price": 280
+    },
+    {
+      "id": "inkstone_chip",
+      "name": "Inkstone Chip",
+      "desc": "Grind it, wet it, and the brush drinks. Adds 25 Vermilion Ink to one ally.",
+      "kind": "ink",
+      "power": 25,
+      "price": 40
+    },
+    {
+      "id": "fresh_ink_pot",
+      "name": "Pot of Fresh Ink",
+      "desc": "Rich and dark, still smelling of pine soot. Adds 50 Vermilion Ink to one ally.",
+      "kind": "ink",
+      "power": 50,
+      "price": 110
+    },
+    {
+      "id": "paper_cracker",
+      "name": "Paper Firecracker",
+      "desc": "Festival leftovers. Bursts for 60 Ember damage on one foe.",
+      "kind": "bomb",
+      "power": 60,
+      "element": "ember",
+      "price": 50
+    },
+    {
+      "id": "thunder_jar",
+      "name": "Thunder Jar",
+      "desc": "Grandmother Tsuru won't say what's inside. Bursts for 150 Gale damage on one foe.",
+      "kind": "bomb",
+      "power": 150,
+      "element": "gale",
+      "price": 150
+    }
   ]
 }

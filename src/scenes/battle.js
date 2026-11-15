@@ -16,7 +16,7 @@ export function create(game, params) {
   const core = game.core, A = game.audio, art = game.art, W = JSON.parse(core.windows_json());
   const partyDef = Object.fromEntries(game.data.party.members.map((m) => [m.id, m]));
   let st = null, F = [], vis = [], phase = 'intro', tPhase = 0, sel = 0, sub = null, target = 0, box = null;
-  let chain = null, sealg = null, unfurl = null, queue = [], banner = null, floaters = [], fx = [], shake = 0, bark = null, result = null, hint = null, seenHint = false;
+  let chain = null, sealg = null, unfurl = null, queue = [], banner = null, floaters = [], fx = [], shake = 0, bark = null, result = null, hint = null, seenHint = false, rewards = null;
   const r = rng(7), motes = Array.from({ length: 16 }, () => ({ x: r() * 1280, y: r() * 720, s: 0.5 + r(), v: 10 + r() * 20, p: r() * 6 }));
   function refresh() { st = JSON.parse(core.battle_json()); F = st.fighters; }
   function home(i) { const f = F[i]; if (f.side === 0) return PARTY_POS[f.id] || [300 + i * 120, 480]; const ids = F.filter((x) => x.side === 1).map((x) => x.id); const k = F.slice(0, i).filter((x) => x.side === 1 && x.id === f.id).length; const p = ENEMY_POS[f.id]; return k === 0 && p ? p : EXTRA_POS[(k + ids.indexOf(f.id)) % EXTRA_POS.length]; }
@@ -44,10 +44,10 @@ export function create(game, params) {
     list.push({ id: 'stroke', label: T('battle.menu.brushstroke') });
     if (!iw) list.push({ id: 'unfurl', label: T('battle.menu.unfurl'), disabled: !full });
     list.push({ id: 'guard', label: T('battle.menu.still_water') }, { id: 'items', label: T('battle.menu.items') });
-    if (!params.boss) list.push({ id: 'flee', label: T('battle.menu.flee') });
+    list.push({ id: 'flee', label: T('battle.menu.flee'), dim: !!params.boss || params.canFlee === false });
     return list;
   }
-  function inventory() { return JSON.parse(core.inventory_json()).items.filter((x) => x.count > 0); }
+  function inventory() { return JSON.parse(core.inventory_json()).items.filter((x) => x.count > 0 && x.kind !== 'gear'); }
 
   // ---------- actions ----------
   function startChain(actor, tgt, strokeIdx) {
@@ -109,8 +109,15 @@ export function create(game, params) {
     sealg = null; seq(1.6, () => {}, nextTurn);
   }
   function doGuard(actor) { const res = JSON.parse(core.guard(actor)); A.play('guard'); A.voice(F[actor].id, 'grunt'); say(F[actor].id, 'still_water'); vis[actor].action = 'guard'; vis[actor].ph = 0; float(actor, '+' + res.heal, '#5f8a6a'); setBanner(T('battle.log.still_water', { name: name(actor) }), false, 1.2); phase = 'anim'; seq(0.9, () => {}, nextTurn); }
+  function doFlee(actor) {
+    const res = JSON.parse(core.flee(actor));
+    if (!res.ok) { A.play('cancel'); setBanner(T('battle.log.flee_blocked'), false, 1.6); return; }
+    phase = 'anim';
+    if (res.fled) { setBanner(T('battle.log.flee_ok'), false, 1.2); seq(1.0, () => {}, () => game.pop({ fled: true })); }
+    else { setBanner(T('battle.log.flee_fail'), false, 1.2); refresh(); seq(0.9, () => {}, nextTurn); }
+  }
   function doItem(actor, item, tgt) {
-    const res = JSON.parse(core.use_item(actor, item.id, tgt)); phase = 'anim';
+    const res = JSON.parse(core.use_item(actor, item.id, tgt)); if (!res.ok) { A.play('cancel'); setBanner(res.reason === 'inkwing' ? 'The Inkwing needs no more ink.' : T('battle.menu.no_items'), false, 1.4); phase = 'menu'; sub = null; return; } phase = 'anim';
     setBanner(T('battle.log.item_used', { name: name(actor), item: item.name }), false, 1.3);
     for (const e of res.events) { if (e.heal != null) { float(e.target, '+' + e.heal, '#5f8a6a'); A.play('heal'); } if (e.ink != null) { float(e.target, 'Ink ' + Math.round(e.ink), PAL.red); A.play('heal'); } if (e.dmg != null) { const [x, y] = hitPt(e.target); addFx('fx-hit-heavy', x, y); float(e.target, e.dmg, e.elem > 1 ? PAL.red : PAL.ink, true); A.play('hit-heavy'); if (e.killed) kill(e.target); } }
     seq(1.0, () => {}, nextTurn);
@@ -131,7 +138,7 @@ export function create(game, params) {
   const sc = {
     phaseName: () => phase, chainState: () => chain, sealState: () => sealg, fighters: () => F,
     enter() {
-      refresh(); core.start_battle(params.enc); refresh();
+      refresh(); rewards = null; core.start_battle_opts(params.enc, JSON.stringify({ first: params.first ?? null, canFlee: !params.boss && params.canFlee !== false })); refresh();
       if (params.boss) { const i = F.findIndex((f) => f.id === 'itsuki'); if (i >= 0 && F[i].ink < 100) { core.debug_ink(i, 100); hint = { s: 'The seal-stone bleeds red ink into Itsuki\'s palm. Vermilion Ink is full: Unfurl!', t: 4.5 }; } refresh(); }
       vis = F.map((f, i) => ({ pos: home(i), action: f.alive ? 'idle' : 'ko', ph: 0, dash: 0, iw: f.inkwing > 0 ? 1 : 0 }));
       A.setScene('battle'); const n = alive(1).length; setBanner(n > 1 ? T('battle.log.appears_many', { count: n }) : T('battle.log.appears', { enemy: F[alive(1)[0]].name }), false, 1.8);
@@ -164,13 +171,14 @@ export function create(game, params) {
         if (inp.pressed('cancel')) { const g = cmds.findIndex((c) => c.id === 'guard'); sel = g; }
         let pick = inp.pressed('confirm') ? sel : -1; for (const p of game.taps) { const i = menuHit(box, cmds.length, p); if (i >= 0) pick = sel = i; }
         if (pick < 0) return; const c = cmds[pick]; if (c.disabled) { A.play('cancel'); setBanner(T('battle.menu.unfurl_locked'), false, 1.2); return; }
+        if (c.id === 'flee' && c.dim) { A.play('cancel'); setBanner(T('battle.log.flee_blocked', {}, 'The Ronin bars the path. There is no slipping away.'), false, 1.6); return; }
         A.play('confirm');
         if (c.id === 'stroke') { const ss = partyDef[F[cur()].id].strokes; sub = ss.length > 1 ? { kind: 'stroke', sel: 0, list: ss.map((s) => ({ label: s.name, sub: s.hits.length + ' hits' })) } : { kind: 'target', side: 1, then: (t) => startChain(cur(), t, 0) }; if (sub.kind === 'target') target = alive(1)[0]; }
         if (c.id === 'seal') startSeal(cur());
         if (c.id === 'unfurl') doUnfurl(cur());
         if (c.id === 'guard') doGuard(cur());
         if (c.id === 'items') { const inv = inventory(); if (!inv.length) { setBanner(T('battle.menu.no_items'), false, 1.2); return; } sub = { kind: 'item', sel: 0, inv, list: inv.map((x) => ({ label: x.name, sub: 'x' + x.count })) }; }
-        if (c.id === 'flee') { setBanner(T('battle.log.flee_ok', {}, 'The party slips away into the mist.'), false, 1.2); phase = 'anim'; seq(1.0, () => {}, () => game.pop({ fled: true })); }
+        if (c.id === 'flee') doFlee(cur());
       }
     },
     draw(ctx, t) {
@@ -279,14 +287,17 @@ export function create(game, params) {
       if (sub && sub.kind === 'item') { const it = sub.inv[sub.sel]; if (it) { panel(ctx, 310, 290 + sub.list.length * 44, 280, 50, { seed: 3 }); wrap(ctx, it.desc, 260, 16).slice(0, 2).forEach((l, k) => text(ctx, l, 320, 310 + sub.list.length * 44 + k * 18, { size: 16, color: PAL.w1 })); } }
     }
     if (banner) { const a = Math.min(1, banner.t * 3); ctx.save(); ctx.globalAlpha = a; stroke(ctx, [[340, 132], [640, 126], [940, 132]], { w: 52, color: banner.red ? PAL.red : PAL.ink, alpha: 0.85, seed: 12, dry: 0.8, taper: [0.06, 0.12] }); ctx.restore(); text(ctx, banner.s, 640, 142, { size: 26, align: 'center', font: FONT.title, color: '#fbf6ec', alpha: a }); }
-    if (bark) { const i = bark.i; if (i >= 0 && vis[i]) { const [x, y] = vis[i].pos, lines = wrap(ctx, bark.s, 230, 18); panel(ctx, x - 120, y - 300 - lines.length * 20, 250, 16 + lines.length * 22, { seed: 30, bw: 3 }); lines.forEach((l, k) => text(ctx, l, x - 108, y - 280 - lines.length * 20 + k * 22, { size: 18 })); } }
+    if (bark) { const i = bark.i; if (i >= 0 && vis[i]) { const [x, y] = vis[i].pos, lines = wrap(ctx, bark.s, 230, 18), bh = 16 + lines.length * 22; const by = Math.max(176, y - 300 - lines.length * 20), bx = Math.max(16, Math.min(1264 - 250, x - 120)); panel(ctx, bx, by, 250, bh, { seed: 30, bw: 3 }); lines.forEach((l, k) => text(ctx, l, bx + 12, by + 20 + k * 22, { size: 18 })); } }
     if (hint) { panel(ctx, 272, 500, 736, 56, { seed: 40 }); wrap(ctx, hint.s, 700, 19).slice(0, 2).forEach((l, k) => text(ctx, l, 640, 522 + k * 22, { size: 19, align: 'center' })); }
     if (phase === 'win' || phase === 'lose') {
       const a = Math.min(1, tPhase * 2); ctx.save(); ctx.globalAlpha = a * 0.55; ctx.fillStyle = PAL.paper; ctx.fillRect(0, 0, 1280, 720); ctx.restore();
       panel(ctx, 440, 220, 400, 200, { seed: 50, alpha: a });
       text(ctx, phase === 'win' ? T('battle.result.victory') : T('battle.result.defeat'), 640, 290, { size: 52, align: 'center', font: FONT.title, color: phase === 'win' ? PAL.red : PAL.ink, alpha: a });
       if (phase === 'win') text(ctx, T('battle.result.mon', { n: core.spoils() }), 640, 340, { size: 26, align: 'center', alpha: a });
-      if (tPhase > 1.2) text(ctx, phase === 'win' ? T('battle.result.continue', { confirm: 'A' }) : T('battle.result.defeat_retry'), 640, 392, { size: 20, align: 'center', color: PAL.w2 });
+      if (phase === 'win') { if (!rewards) { try { rewards = JSON.parse(core.rewards_json()); } catch (e) { rewards = {}; } }
+        if (rewards.xp) text(ctx, `+${rewards.xp} XP`, 640, 368, { size: 20, align: 'center', color: PAL.w2, alpha: a });
+        const ups = (rewards.members || []).filter((m) => m.leveled_up); if (ups.length) text(ctx, ups.map((m) => `${m.name} Lv ${m.lv}`).join('   '), 640, 430, { size: 20, align: 'center', color: PAL.red, alpha: a }); }
+      if (tPhase > 1.2) text(ctx, phase === 'win' ? T('battle.result.continue') : T('battle.result.defeat_retry'), 640, 392, { size: 20, align: 'center', color: PAL.w2 });
     }
   }
   return sc;

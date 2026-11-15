@@ -15,4 +15,19 @@ Preview: contact_mark.png (on dark backing)
 manifest-items.json: entries in assets/art/manifest.json format to merge (src paths relative to this folder; adjust to assets/art/<group>/ on integration).
 extra-icons/: earlier non-canon icons (not in the shop list), spare.
 src/: raw generations.
-Coming next: signature weapons (Itsuki katana, Benika bow, Gonzo staff) and Hanshi/Sumikage props.
+
+## Signature weapons (weapons/)
+wpn-itsuki-katana.webp (1024x120), brush-handled katana
+wpn-benika-bow.webp (199x1024), tall bow with prayer slips (gap between string and limb is transparent)
+wpn-gonzo-staff.webp (1024x92), iron-banded staff
+wpn-gonzo-prayer-beads.webp (873x1024), prayer-bead mala
+icon-wpn-*.webp at 128x128 (diagonal for long weapons), plus @4x.png masters.
+Preview: contact-weapons.png
+
+## App icons
+assets/icons/ overwritten; masters and preview in app-icon/.
+
+## Town and forest props (props/), 512x512, anchor at the feet [0.5,1] (lantern-string hangs from the top, [0.5,0])
+Hanshi: prop-lantern-paper, prop-lantern-stone, prop-signpost, prop-barrel, prop-shop-kobo-tsuru (shop front with a blank noren; composite prop-kobo-tsuru-mark onto it), prop-shrine (small shrine with a red gate), prop-shrine-stair, prop-lantern-string
+Sumikage Wood: prop-seal-stone-tall, prop-seal-stones-cluster, prop-bamboo-tall, prop-bamboo-young
+Preview: contact-props.png

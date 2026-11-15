@@ -8,9 +8,9 @@ Six stats, all SPEC field names: `hp`, `atk` (physical attack), `def` (physical 
 
 | Member | Role | Element | L1 HP/ATK/DEF/MAT/MDF/SPD | L20 HP/ATK/DEF/MAT/MDF/SPD |
 |---|---|---|---|---|
-| Itsuki Hane, wandering swordsman | physical DPS | Gale | 120 / 18 / 10 / 8 / 8 / 14 | 386 / 64 / 35 / 25 / 27 / 31 |
-| Benika Matsuo, shrine archer | support, magic | Ember | 100 / 13 / 8 / 17 / 13 / 16 | 309 / 43 / 27 / 63 / 45 / 35 |
-| Gonzō Kuraishi, retired temple monk | tank, heavy hitter | Stone | 160 / 16 / 15 / 6 / 11 / 8 | 521 / 56 / 53 / 17 / 38 / 18 |
+| Itsuki Hane, wandering swordsman | physical DPS | Gale | 150 / 22 / 12 / 10 / 10 / 14 | 454 / 71 / 39 / 29 / 31 / 29 |
+| Benika Matsuo, shrine archer | support, magic | Ember | 125 / 15 / 10 / 22 / 16 / 16 | 372 / 49 / 31 / 75 / 52 / 33 |
+| Gonzō Kuraishi, retired temple monk | tank, heavy hitter | Stone | 200 / 20 / 18 / 8 / 14 / 8 | 618 / 66 / 60 / 21 / 44 / 18 |
 
 **Growth:** `stat(lv) = base + floor(growth * (lv - 1) + 0.5)`. Growth is linear, so balance stays predictable over a short demo. Every level is precomputed in `stat_table`, so the core can just index it and never needs floats.
 
@@ -37,16 +37,16 @@ final         = max(1, round_half_up(result))
 ```
 Inkwing stat multipliers apply to `atk/def/mat/mdf/spd` before `raw()`. Max HP never changes. Gonzō's Slate Mantle multiplies damage the party takes by 0.85.
 
-**Worked example, Itsuki L1 vs a Blotling (def 6, Dusk):** raw = max(4.5, 36 − 6) = 30. Falling Pine with all three hits good gives 30×0.7 = 21, 30×0.8 = 24, and 30×1.0×1.3 = 39, so **84** in total. All three Clean is ×1.25 per hit, so **105**.
+**Worked example, Itsuki L1 vs a Blotling (def 6, Dusk):** raw = max(5.5, 44 − 6) = 38. Falling Pine with all three hits good gives 38×0.7 ≈ 27, 38×0.8 ≈ 30, and 38×1.0×1.3 ≈ 49, so **106** in total. All three Clean is ×1.25 per hit, so **133**.
 
-**Same chain in Gale Crane Inkwing:** atk 18×1.5 = 27, so raw = 48 and the chain does **134**. The Strokes are now Gale, so against a Stone enemy that's ×2, or **269**.
+**Same chain in Gale Crane Inkwing:** atk 22×1.5 = 33, so raw = 60 and the chain does **168**. The Strokes are now Gale, so against a Stone enemy that's ×2, or **336**.
 
 **Seal Arts at L1, vs mdf 4, all seals Clean:**
-- Itsuki: raw(27, 4) = 50 × 0.55 × 4 × 1.25 ≈ 138.
-- Benika: raw(25.5, 4) = 47 × 0.4 × 5 × 1.25 ≈ 118, plus a party heal of 5% for each Clean seal (25% total).
-- Gonzō: raw(22.4, 4) = 40.8 × 0.8 × 3 × 1.25 ≈ 122.
+- Itsuki: raw(33, 4) = 62 × 0.55 × 4 × 1.25 ≈ 171.
+- Benika: raw(33, 4) = 62 × 0.4 × 5 × 1.25 ≈ 155, plus a party heal of 5% for each Clean seal (25% total).
+- Gonzō: raw(28, 4) = 52 × 0.8 × 3 × 1.25 ≈ 156.
 
-**Taking damage:** an enemy with atk 12 hits Itsuki (def 10) for raw(12, 10) = 14. If he's in Still Water, that's 7, and he also heals 10% max HP (12). Gonzō takes 9.
+**Taking damage:** an enemy with atk 12 hits Itsuki (def 12) for raw(12, 12) = 12. If he's in Still Water, that's 6, and he also heals 10% max HP (15). Gonzō (def 18) takes 6.
 
 ## 3. Vermilion Ink (`ink`, 0 to 100 per character)
 **Fill sources** (all integers, clamped to 100):
@@ -68,7 +68,7 @@ There's no gain while in Inkwing (no stacking a second Unfurl), and Seal Arts do
 
 **Pacing target** (validate.py prints this): attacking every turn with the starter Stroke and taking no damage, Itsuki and Benika fill in 6 turns with good presses and 3 with perfect ones. Gonzō takes 8 and 4, but as the tank who guards he gets most of his ink from damage and Still Water. Taking a hit for about 12% HP adds about 4 per hit. So a typical player Unfurls once per tough fight, around turns 4 to 5, and a skilled player can do it twice against the boss.
 
-**Example:** Gonzō uses Still Water (+6), then takes a 20 damage hit, halved to 10. That's 10/160 = 6.25% HP, so 30 × 0.0625 = 1.9, ×1.5 = 2.8, which rounds to 3. Total +9 for the round, plus he heals 16 HP.
+**Example:** Gonzō uses Still Water (+6), then takes a 20 damage hit, halved to 10. That's 10/200 = 5% HP, so 30 × 0.05 = 1.5, ×1.5 = 2.25, which rounds to 2. Total +8 for the round, plus he heals 20 HP.
 
 ## 4. Unfurl and Inkwing form
 - **Cost:** a full gauge (100), and the command is `Unfurl` (canon), available only at 100. Unfurling **uses the turn**: the character transforms, heals 15% max HP, and their next 3 own turns are in Inkwing (SPEC: "lasts 3 of that character's turns").

@@ -19,14 +19,14 @@ for m in p['members']:
     m['lv'] = DEMO_LV; m['ink'] = START_INK.get(m['id'], 0)
     m['strokes'] = [s for s in m['strokes'] if s.get('unlock_lv', 1) <= DEMO_LV]
     if m['seal']['name'] == 'Crane Gale Script': m['seal']['name'] = 'Gale Crane Script'  # Lisa's approved rename
-    for k in ('stat_table',): m.pop(k, None)
-p.pop('progression', None)
+# 0.1.1: keep Jake's stat_table + progression.xp_table so the core (Rusty 0008) can level members up
 save(D('party.json'), p)
 shutil.copy(T('systems', 'jake', 'transformation.json'), D('transformation.json'))
 shutil.copy(T('systems', 'jake', 'elements.json'), D('elements.json'))
 
 # items + shop: Ollie's ids/names (story) with Jane's numbers mapped by Kekai
-shutil.copy(T('story', 'items.json'), D('items.json'))
+# items/shops: Ollie's ids+names, Jane's prices/powers (inkstone_chip 25, fresh_ink_pot 50); equipment held out until named
+shutil.copy(T('story', 'items.json'), D('items.json'))  # Ollie ids/names + Jane prices/powers + equipment[]
 shutil.copy(T('story', 'shops.json'), D('shops.json'))
 
 # strings (Jamie), barks (Ollie), dialogue (Ollie), story (Lisa)
@@ -38,7 +38,7 @@ save(D('barks.json'), load(T('story', 'barks.json')))
 dl = load(T('story', 'dialogue.json'))
 # TODO(story): SPEC asks for dialogue choices; Ollie's scene has none yet, so the integrator adds one branch at n12.
 n = dl['hanshi_dusk']['nodes']
-if 'n12' in n and not n['n12'].get('choices'):
+if 'n11' in n and not n['n11'].get('choices'):
     n['n11']['choices'] = [
         {'text': 'I need somewhere to sleep. Hard to sleep with ink-beasts at the door.', 'next': 'n12'},
         {'text': "Point me at whatever's breaking the seals.", 'next': 'n12b', 'set': 'eager'}]
@@ -51,13 +51,22 @@ save(D('story.json'), sj)
 # enemies: TODO(systems/Karen) stats not delivered yet -> integrator placeholders; names (Lisa), mon (Jane)
 mon = load(T('systems', 'jane', 'data', 'enemies.mon.json'))['mon']
 save(D('enemies.json'), {'_todo': 'enemy stats are integrator placeholders until Karen delivers', 'enemies': [
-  {'id': 'blotling', 'name': 'Blotling', 'element': 'dusk', 'hp': 110, 'atk': 22, 'def': 6, 'mat': 16, 'mdf': 4, 'spd': 12, 'mon': mon['blotling'],
+  {'id': 'blotling', 'name': 'Blotling', 'element': 'dusk', 'hp': 110, 'atk': 22, 'def': 6, 'mat': 16, 'mdf': 4, 'spd': 12, 'mon': mon['blotling'], 'xp': 12,
    'moves': [{'id': 'splash', 'name': 'Ink Splash', 'kind': 'phys', 'power': 1.0, 'weight': 3}, {'id': 'seep', 'name': 'Seep', 'kind': 'elem', 'power': 1.1, 'element': 'dusk', 'weight': 1}]},
-  {'id': 'hollow_lantern', 'name': 'Hollow Lantern', 'element': 'gale', 'hp': 150, 'atk': 18, 'def': 8, 'mat': 24, 'mdf': 10, 'spd': 15, 'mon': mon['hollow_lantern'],
+  {'id': 'hollow_lantern', 'name': 'Hollow Lantern', 'element': 'gale', 'hp': 150, 'atk': 18, 'def': 8, 'mat': 24, 'mdf': 10, 'spd': 15, 'mon': mon['hollow_lantern'], 'xp': 18,
    'moves': [{'id': 'dim', 'name': 'Dimming Curse', 'kind': 'elem', 'power': 1.15, 'element': 'gale', 'weight': 2}, {'id': 'singe', 'name': 'Grey Singe', 'kind': 'phys', 'power': 0.9, 'weight': 1}]},
-  {'id': 'smudge_ronin', 'name': 'Smudge Ronin', 'element': 'stone', 'hp': 620, 'atk': 30, 'def': 16, 'mat': 22, 'mdf': 14, 'spd': 13, 'mon': mon['smudge_ronin'],
+  {'id': 'smudge_ronin', 'name': 'Smudge Ronin', 'element': 'stone', 'hp': 620, 'atk': 30, 'def': 16, 'mat': 22, 'mdf': 14, 'spd': 13, 'mon': mon['smudge_ronin'], 'xp': 150,
    'moves': [{'id': 'drip', 'name': 'Dripping Cut', 'kind': 'phys', 'power': 1.1, 'weight': 3}, {'id': 'unwrite', 'name': 'Unwriting Slash', 'kind': 'elem', 'power': 1.3, 'element': 'stone', 'weight': 1}]}],
   'encounters': {'sumikage_c': ['blotling', 'hollow_lantern', 'blotling'], 'sumikage_boss': ['smudge_ronin']}})
+# zones: Ashley -> data/zones.json (separate file); her encounter groups merged into enemies.json for the core
+zj = T('systems', 'ashley', 'zones.json')
+if os.path.exists(zj):
+    shutil.copy(zj, D('zones.json'))
+    en = load(D('enemies.json'))
+    for k, v in load(zj)['encounters'].items():
+        ids = v if isinstance(v, list) else v.get('enemies', [])
+        en['encounters'].setdefault(k, ids)
+    save(D('enemies.json'), en)
 
 # audio: James (sfx), Rita (voice)
 for f in glob.glob(T('audio', 'sfx', '*.mp3')): shutil.copy(f, os.path.join(R, 'assets', 'sfx'))
@@ -85,4 +94,5 @@ save(os.path.join(R, 'assets', 'art', 'manifest.json'), man)
 os.makedirs(os.path.join(R, 'assets', 'music'), exist_ok=True)
 for f in glob.glob(T('audio', 'music', '*.mp3')): shutil.copy(f, os.path.join(R, 'assets', 'music'))
 shutil.copy(T('audio', 'music', 'manifest.json'), os.path.join(R, 'assets', 'music', 'manifest.json'))
+for f in ('ambient.js', 'encounters.js'): shutil.copy(T('systems', 'ashley', f), os.path.join(R, 'src', f))  # Ashley: final
 print('integrated')

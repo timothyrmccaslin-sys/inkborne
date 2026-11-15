@@ -65,7 +65,17 @@
         "who": "lantern_keeper",
         "mood": "calm",
         "text": "And this young man? A stranger, with his hand wrapped.",
-        "next": "n12"
+        "choices": [
+          {
+            "text": "I need somewhere to sleep.",
+            "next": "n12"
+          },
+          {
+            "text": "Point me at whatever's breaking the seals.",
+            "next": "n12b",
+            "set": "eager"
+          }
+        ]
       },
       "n12": {
         "who": "itsuki",
@@ -120,6 +130,18 @@
         "mood": "calm",
         "text": "First light, then. Let's see what's hungry for ink.",
         "end": true
+      },
+      "n12b": {
+        "who": "itsuki",
+        "mood": "angry",
+        "text": "Point me at whatever's breaking the seals. I'd like a word with it.",
+        "next": "n13b"
+      },
+      "n13b": {
+        "who": "benika",
+        "mood": "smile",
+        "text": "Careful, Hotaru. He's almost friendly when there's something to cut.",
+        "next": "n14"
       }
     },
     "start": "n01"

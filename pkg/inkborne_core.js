@@ -10,6 +10,23 @@ export class Game {
         wasm.__wbg_game_free(ptr, 0);
     }
     /**
+     * UI hint for one fighter: `{element, weak:[...x>1], resist:[...x<1]}` over the six inks.
+     * @param {number} target
+     * @returns {string}
+     */
+    affinity_json(target) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_affinity_json(this.__wbg_ptr, target);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
      * @returns {string}
      */
     battle_json() {
@@ -17,6 +34,28 @@ export class Game {
         let deferred1_1;
         try {
             const ret = wasm.game_battle_json(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Start a timed chain at `t0_ms` (performance.now()). Hit 0's target is t0 + gap_ms[0]; hit n's target is
+     * the press that landed hit n-1 + gap_ms[n] (or the previous target with anchor "close").
+     * Returns `{ok, actor, target, stroke, name, anchor, hits:[{hit,gap_ms,mult,clean_ms,good_ms}], next}`.
+     * @param {number} actor
+     * @param {number} target
+     * @param {number} stroke_idx
+     * @param {number} t0_ms
+     * @returns {string}
+     */
+    begin_stroke(actor, target, stroke_idx, t0_ms) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_begin_stroke(this.__wbg_ptr, actor, target, stroke_idx, t0_ms);
             deferred1_0 = ret[0];
             deferred1_1 = ret[1];
             return getStringFromWasm0(ret[0], ret[1]);
@@ -37,6 +76,65 @@ export class Game {
         return ret !== 0;
     }
     /**
+     * Whether Flee is allowed in this battle (false for `canFlee:false` encounters or when over).
+     * @returns {boolean}
+     */
+    can_flee() {
+        const ret = wasm.game_can_flee(this.__wbg_ptr);
+        return ret !== 0;
+    }
+    /**
+     * Whether `actor` may Unfurl right now.
+     * @param {number} actor
+     * @returns {boolean}
+     */
+    can_unfurl(actor) {
+        const ret = wasm.game_can_unfurl(this.__wbg_ptr, actor);
+        return ret !== 0;
+    }
+    /**
+     * Abort a chain before its first press (back to the command menu). False once a press has been judged.
+     * @returns {boolean}
+     */
+    cancel_combo() {
+        const ret = wasm.game_cancel_combo(this.__wbg_ptr);
+        return ret !== 0;
+    }
+    /**
+     * The running chain (`null` if none).
+     * @returns {string}
+     */
+    combo_json() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_combo_json(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Call every frame while a chain is running. If `now_ms` is past the pending hit's good window,
+     * that hit is judged a miss (no press) and the chain ends. Returns `{timeout:false}` otherwise.
+     * @param {number} now_ms
+     * @returns {string}
+     */
+    combo_tick(now_ms) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_combo_tick(this.__wbg_ptr, now_ms);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
      * Index of the fighter whose turn it is (-1 when over).
      * @returns {number}
      */
@@ -53,7 +151,34 @@ export class Game {
         wasm.game_debug_ink(this.__wbg_ptr, actor, v);
     }
     /**
-     * Enemy acts (call when current() is an enemy). Picks a weighted move and a living party target.
+     * Element multiplier attack element -> defender element (chart if loaded, else the SPEC rule).
+     * @param {string} atk
+     * @param {string} def
+     * @returns {number}
+     */
+    elem(atk, def) {
+        let ptr0, len0, ptr1, len1;
+        try {
+            ptr0 = passStringToWasm0(atk, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passStringToWasm0(def, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len1 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 1, 1); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
+        const ret = wasm.game_elem(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+        return ret;
+    }
+    /**
+     * Enemy acts (call when current() is an enemy). Data-driven AI (enemies.json, all fields optional):
+     * - move `weight`: weighted pick among eligible moves (seeded RNG).
+     * - move `hp_below` (0..1): only eligible while the enemy's own HP fraction is below it (e.g. a desperation move).
+     * - move `kind`: "phys" (atk vs def), "elem" (mat vs mdf, x element), "heal" (heals the most-hurt living enemy
+     *   by power x mat), "guard" (the enemy takes Still Water: damage x0.5 until its next turn).
+     * - move `target` (else enemy `ai`, else "random"): "random" | "lowest_hp" | "lowest_hp_pct" | "highest_hp" |
+     *   "weak" (prefers a member weak to the move's element) | "all" (hits every living party member).
      * @returns {string}
      */
     enemy_turn() {
@@ -61,6 +186,48 @@ export class Game {
         let deferred1_1;
         try {
             const ret = wasm.game_enemy_turn(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Put `id` in `member`'s `slot` (empty `id` clears it). Validates member, slot and id/slot match.
+     * Stat mods and inventory accounting are not applied yet (pending Jane/Jake).
+     * @param {string} member
+     * @param {string} slot
+     * @param {string} id
+     * @returns {boolean}
+     */
+    equip(member, slot, id) {
+        let ptr0, len0, ptr1, len1, ptr2, len2;
+        try {
+            ptr0 = passStringToWasm0(member, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len0 = WASM_VECTOR_LEN;
+            ptr1 = passStringToWasm0(slot, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len1 = WASM_VECTOR_LEN;
+            ptr2 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            len2 = WASM_VECTOR_LEN;
+        } catch (e) {
+            if (ptr2) { wasm.__wbindgen_free(ptr2, len2 * 1, 1); }
+            if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 1, 1); }
+            if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+            throw e;
+        }
+        const ret = wasm.game_equip(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        return ret !== 0;
+    }
+    /**
+     * `{ "<member>": { "<slot>": id|null } }`
+     * @returns {string}
+     */
+    equipped_json() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_equipped_json(this.__wbg_ptr);
             deferred1_0 = ret[0];
             deferred1_1 = ret[1];
             return getStringFromWasm0(ret[0], ret[1]);
@@ -79,6 +246,33 @@ export class Game {
         return ret !== 0;
     }
     /**
+     * Flee (party command, uses the turn). Refuses with `reason`: "over", "cannot_flee", "bad_index", "not_party_actor",
+     * "not_your_turn". On success the battle ends with outcome "fled" (HP and Vermilion Ink kept, no mon/XP);
+     * on failure the turn passes and the next attempt gets +per_fail. Returns `{kind:"flee", ok, fled, chance, roll}`.
+     * @param {number} actor
+     * @returns {string}
+     */
+    flee(actor) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_flee(this.__wbg_ptr, actor);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Current flee success chance 0..1 (what the next `flee()` rolls against).
+     * @returns {number}
+     */
+    flee_chance() {
+        const ret = wasm.game_flee_chance(this.__wbg_ptr);
+        return ret;
+    }
+    /**
      * @returns {number}
      */
     gold() {
@@ -87,6 +281,8 @@ export class Game {
     }
     /**
      * Still Water: halve damage until next turn and restore 10% max HP.
+     * Still Water: damage x0.5 until this fighter's next turn, heals 10% max HP (15% in Inkwing), +6 Vermilion Ink
+     * (not in Inkwing); Ink from damage taken while guarding is x1.5. Uses the turn.
      * @param {number} actor
      * @returns {string}
      */
@@ -103,7 +299,24 @@ export class Game {
         }
     }
     /**
-     * Inkwing: needs a full gauge, lasts 3 of this character's turns. Uses this turn.
+     * Gauge rules in effect: `{max, unfurl_cost, unfurl_turns}`.
+     * @returns {string}
+     */
+    ink_rules_json() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_ink_rules_json(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
+     * Unfurl (the battle command) into Inkwing form. Needs ink >= unfurl.cost (a full gauge), not already Inkwing.
+     * Uses this turn; the next `unfurl.duration_turns` (3) own turns are Inkwing. Heals unfurl.heal_pct_max_hp.
      * @param {number} actor
      * @returns {string}
      */
@@ -144,6 +357,7 @@ export class Game {
         return ret;
     }
     /**
+     * Lenient, validated load (save.rs). `false` only for unreadable input, and then state is untouched.
      * @param {string} s
      * @returns {boolean}
      */
@@ -152,6 +366,25 @@ export class Game {
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.game_load_json(this.__wbg_ptr, ptr0, len0);
         return ret !== 0;
+    }
+    /**
+     * Warnings from the last `load_json`: `[{ "code", "path", "detail" }]` (empty after a clean load).
+     * Codes: malformed_json, not_object, too_large, version_too_new (load returned false), migrated,
+     * unknown_field, unknown_item, unknown_member, unknown_slot, unknown_equipment, wrong_slot,
+     * not_equippable, bad_type, clamped, defaulted.
+     * @returns {string}
+     */
+    load_warnings() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_load_warnings(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
     }
     /**
      * @param {string} party_json
@@ -213,8 +446,42 @@ export class Game {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
     }
+    /**
+     * Grade a press at `t_ms` against the pending hit. Returns `{ok, hit, grade, delta_ms, timeout, done, next?, result?}`.
+     * A miss (early or late) ends the chain. When `done`, `result` is the `stroke()` result and the turn has advanced.
+     * @param {number} t_ms
+     * @returns {string}
+     */
+    press(t_ms) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_press(this.__wbg_ptr, t_ms);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
     rest() {
         wasm.game_rest(this.__wbg_ptr);
+    }
+    /**
+     * XP/level-ups from the last victory: `{mon, xp, members:[{id, name, alive, gained, xp, lv_before, lv, leveled_up, next_total, stats?}]}` or null.
+     * @returns {string}
+     */
+    rewards_json() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_rewards_json(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
     }
     /**
      * @returns {string}
@@ -230,6 +497,14 @@ export class Game {
         } finally {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
+    }
+    /**
+     * Schema version this build writes.
+     * @returns {number}
+     */
+    save_version() {
+        const ret = wasm.game_save_version(this.__wbg_ptr);
+        return ret >>> 0;
     }
     /**
      * Seal Arts (Inkwing only): `hits` seals struck of the member's seal count, `clean` of those perfect.
@@ -264,6 +539,50 @@ export class Game {
         return ret !== 0;
     }
     /**
+     * Override combo windows: `{ "clean_ms": 95, "good_ms": 150, "anchor": "press"|"close",
+     * "hits": { "<stroke_id>#<hit index>": { "clean_ms", "good_ms" } } }` (any subset). Half-widths in ms.
+     * @param {string} cj
+     * @returns {boolean}
+     */
+    set_combo_windows(cj) {
+        const ptr0 = passStringToWasm0(cj, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.game_set_combo_windows(this.__wbg_ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
+     * Load Jake's elements.json (`{"chart": {"ember": {"tide": 2.0, ...}, ...}}`). Optional: without it the
+     * SPEC section 2 rule (opposite x2, same x0.5, else x1) is used. Pairs missing from the chart also fall back.
+     * @param {string} ej
+     * @returns {boolean}
+     */
+    set_elements(ej) {
+        const ptr0 = passStringToWasm0(ej, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.game_set_elements(this.__wbg_ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
+     * Damage multiplier on all enemy attacks (default 0.8, the integrator's tuning).
+     * @param {number} m
+     */
+    set_enemy_damage_mult(m) {
+        wasm.game_set_enemy_damage_mult(this.__wbg_ptr, m);
+    }
+    /**
+     * Load the equipment catalog: pass the live `data/items.json` text (its `equipment` array) or Jane's
+     * `equipment.json`. Call it right after the constructor and before `load_json`, or every equipped id
+     * in the save is dropped as unknown. Also puts `starting_for` gear into empty slots (new game).
+     * @param {string} equipment_json
+     * @returns {boolean}
+     */
+    set_equipment(equipment_json) {
+        const ptr0 = passStringToWasm0(equipment_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.game_set_equipment(this.__wbg_ptr, ptr0, len0);
+        return ret !== 0;
+    }
+    /**
      * @param {string} k
      * @param {boolean} v
      */
@@ -272,6 +591,17 @@ export class Game {
         const ptr0 = passStringToWasm0(k, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.game_set_flag(this.__wbg_ptr, ptr0, len0, val2);
+    }
+    /**
+     * Override the flee formula: `{ base, per_spd, per_fail, min, max }` (any subset).
+     * @param {string} j
+     * @returns {boolean}
+     */
+    set_flee_rules(j) {
+        const ptr0 = passStringToWasm0(j, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.game_set_flee_rules(this.__wbg_ptr, ptr0, len0);
+        return ret !== 0;
     }
     /**
      * @param {string} n
@@ -318,6 +648,53 @@ export class Game {
         }
     }
     /**
+     * Start a battle with optional encounter flags: `{ "first": "enemy"|"party"|null, "canFlee": bool }`
+     * (`can_flee` also accepted). `first` reorders round 1 only (ambush: that side acts first, each side by speed).
+     * `canFlee:false` makes `flee()` refuse with reason "cannot_flee" (bosses). Missing flags = normal start, Flee allowed.
+     * @param {string} encounter
+     * @param {string} opts_json
+     * @returns {string}
+     */
+    start_battle_opts(encounter, opts_json) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            let ptr0, len0, ptr1, len1;
+            try {
+                ptr0 = passStringToWasm0(encounter, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+                len0 = WASM_VECTOR_LEN;
+                ptr1 = passStringToWasm0(opts_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+                len1 = WASM_VECTOR_LEN;
+            } catch (e) {
+                if (ptr1) { wasm.__wbindgen_free(ptr1, len1 * 1, 1); }
+                if (ptr0) { wasm.__wbindgen_free(ptr0, len0 * 1, 1); }
+                throw e;
+            }
+            const ret = wasm.game_start_battle_opts(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+            deferred3_0 = ret[0];
+            deferred3_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+    /**
+     * Renderer step: if it is an enemy's turn, run its AI (same as `enemy_turn`); otherwise `{"ok":false}`.
+     * @returns {string}
+     */
+    step() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_step(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
+    /**
      * Party attack with a Brushstroke Chain. `grades` = per-hit judgement (2/1/0); stops at first 0.
      * @param {number} actor
      * @param {number} target
@@ -340,6 +717,23 @@ export class Game {
             return getStringFromWasm0(ret[0], ret[1]);
         } finally {
             wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
+        }
+    }
+    /**
+     * Alias of `inkwing` under the command's name (SPEC section 2: the command is Unfurl, the form is Inkwing).
+     * @param {number} actor
+     * @returns {string}
+     */
+    unfurl(actor) {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.game_unfurl(this.__wbg_ptr, actor);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
     }
     /**
@@ -415,6 +809,7 @@ export class Game {
         }
     }
     /**
+     * `clean`/`good` (and the same values as `clean_ms`/`good_ms`) are half-widths in ms.
      * @returns {string}
      */
     windows_json() {

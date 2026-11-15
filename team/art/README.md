@@ -15,7 +15,7 @@ Each key comes as `.webp` (q90, preferred) and `.png` (lossless master). `manife
 | `poi-forest-mid` | 3200×1440 | **yes** | Pines and a bamboo grove with solid, opaque stalks. Seal-stones; two carry small cracked vermilion seals at about (1499,901) and (2514,1063). Opaque ground band from y≈1150. |
 | `poi-forest-near` | 3200×1440 | **yes** | Framing: pine branch (top left), grass and ferns (left), a grass tuft (about x 1350), bamboo and a rock (right). |
 | `poi-town-far` | 3200×1440 | no | Hanshi far layer: the shrine stair up to a vermilion torii at about (1262,498), with misty hills. |
-| `poi-town-mid` | 3200×1440 | **yes** | Storehouse, inn, well, and the street of paper-walled houses, with opaque walls. The Kōbō Tsuru shop has Luc's mark on its noren at about (2429,838). Lanterns at about (1195,692), (2067,669), (2249,815), (2673,836). Opaque street from y≈1065. |
+| `poi-town-mid` | 3200×1440 | **yes** | Storehouse, inn, well, and the street of paper-walled houses, with opaque walls. v2.1: an old black pine (trunk about x 1340–1420, canopy over the roofs to x≈1700) stands at the old tile seam, full alpha, so the main street is solid right up to the trunk. Between the inn and the pine, the far layer's shrine stair and torii show through. The Kōbō Tsuru shop has Luc's mark on its noren at about (2429,838). Lanterns at about (1195,692), (2067,669), (2249,815), (2673,836). Opaque street from y≈1065. |
 | `poi-town-near` | 3200×1440 | **yes** | An eave with the big foreground lantern at about (407,359), a stone lantern and fence (left), willow and a water barrel (right). |
 | `battle-forest` | 2560×1440 | no | Unchanged composition. A hairline vermilion crack now runs down from the left seal-stone's seal (about x 810, y 710–900). The open fighting ground is about x 300–2300, y 760–1250. |
 
@@ -32,7 +32,7 @@ With 3200-wide layers and a 2560 view, there are 640px of scroll at parallax 1.0
 
 ## Notes and known weaknesses
 - The source images are capped at 1152×864, so the POI layers were built from two tiles each, scaled 1.67× and stitched, instead of a true native render. Fine line work is still a little soft, though sharper than v1's 2×.
-- Each POI layer has a stitch zone at about x 1280–1920. In town-mid, the left edge of the main street fades into mist there, where the storehouse block meets it.
+- Each POI layer has a stitch zone at about x 1280–1920. In town-mid (v2.1), the seam is hidden behind a solid pine instead of fading. Forest layers still use the multiply and crossfade there.
 - `world-bg`: the mountains come from a generated image; the river, coast, sea, forests, the Hanshi mark and the seams are painted procedurally at 2560. The river's dry-brush texture is a little regular.
 - Alpha is keyed from luminance. Enclosed areas, bamboo stalks and the ground bands are filled opaque.
-- `src-environments/v2/` holds the raw images and scripts. Run them in this order: `stitch.py`, `process_v2.py`, `world_v2.py`, `previews.py`. They write to `../out` relative to the script folder.
+- `src-environments/v2/` holds the raw images and scripts. Run them in this order: `stitch.py`, `process_v2.py`, `world_v2.py`, `fix_town_seam.py` (rebuilds town-mid), `previews.py`. They write to `../out` relative to the script folder.

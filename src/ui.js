@@ -2,9 +2,13 @@
 import { PAL, stroke, wash, seal } from './ink.js';
 let STR = {};
 export function setStrings(s) { STR = s || {}; }
+let SRC = () => 'touch';
+export function setInputSource(f) { SRC = f; }
+const GLYPH = { touch: { confirm: 'A', cancel: 'B', menu: '☰' }, pad: { confirm: 'A', cancel: 'B', menu: 'Start' }, keyboard: { confirm: 'Enter', cancel: 'Esc', menu: 'Tab' } };
+export function glyph(k) { return (GLYPH[SRC()] || GLYPH.touch)[k]; }
 export function T(key, vars = {}, fallback) {
   let s = STR[key] ?? fallback ?? key;
-  return s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] ?? (k === 'gauge' ? STR['battle.gauge.label'] : m)));
+  return s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] ?? (k === 'gauge' ? STR['battle.gauge.label'] : (k === 'confirm' || k === 'cancel' || k === 'menu') ? glyph(k) : m)));
 }
 export const FONT = { title: '"Marker", serif', body: '"Hand", "Trebuchet MS", sans-serif', kanji: 'Kanji, serif' };
 export function text(ctx, s, x, y, o = {}) {
@@ -41,7 +45,7 @@ export function menu(ctx, items, sel, x, y, o = {}) {
   items.forEach((it, i) => {
     const yy = y + i * lh;
     if (i === sel) { stroke(ctx, [[x - 8, yy - 6], [x + w * 0.6, yy - 9], [x + w - 6, yy - 5]], { w: lh * 0.62, color: PAL.red, alpha: 0.85, seed: 7 + i, dry: 0.7, taper: [0.05, 0.4] }); }
-    text(ctx, it.label, x + 6, yy + 2, { size: o.size ?? 24, color: it.disabled ? PAL.w3 : i === sel ? '#fbf6ec' : PAL.ink });
+    text(ctx, it.label, x + 6, yy + 2, { size: o.size ?? 24, color: (it.disabled || it.dim) ? PAL.w3 : i === sel ? '#fbf6ec' : PAL.ink });
     if (it.sub) text(ctx, it.sub, x + w - 10, yy + 2, { size: 18, align: 'right', color: i === sel ? '#fbf6ec' : PAL.w2 });
   });
   return { x: x - 18, y: y - 30, w: w + 30, lh };

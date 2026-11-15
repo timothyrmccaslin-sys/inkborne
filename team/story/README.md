@@ -4,9 +4,9 @@ Drop folder for the story team. See ../../SPEC.md section 9 for what goes here.
 
 The game is titled Inkborne (SPEC v1.1), and the repo is /workspace/inkborne.
 
-- `glossary.json`: 52 entries (characters, Inkwings, Strokes, Seal Arts, enemies with flavor lines, places, lore, SPEC §2 mechanics, Six Inks, items). Each has `id`, `name`, `category`, `desc`, `source`, `status` (canon or TBD).
+- `glossary.json`: 63 entries (characters, Inkwings, Strokes, Seal Arts, enemies with flavor lines, places, lore, SPEC §2 mechanics, Six Inks, items, equipment). Each has `id`, `name`, `category`, `desc`, `source`, `status` (canon or TBD).
 - `glossary.md`: the same glossary as tables, for reading.
-- `strings.json`: a flat key map of 147 strings, which goes to `data/strings.json` per Kekai until Marc sets a schema. It covers the title screen, battle menu, targeting, turn order, battle log, results, Brushstroke prompts, Seal Arts prompts, gauge states, Unfurl, shop, pause, status, settings, world/POI prompts, and tutorials for Brushstroke, Unfurl, Still Water and the Six Inks.
+- `strings.json`: a flat key map of 158 strings, which goes to `data/strings.json` per Kekai until Marc sets a schema. It covers the title screen, battle menu, targeting, turn order, battle log, results, Brushstroke prompts, Seal Arts prompts, gauge states, Unfurl, shop, pause, equipment, status, settings, world/POI prompts, and tutorials for Brushstroke, Unfurl, Still Water and the Six Inks.
 
 Conventions: `{gauge}` always resolves to `battle.gauge.label`, which is "Vermilion Ink" (locked by Marc). `{confirm}`, `{cancel}` and `{menu}` are the SPEC §4 actions shown as the device's button glyph. No numbers live here; stats belong to team/systems.
 

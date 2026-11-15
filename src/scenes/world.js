@@ -29,9 +29,13 @@ export function create(game, params) {
   }
   return {
     enter() { game.audio.setScene('world'); if (!cache) bake(); game.core.set_node(at); game.save(); },
+    resume() { game.audio.setScene('world'); },
+    onResult() { game.enc.afterBattle(); game.save(); },
     update(dt, inp) {
       if (toast) { toast.t -= dt; if (toast.t <= 0) toast = null; }
-      if (travel) { travel.k += dt / 0.9; if ((travel.k * 6 | 0) !== ((travel.k - dt / 0.9) * 6 | 0)) game.audio.play('step', { gain: 0.2 }); if (travel.k >= 1) { at = travel.to; travel = null; game.core.set_node(at); } return; }
+      if (travel) { const k0 = travel.k; travel.k += dt / 0.9;
+        const a = N[travel.from], b = N[travel.to], hit = game.enc.move({ scene: 'world', path: [travel.from, travel.to], dist: Math.hypot(b.x - a.x, b.y - a.y) * (travel.k - k0) });
+        if (hit) { const tr = travel; at = tr.k > 0.5 ? tr.to : tr.from; travel = null; game.core.set_node(at); import('../encounters.js').then((m) => m.startBattle(game, hit)); return; } if ((travel.k * 6 | 0) !== ((travel.k - dt / 0.9) * 6 | 0)) game.audio.play('step', { gain: 0.2 }); if (travel.k >= 1) { at = travel.to; travel = null; game.core.set_node(at); } return; }
       const [mx, my] = inp.move();
       if (inp.pressed('right') || inp.pressed('left') || inp.pressed('up') || inp.pressed('down') || (Math.hypot(mx, my) > 0.6 && !this._held)) { go(Math.hypot(mx, my) > 0.1 ? [mx, my] : [inp.down('right') - inp.down('left'), inp.down('down') - inp.down('up')]); }
       this._held = Math.hypot(mx, my) > 0.6;

@@ -4,7 +4,7 @@
 import { PAL, paper, stroke, wash, seal } from '../ink.js';
 import { drawPortrait } from '../figures.js';
 import { T, text, panel, wrap, bar, FONT } from '../ui.js';
-const ICON = { heal: '餅', healall: '茶', ink: '墨', bomb: '爆' };
+const ICON = { heal: '餅', healall: '茶', ink: '墨', bomb: '爆', gear: '具' };
 export function create(game, params) {
   const shop = game.data.shops[params.shop], core = game.core, A = game.audio, D = game.data.dialogue;
   const line = (k) => { const s = D[`shop_tsuru_${k}`]; return s ? s.nodes[s.start].text : ''; };
@@ -32,7 +32,7 @@ export function create(game, params) {
       }
       if (inp.pressed('left') || inp.pressed('right')) { tab = 1 - tab; sel = 0; A.play('move'); say = line(tab ? 'sell' : 'buy'); mood = 'calm'; }
       if (inp.pressed('down') && L.length) { sel = (sel + 1) % L.length; A.play('move'); } if (inp.pressed('up') && L.length) { sel = (sel + L.length - 1) % L.length; A.play('move'); }
-      if (tap) { if (tap.y < 92 && tap.x < 384) { tab = tap.x < 224 ? 0 : 1; sel = 0; A.play('move'); } const i = Math.floor((tap.y - 132) / 60); if (tap.x > 336 && tap.x < 784 && i >= 0 && i < L.length) { if (i === sel) { qty = 1; } else sel = i; A.play('move'); } }
+      if (tap) { if (tap.y < 92 && tap.x < 384) { tab = tap.x < 224 ? 0 : 1; sel = 0; A.play('move'); } const r = Math.floor((tap.y - 132) / 60), i = r >= 0 && r < 8 ? Math.max(0, Math.min(sel - 7, L.length - 8)) + r : -1; if (tap.x > 336 && tap.x < 784 && i >= 0 && i < L.length) { if (i === sel) { qty = 1; } else sel = i; A.play('move'); } }
       if (inp.pressed('confirm') && L.length) { const it = L[sel]; if (tab === 0 && g < it.price) { A.play('cancel'); mood = 'sad'; say = line('buy_poor'); } else { qty = 1; A.play('confirm'); } }
       if (inp.pressed('confirm') && !L.length && tab === 1) say = T('shop.nothing_to_sell');
       if (inp.pressed('cancel') || inp.pressed('menu')) { A.play('cancel'); say = line('leave'); game.save(); game.pop({}); }
@@ -52,11 +52,12 @@ export function create(game, params) {
       panel(ctx, 64, 430, 248, 40, { seed: 82, bw: 3 }); text(ctx, 'Grandmother Tsuru', 188, 458, { size: 21, align: 'center', font: FONT.title });
       // S6 list
       panel(ctx, 336, 112, 448, 500, { seed: 83 });
-      text(ctx, tab ? T('shop.owned') : T('shop.price'), 764, 130, { size: 15, align: 'right', color: PAL.w2 });
+      text(ctx, tab ? T('shop.owned',{n:''}).replace(/[:\s]+$/,'') : 'Price', 764, 130, { size: 15, align: 'right', color: PAL.w2 });
       if (!L.length) text(ctx, T('shop.nothing_to_sell'), 560, 300, { size: 22, align: 'center', color: PAL.w2 });
-      L.slice(0, 8).forEach((x, i) => { const y = 132 + i * 60;
-        if (i === sel) { ctx.save(); ctx.fillStyle = 'rgba(179,38,30,0.08)'; ctx.fillRect(344, y, 432, 58); ctx.restore(); stroke(ctx, [[384, y + 54], [770, y + 52]], { w: 3, color: PAL.red, seed: 20 + i, dry: 0.4 }); }
-        if (!drawIcon(ctx, x, 372, y + 29, 48)) {} text(ctx, x.name, 408, y + 30, { size: 22, color: tab === 0 && g < x.price ? PAL.w2 : PAL.ink }); text(ctx, `${T('shop.owned')} ${x.count}`, 408, y + 50, { size: 14, color: PAL.w2 });
+      const off = Math.max(0, Math.min(sel - 7, L.length - 8)); if (off > 0) text(ctx, '▲', 560, 128, { size: 14, align: 'center', color: PAL.w2 }); if (off + 8 < L.length) text(ctx, '▼', 560, 622, { size: 14, align: 'center', color: PAL.w2 });
+      L.slice(off, off + 8).forEach((x, j) => { const i = j + off, y = 132 + j * 60;
+        if (i === sel) { ctx.save(); ctx.fillStyle = 'rgba(179,38,30,0.08)'; ctx.fillRect(344, y, 432, 58); ctx.restore(); stroke(ctx, [[384, y + 54], [770, y + 52]], { w: 3, color: PAL.red, seed: 20 + j, dry: 0.4 }); }
+        if (!drawIcon(ctx, x, 372, y + 29, 48)) {} text(ctx, x.name, 408, y + 30, { size: 22, color: tab === 0 && g < x.price ? PAL.w2 : PAL.ink }); text(ctx, T('shop.owned',{n:x.count}), 408, y + 50, { size: 14, color: PAL.w2 });
         text(ctx, `${tab ? x.sell : x.price} mon`, 764, y + 36, { size: 21, align: 'right' }); });
       // S7 description
       panel(ctx, 808, 112, 408, 224, { seed: 84 });
@@ -68,10 +69,11 @@ export function create(game, params) {
           let now, after, max = m.maxHp, lab = 'HP';
           if (it.kind === 'ink') { lab = 'Ink'; now = m.ink; after = Math.min(100, now + (item.power || 0)); max = 100; } else { now = m.hp; after = it.kind === 'heal' || it.kind === 'healall' ? Math.min(max, now + (item.power || 0)) : now; }
           bar(ctx, 930, y - 6, 140, 8, now / max, lab === 'Ink' ? PAL.red : PAL.w1); text(ctx, `${lab} ${Math.round(now)} → ${Math.round(after)}`, 1200, y + 6, { size: 16, align: 'right', color: after > now ? PAL.red : PAL.w2 }); if (after > now && tab === 0) text(ctx, '▲', 1082, y + 4, { size: 14, color: PAL.red }); });
+        if (it.kind === 'gear') { const eq = (game.data.items.equipment || []).find((z) => z.id === it.id) || {}; const mods = Object.entries(eq.mods || {}).map(([k, v]) => `${k.toUpperCase()} +${v}`).join('  '); text(ctx, `${(eq.slot || 'gear').toUpperCase()}  ${mods}`, 1012, 292, { size: 16, align: 'center', color: PAL.red }); text(ctx, 'Equip screen arrives in a later build.', 1012, 314, { size: 14, align: 'center', color: PAL.w2 }); }
         if (it.kind === 'bomb') text(ctx, 'For throwing at ink-beasts, not friends.', 1012, 476, { size: 15, align: 'center', color: PAL.w2 }); }
       // S9 keeper line / qty stepper
       panel(ctx, 272, 628, 736, 56, { seed: 86 });
-      if (qty && it) { const tot = qty * (tab ? it.sell : it.price); text(ctx, `${tab ? T('shop.sell') : T('shop.buy')} ${it.name}  ◀ ${qty} ▶   ${T('shop.total')}: ${tot} mon   (A ${T('shop.yes')} / B ${T('shop.no')})`, 640, 664, { size: 20, align: 'center' }); }
+      if (qty && it) { const tot = qty * (tab ? it.sell : it.price); text(ctx, `${tab ? T('shop.sell') : T('shop.buy')} ${it.name}  ◀ ${qty} ▶   ${T('shop.total',{n:tot})}   (A ${T('shop.yes')} / B ${T('shop.no')})`, 640, 664, { size: 20, align: 'center' }); }
       else text(ctx, say, 640, 664, { size: 20, align: 'center', color: PAL.w1 });
       text(ctx, 'B: leave', 1200, 700, { size: 14, align: 'right', color: PAL.w2 });
     },

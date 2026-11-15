@@ -1,134 +1,537 @@
 {
- "images": {
-  "icon-rice_cake": {
-   "src": "icons/icon-rice_cake.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-plum_tonic": {
-   "src": "icons/icon-plum_tonic.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-pine_tea": {
-   "src": "icons/icon-pine_tea.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-festival_bento": {
-   "src": "icons/icon-festival_bento.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-inkstone_chip": {
-   "src": "icons/icon-inkstone_chip.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-fresh_ink_pot": {
-   "src": "icons/icon-fresh_ink_pot.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-paper_cracker": {
-   "src": "icons/icon-paper_cracker.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "icon-thunder_jar": {
-   "src": "icons/icon-thunder_jar.webp",
-   "w": 128,
-   "h": 128,
-   "frames": 1,
-   "fw": 128,
-   "fh": 128,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "prop-kobo-tsuru-mark": {
-   "src": "props/prop-kobo-tsuru-mark.webp",
-   "w": 512,
-   "h": 512,
-   "frames": 1,
-   "fw": 512,
-   "fh": 512,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
-  },
-  "prop-kobo-tsuru-mark-ink": {
-   "src": "props/prop-kobo-tsuru-mark-ink.webp",
-   "w": 512,
-   "h": 512,
-   "frames": 1,
-   "fw": 512,
-   "fh": 512,
-   "fps": 0,
-   "anchor": [
-    0.5,
-    0.5
-   ]
+  "images": {
+    "icon-rice_cake": {
+      "src": "icons/icon-rice_cake.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-plum_tonic": {
+      "src": "icons/icon-plum_tonic.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-pine_tea": {
+      "src": "icons/icon-pine_tea.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-festival_bento": {
+      "src": "icons/icon-festival_bento.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-inkstone_chip": {
+      "src": "icons/icon-inkstone_chip.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-fresh_ink_pot": {
+      "src": "icons/icon-fresh_ink_pot.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-paper_cracker": {
+      "src": "icons/icon-paper_cracker.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-thunder_jar": {
+      "src": "icons/icon-thunder_jar.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "prop-kobo-tsuru-mark": {
+      "src": "props/prop-kobo-tsuru-mark.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "prop-kobo-tsuru-mark-ink": {
+      "src": "props/prop-kobo-tsuru-mark-ink.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "wpn-itsuki-katana": {
+      "src": "weapons/wpn-itsuki-katana.webp",
+      "w": 1024,
+      "h": 120,
+      "frames": 1,
+      "fw": 1024,
+      "fh": 120,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-wpn-itsuki-katana": {
+      "src": "weapons/icon-wpn-itsuki-katana.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "wpn-benika-bow": {
+      "src": "weapons/wpn-benika-bow.webp",
+      "w": 199,
+      "h": 1024,
+      "frames": 1,
+      "fw": 199,
+      "fh": 1024,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-wpn-benika-bow": {
+      "src": "weapons/icon-wpn-benika-bow.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "wpn-gonzo-staff": {
+      "src": "weapons/wpn-gonzo-staff.webp",
+      "w": 1024,
+      "h": 92,
+      "frames": 1,
+      "fw": 1024,
+      "fh": 92,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-wpn-gonzo-staff": {
+      "src": "weapons/icon-wpn-gonzo-staff.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "wpn-gonzo-prayer-beads": {
+      "src": "weapons/wpn-gonzo-prayer-beads.webp",
+      "w": 873,
+      "h": 1024,
+      "frames": 1,
+      "fw": 873,
+      "fh": 1024,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-wpn-gonzo-prayer-beads": {
+      "src": "weapons/icon-wpn-gonzo-prayer-beads.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "prop-lantern-paper": {
+      "src": "props/prop-lantern-paper.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-lantern-stone": {
+      "src": "props/prop-lantern-stone.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-signpost": {
+      "src": "props/prop-signpost.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-barrel": {
+      "src": "props/prop-barrel.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-shop-kobo-tsuru": {
+      "src": "props/prop-shop-kobo-tsuru.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-shrine": {
+      "src": "props/prop-shrine.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-shrine-stair": {
+      "src": "props/prop-shrine-stair.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-lantern-string": {
+      "src": "props/prop-lantern-string.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.0
+      ]
+    },
+    "prop-seal-stone-tall": {
+      "src": "props/prop-seal-stone-tall.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-seal-stones-cluster": {
+      "src": "props/prop-seal-stones-cluster.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-bamboo-tall": {
+      "src": "props/prop-bamboo-tall.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "prop-bamboo-young": {
+      "src": "props/prop-bamboo-young.webp",
+      "w": 512,
+      "h": 512,
+      "frames": 1,
+      "fw": 512,
+      "fh": 512,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        1
+      ]
+    },
+    "icon-washi_vest": {
+      "src": "icons/icon-washi_vest.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-paper_charm": {
+      "src": "icons/icon-paper_charm.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-redcord_katana": {
+      "src": "icons/icon-redcord_katana.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-prayerslip_bow": {
+      "src": "icons/icon-prayerslip_bow.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-ironband_staff": {
+      "src": "icons/icon-ironband_staff.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-prayer_mala": {
+      "src": "icons/icon-prayer_mala.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-sealedge_katana": {
+      "src": "icons/icon-sealedge_katana.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-cranefeather_bow": {
+      "src": "icons/icon-cranefeather_bow.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-bellbronze_staff": {
+      "src": "icons/icon-bellbronze_staff.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-lacquer_haori": {
+      "src": "icons/icon-lacquer_haori.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    },
+    "icon-lantern_bell": {
+      "src": "icons/icon-lantern_bell.webp",
+      "w": 128,
+      "h": 128,
+      "frames": 1,
+      "fw": 128,
+      "fh": 128,
+      "fps": 0,
+      "anchor": [
+        0.5,
+        0.5
+      ]
+    }
   }
- }
 }

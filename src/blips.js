@@ -1,4 +1,4 @@
-// Tabula Rasa: runtime dialogue blips (Rita, audio/voice). SPEC section 9 JS synth patch format.
+// Inkborne: runtime dialogue blips (Rita, audio/voice). SPEC section 9 JS synth patch format.
 // Each key plays one text-scroll chirp: a pulse wave through two formant band-passes, with a tiny random
 // pitch wobble so repeated blips don't machine-gun. Fire one per 2-3 revealed characters, skip spaces.
 // The MP3s voice-<id>-blip-1..3 are the same voices pre-rendered, if you'd rather use samples.

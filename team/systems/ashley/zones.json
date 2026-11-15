@@ -1,14 +1,14 @@
 {
-  "version": 2,
-  "about": "Inkborne encounter zones (Systems / Ashley). Read by encounters.js. Ids match the live data/world.json nodes, data/pois/*.json and data/enemies.json enemies. Canon enemies only: blotling, hollow_lantern, smudge_ronin (Smudge Ronin is the fixed mini-boss and never appears in random tables). `encounters` has the same shape as enemies.json `encounters` (SPEC 7) and keeps the existing 'sumikage_c' and 'sumikage_boss' entries unchanged, so it can be merged as-is.",
+  "version": 3,
+  "about": "Inkborne encounter zones (Systems / Ashley). Read by encounters.js. Ids match the live data/world.json nodes, data/pois/*.json and data/enemies.json enemies. Canon enemies only: blotling, hollow_lantern, smudge_ronin (Smudge Ronin is the fixed mini-boss and never appears in random tables). `encounters` has the same shape as enemies.json `encounters` (SPEC 7) and keeps the existing 'sumikage_c' and 'sumikage_boss' entries unchanged, so it can be merged as-is. Recommended path for the integrator: data/zones.json (a separate file, not folded into enemies.json).",
   "rules": {
     "stepPx": {
-      "poi": 24,
+      "poi": 10,
       "world": 20
     },
     "graceStepsAfterBattle": 6,
     "graceStepsOnEnter": 4,
-    "note": "A step is stepPx of real travel. After minSteps, each step rolls 1/(avgSteps-minSteps); maxSteps forces an encounter. Standing still never rolls. Sumikage Wood is 1280 px wide, so one crossing is about 53 POI steps."
+    "note": "A step is stepPx of real travel. After minSteps, each step rolls 1/(avgSteps-minSteps); maxSteps forces an encounter. Standing still never rolls. Sumikage Wood is 1280 px wide; a straight crossing from the spawn to the Smudge Ronin clearing averages about 1 random fight on top of the 2 fixed ones (sim in test/encounters.test.mjs)."
   },
   "zones": [
     {
@@ -62,11 +62,20 @@
       ]
     },
     {
+      "id": "sumikage-trailhead",
+      "name": "Sumikage Wood, trail entrance to the seal-stone (safe)",
+      "scene": "poi",
+      "poi": "forest",
+      "rectN": [0.0, 0.0, 0.2, 1.0],
+      "priority": 2,
+      "safe": true
+    },
+    {
       "id": "sumikage-edge",
       "name": "Sumikage Wood, outer trail",
       "scene": "poi",
       "poi": "forest",
-      "rectN": [0.0, 0.0, 0.4, 1.0],
+      "rectN": [0.2, 0.0, 0.2, 1.0],
       "priority": 1,
       "bg": "forest",
       "rate": {
@@ -146,13 +155,11 @@
     "sumikage_c": {
       "bg": "forest",
       "canFlee": true,
-      "music": "battle",
       "note": "Already placed as the pois/forest.json 'ambush' trigger (once, flag won_ambush). Also in the deep-trees random table so the standard fight can repeat."
     },
     "sumikage_boss": {
       "bg": "forest",
       "canFlee": false,
-      "music": "battle",
       "note": "Mini-boss (Smudge Ronin). Already placed as the pois/forest.json 'ronin' trigger (once, needs won_ambush) inside the safe clearing."
     }
   },

@@ -90,6 +90,11 @@ if ! semver_gt "$NEW" "$CUR"; then
 fi
 
 new_sw="${prefix}${NEW}"
+# Keep APP_VERSION's own form: bare X.Y.Z (Asura) or prefixed like ib-X.Y.Z (Inkborne).
+new_app="$NEW"
+if [[ "$app_raw" =~ ^([A-Za-z][A-Za-z0-9_]*-)[0-9] ]]; then
+  new_app="${BASH_REMATCH[1]}${NEW}"
+fi
 
 # Replace only the first assignment of each const, keep the rest of the line
 # (comments, etc.).
@@ -97,9 +102,9 @@ tmp_app="$(mktemp)"
 tmp_sw="$(mktemp)"
 trap 'rm -f "$tmp_app" "$tmp_sw"' EXIT
 
-awk -v new="$NEW" '
+awk -v new="$new_app" '
   !done && $0 ~ /^[[:space:]]*(export[[:space:]]+)?const APP_VERSION = '\''/ {
-    sub(/const APP_VERSION = '\''[0-9]+\.[0-9]+\.[0-9]+'\''/, "const APP_VERSION = '\''" new "'\''")
+    sub(/const APP_VERSION = '\''[^'\'']+'\''/, "const APP_VERSION = '\''" new "'\''")
     done=1
   }
   { print }
@@ -114,7 +119,7 @@ awk -v new="$new_sw" '
 ' "$SW_JS" > "$tmp_sw"
 
 # Confirm the edit landed before replacing the originals.
-grep -q "const APP_VERSION = '$NEW'" "$tmp_app" || die "failed to update APP_VERSION in $APP_JS"
+grep -q "const APP_VERSION = '$new_app'" "$tmp_app" || die "failed to update APP_VERSION in $APP_JS"
 grep -q "const VERSION = '$new_sw'" "$tmp_sw" || die "failed to update VERSION in $SW_JS"
 
 cat "$tmp_app" > "$APP_JS"
@@ -122,4 +127,4 @@ cat "$tmp_sw" > "$SW_JS"
 
 "$CHECK_SCRIPT" "$APP_JS" "$SW_JS"
 printf 'bump-version: %s -> %s (APP_VERSION=%s, VERSION=%s)\n' \
-  "$CUR" "$NEW" "$NEW" "$new_sw"
+  "$CUR" "$NEW" "$new_app" "$new_sw"

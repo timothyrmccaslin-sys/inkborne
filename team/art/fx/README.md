@@ -46,3 +46,18 @@ cd /workspace/inkborne/team/art/fx && python3 tools/gen_fx.py            # every
 python3 tools/gen_fx.py fx-seal-gale fx-death                          # selected keys
 ```
 The config block at the top of `tools/gen_fx.py` sets the output dir, frame sizes, fps, supersampling, palette, elements and tints, and frame counts. Previews (GIF over paper plus contact sheets, and `overview.jpg`) go to `previews/`. These are not game assets.
+
+## Polish pass (v1.1)
+Same keys, frame counts, sizes, fps and anchors. What changed:
+- **Inkwing opening (all three elements):** an accelerating ink vortex replaces the plain loops. Tapering strokes of varied weight spiral inward with wet bleed, a dry speed streak runs beside the heavy strokes, and droplets fling off along the spin.
+- **Stone Owl wings:** broad and rounded with soft edges, irregular rounded feathers, dark slate tips, barring and shingle coverts. Feather spacing, length, angle and width are now irregular on every wing. The Crane and Kite wings are about 12% smaller so they no longer clip the frame edge.
+- **Death dissolve:** the dissolve front now creeps along the paper fibres with a softer edge. Dissolved ink wicks into the paper as a fading grey wash. Drips taper from a hairline to a bead and leave a wet trail. The puddle is an irregular blot.
+- **Stone Seal Art:** the slabs use a flat brush with flat sides, ragged ends and bristles that split into clumps and run dry.
+
+`previews/before/` keeps the pre-polish previews for comparison.
+- **Owl round 3 (only `fx-inkwing-stone` and `fx-inkwing-stone-loop`):**
+  - The Stone Owl wing is rebuilt with a broad, rounded leading edge and a deep chord of hanging secondaries with a soft scalloped trailing edge.
+  - The tip is a short, rounded fringe of separated primaries spread around the wrist, with soft serrations along their edge.
+  - Dark and light bars run across the wing, parallel to the leading edge on the secondaries and in arcs across the primaries.
+  - The wings are raised higher. Keys, frames, size and anchor are unchanged.
+  - Previews from before this round are in `previews/before/*_owl-round2*`.

@@ -43,10 +43,10 @@ export function presetProps(kind, w, h, seed = hashStr(kind)) {
     out.push({ type: 'mist', y: h * 0.78, h: 110, alpha: 0.28, speed: 18, parallax: 1.15, layer: 'front' });
     for (let y = h * 0.5; y < h - 20; y += 70 + r() * 40) {
       let x = r() * 120;
-      while (x < w) { const len = 120 + r() * 260; out.push({ type: 'grass', x, y: y + r() * 20, w: len, h: 20 + r() * 14 }); x += len + 60 + r() * 220; }
+      while (x < w) { const len = 120 + r() * 260; out.push({ type: 'grass', x, y: y + r() * 20, w: len, h: 20 + r() * 14, density: 7 }); x += len + 60 + r() * 220; }
     }
     for (let x = 0; x < w; x += 480) out.push({ type: 'leaves', rect: [x, 0, 480, h * 0.92], rate: 0.5 + r() * 0.4 });
-    out.push({ type: 'grass', x: 0, y: h - 6, w, h: 44, layer: 'front', density: 10 });
+    out.push({ type: 'grass', x: 0, y: h - 6, w, h: 44, layer: 'front', density: 6 });
   } else if (kind === 'town') {
     out.push({ type: 'mist', y: h * 0.86, h: 90, alpha: 0.22, speed: 8, parallax: 1.1, layer: 'front' });
     for (let x = 140 + r() * 60; x < w - 60; x += 190 + r() * 90) out.push({ type: 'lantern', x, y: h * 0.33 + (r() - 0.5) * 30, len: 22 + r() * 18 });
@@ -62,6 +62,7 @@ export function createAmbient(opts = {}) {
   const reducedOS = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   let quality = opts.quality || (reducedOS ? 'reduced' : 'full');
   const auto = opts.auto !== false;
+  const maxBlades = opts.maxBlades ?? 1400; // whole-POI grass budget; lite draws every other blade on top of this
   const sfx = typeof opts.sfx === 'function' ? opts.sfx : null; // sfx('wind') / sfx('lantern'): SPEC ambient keys
   let preset = AMBIENT_PRESETS.forest, kind = 'forest', world = { w: 1280, h: 720 };
   let t = 0, slowT = 0, dtAvg = 1 / 60, lanternCue = 0;
@@ -112,9 +113,12 @@ export function createAmbient(opts = {}) {
     if (!props.length && AMBIENT_PRESETS[kind]) props = presetProps(kind, world.w, world.h, seed);
     tufts.back.length = tufts.front.length = mists.length = leafSrc.length = lanterns.length = leaves.length = 0;
     const r = rng(seed ^ 0x5bd1e995);
+    // blade budget (iPad): thin every grass prop evenly so a whole POI stays under maxBlades (~4 blades per tuft)
+    let est = 0; for (const p of props) if (p.type === 'grass') est += Math.round((p.w || 100) / 100 * (p.density || 8)) * 4;
+    const thin = Math.min(1, maxBlades / Math.max(1, est));
     for (const p of props) {
       if (p.type === 'grass') {
-        const n = Math.max(1, Math.round((p.w || 100) / 100 * (p.density || 14))), H = p.h || 26;
+        const n = Math.max(1, Math.round((p.w || 100) / 100 * (p.density || 8) * thin)), H = p.h || 26;
         const arr = tufts[p.layer === 'front' ? 'front' : 'back'];
         for (let i = 0; i < n; i++) {
           const blades = [], nb = 3 + ((r() * 3) | 0);

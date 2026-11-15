@@ -2,6 +2,13 @@
 
 - Author: Noe (Quality & Security), for Marc
 - Snapshot: **2026-11-15 3:22 PM America/Chicago (CST)** — code is still landing; several files in `src/` and `data/` were rewritten in the hour before this pass
+
+> **Integrator status note, 2026-11-15 3:52 PM CST (ib-0.1.1 build). The 3:22 PM snapshot below is out of date; Noe to refresh on the next pass.**
+> - P0-1 **fixed** (battle/dialogue/shop scenes exist; 0.1.0 boots live). P0-2 **fixed** (Audio no longer shadows `music()`).
+> - P1-1 **fixed** (`sw.js` present, VERSION synced with APP_VERSION, offline reload verified on 0.1.0). P1-2 **fixed** (art team icons in `assets/icons/`).
+> - P1-3 **fixed** (guarded `readSave()`/`hasSave`/load; a failed load stays on title). P1-4 **addressed in 0.1.1** by Jared's save module (0010/0011: validation, clamps, version and size checks) if it passes the release gate. P1-5 **fixed** (enemy_turn unwrap removed).
+> - P2-6 **fixed** (leftover "Tabula Rasa" comment in `src/blips.js`). P2-10 **fixed** (`fonts/inkborne-kanji.woff2`). P2-7 / P2-8 (`save_json` / turn-order `unwrap`) still open. IP watch items P2-1 to P2-5 unchanged.
+
 - SPEC: v1.1 (title Inkborne, crate `inkborne_core`, save key `inkborne-save-v1`, version prefix `ib-`, gauge **Vermilion Ink**)
 - Scope: rollup of `team/qa/` inputs, plus a light static first pass on the code that exists now. No files outside `team/qa/` were edited. The demo was not booted in a browser; there is no playable build yet.
 
@@ -212,3 +219,67 @@ What's missing for a playable build, and for June's full-loop plan:
 4. **John** re-reviews the actual `save_json` / `load_json` path, runs the tamper table, and replaces the provisional `save-tamper.md`.
 5. **Brandon** (with Rick) lands the real CI workflow in place of `pages-temp.yml`, pins `wasm-bindgen`, and validates manifest / SW / icons / version sync once `sw.js` exists.
 6. **Noe** re-runs the IP-similarity check when Inkwing / character sprites land, and keeps this rollup current as scenes ship.
+
+---
+
+## Sam (perf/errors), static pass at `afdfcc9`, 2026-11-15 ~3:45 PM CST. PARTIAL: the runtime fps and console pass is still pending
+Full detail with fix snippets is in `perf-errors-review.md`. **No new P0s.** P0-1, P0-2, and P1-1 above look fixed at `afdfcc9`: the scene modules exist, `this.music = null` is gone, and `sw.js` exists with all 37 shell URLs present. Noe, please confirm.
+
+### P1-S1. A full-screen `ctx.filter` blur runs every frame in dialogue and shop
+- **Owner:** dev
+- **File:** `src/scenes/dialogue.js:40`, `src/scenes/shop.js:42`
+- **What is wrong:** `blur(6px)` / `blur(4px)` is applied to a full-frame `drawImage` inside `draw()`, so it runs every frame at DPR 2. This is the likely worst fps cost on iPad, and older Safari ignores Canvas2D `filter`.
+- **Fix:** Blur once into an offscreen canvas in `enter()` (the way `world.js:13` does) or ship a pre-blurred `.webp`.
+
+### P1-S2. One exception freezes the game, and there are no global error handlers
+- **Owner:** dev
+- **File:** `src/main.js` `frame()` (~66-84)
+- **What is wrong:** Scene `update`/`draw` has no guard, and the next `requestAnimationFrame` is scheduled last, so any throw stops the loop for good. There's no `window.onerror` or `unhandledrejection` handler.
+- **Fix:** Call rAF first, wrap the step in try/catch (log once, show a "return to title" panel), and add global `error` and `unhandledrejection` handlers.
+
+### P1-S3. The canvas backing store covers the whole viewport at DPR 2 and repaints in full every frame
+- **Owner:** dev
+- **File:** `src/main.js:19-23`
+- **What is wrong:** An iPad Pro 12.9" in landscape gets a 2732×2048 Canvas2D surface, letterbox included, cleared and redrawn every frame.
+- **Fix:** Size the canvas to the 1280×720 game area times scale; cap DPR at 1.5 on touch devices, or adjust it from measured frame time.
+
+### P1-S4. Rust battle exports index without bounds checks, and `panic = "abort"` makes the core unusable for the session
+- **Owner:** dev (core)
+- **File:** `core/src/lib.rs:192, 211-212, 234, 245, 268, 274` (`stroke`, `guard`, `inkwing`, `use_item`, `seal_art`)
+- **What is wrong:** `self.fighters[actor]` and `self.party[self.fighters[actor].idx]` are unchecked. A bad index traps (`RuntimeError: unreachable`), and every later call on `Game` fails.
+- **Fix:** Use `fighters.get(i)` plus a side check at each export, return `{"error":…}` JSON, and have the JS check `res.error`.
+
+### P2-S1 to P2-S7 (efficiency and polish)
+- **P2-S1** (`main.js:30`): a failed save is silent in Private mode or when the quota is full. Return a boolean and show a banner.
+- **P2-S2** (`audio.js` `unlock` → `loadAll`): every SFX and voice decodes on the first tap. Stage it: SFX first, voices per scene.
+- **P2-S3** (`sw.js` install): about 130 parallel `EXTRA` adds compete with boot. Limit concurrency or warm them after the title screen is up.
+- **P2-S4** (`poi.js:29`): `walker_step` returns a new `Vec<f64>` every frame. Use getters or a shared buffer.
+- **P2-S5** (`ink.js` `wash`/`washPoly`): a new gradient is built on every call. Pre-render wherever it runs per frame.
+- **P2-S6** (`sw.js` activate): only `ib-*` caches get cleaned. Remove any legacy-prefix caches once.
+- **P2-S7** (`audio.js:16`): the global unlock listeners are never removed. Drop them once the audio context is running, and resume on `visibilitychange`.
+
+---
+
+## Save tamper (John)
+
+Executed Sunday, Nov 15, 2026, 3:48 PM America/Chicago (CST) against the live build https://timothyrmccaslin-sys.github.io/inkborne/ (ib-0.1.0, commit **63923da**). Full write-up and the case table are in `save-tamper.md`. The local tree has since diverged; line numbers below are for 63923da.
+
+### Blockers
+
+- **ST-1 P0.** Incomplete `hp` or `ink` maps (`{}` or a missing party id) load fine, then `party_json` / `start_battle` index the maps and abort WASM (`RuntimeError: unreachable`). Opening the shop freezes on a half-drawn frame; starting a battle leaves a dark blank canvas. `core/src/lib.rs:125,138,140`. See save-tamper.md ST-1.
+- **ST-2 P0.** Continue is offered for JS-valid JSON that Rust `load_json` rejects (`gold: -1` / `1e300`, string HP, negative or huge `u32` item counts, missing `node`). `title.js` ignores the `false` return, `world.enter()` writes a fresh default save, and mid-game progress is destroyed with no backup or message. `src/scenes/title.js:17-18`, `src/scenes/world.js:31`, `src/main.js:31-33`. See save-tamper.md ST-2.
+
+### P1
+
+- **ST-3 P1.** Successful loads do not clamp `hp` / `ink`. Negative HP is shown in the shop (`HP -10 → 40`); battle floors it to 1. HP of 99999 or `1e300` is used as current HP. `core/src/lib.rs:103,138`. See save-tamper.md ST-3.
+- **ST-4 P1.** An unknown `node` is silently repaired to `world.start`. A locked node (`shrine_stair`) is a playable sequence break. Once-battle flags are trusted and can skip forest fights. `src/scenes/world.js:6,27,31`. See save-tamper.md ST-4.
+
+### P2
+
+- **ST-5 P2.** `save_json` still `unwrap`s serialize (`core/src/lib.rs:102`). Not hit with the current `Save` shape.
+- **ST-6 P2.** Turn-order `partial_cmp(...).unwrap()` (`lib.rs:156`) is not reachable from this save key (`spd` is not stored). Still worth `total_cmp`. The enemy-def `unwrap` flagged in the earlier static pass is already a safe `match` in 63923da (`lib.rs:295`).
+- **ST-7 P2.** Unknown item ids persist but are hidden from the shop; `u32::MAX` gold and stacks load and display. Cap or drop on load.
+- **ST-8 P2.** No `version` field or CRC; treat a checksum as corruption, not cheating. A 5 MB `setItem` hits `QuotaExceededError` (1–4 MB store; a 5 MB `load_json` parse is fine).
+- **ST-9 P2.** Garbage / empty / `{}` / truncated JSON hide Continue; New Game still overwrites the key with no backup.
+
+POI walker position and party stats (`spd`, `lv`, …) are not in the save, so those tamper cases could not be run. 24 Playwright cases plus mid-game follow-ups; C11, C21, and C24 crashed (ST-1). Full table in `save-tamper.md`.

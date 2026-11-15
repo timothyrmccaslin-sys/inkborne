@@ -1,0 +1,596 @@
+diff --git a/core/src/lib.rs b/core/src/lib.rs
+index 035f01f..3bef02f 100644
+--- a/core/src/lib.rs
++++ b/core/src/lib.rs
+@@ -186,10 +186,9 @@ impl Rng {
+ struct Fighter { side: u8, idx: usize, id: String, name: String, element: String, hp: f64, max_hp: f64, atk: f64, def: f64, mat: f64, mdf: f64, spd: f64,
+     ink: f64, guarding: bool, inkwing: u32, alive: bool, mon: u32, #[serde(skip)] fm: [f64; 5], form: String }
+ 
+-#[derive(Serialize, Deserialize, Clone, Default)]
+-struct Save { gold: u32, inv: BTreeMap<String, u32>, hp: BTreeMap<String, f64>, ink: BTreeMap<String, f64>, flags: BTreeMap<String, bool>, node: String,
+-    /// Per-member cumulative XP and level (0008). Older saves load with these empty.
+-    #[serde(default)] xp: BTreeMap<String, u32>, #[serde(default)] lv: BTreeMap<String, u32> }
++// Save state lives in save.rs (Jared): schema `version`, `equipped`, validated load, `load_warnings()`.
++mod save;
++use save::Save;
+ 
+ #[wasm_bindgen]
+ pub struct Game {
+@@ -283,23 +282,8 @@ impl Game {
+     fn add_ink(&mut self, i: usize, n: f64) { let f = &mut self.fighters[i]; if f.side == 0 && f.alive && (f.inkwing == 0 || self.ink.gain_while_inkwing) { f.ink = (f.ink + n).clamp(0.0, self.ink.max); } }
+     // ---------- save / economy ----------
+     pub fn save_json(&self) -> String { serde_json::to_string(&self.st).unwrap() }
+-    pub fn load_json(&mut self, s: &str) -> bool {
+-        match serde_json::from_str::<Save>(s) {
+-            Ok(v) => {
+-                self.st = v;
+-                for i in 0..self.party.len() { // restore level (clamped 1..cap) and its stat_table row
+-                    let id = self.party[i].id.clone();
+-                    let lv = self.st.lv.get(&id).copied().unwrap_or(self.party[i].lv).clamp(1, self.progression.cap().max(self.party[i].lv));
+-                    self.st.lv.insert(id.clone(), lv); self.st.xp.entry(id.clone()).or_insert(0);
+-                    self.st.ink.entry(id.clone()).or_insert(0.0); // partial/old saves: avoid the map-index panic in party_json/start_battle
+-                    self.apply_level(i, lv);
+-                    let mx = self.party[i].hp; self.st.hp.entry(id).or_insert(mx);
+-                }
+-                true
+-            }
+-            Err(_) => false,
+-        }
+-    }
++    /// Lenient, validated load (save.rs). `false` only for unreadable input, and then state is untouched.
++    pub fn load_json(&mut self, s: &str) -> bool { self.load_save(s) }
+     /// Set member `i`'s stats from `stat_table[lv-1]` (no-op without a table). Returns the max-HP gain.
+     fn apply_level(&mut self, i: usize, lv: u32) -> f64 {
+         let m = &mut self.party[i];
+diff --git a/core/src/save.rs b/core/src/save.rs
+new file mode 100644
+index 0000000..821b787
+--- /dev/null
++++ b/core/src/save.rs
+@@ -0,0 +1,546 @@
++//! Save state for `inkborne-save-v1` (owner: Jared, Dev).
++//!
++//! `save_json()` serializes [`Save`]. `load_json()` is lenient: it parses the string to a JSON value,
++//! then rebuilds a fresh `Save` field by field, validating ids against the data the core already holds
++//! (`items.json` + `party.json` from the constructor, `equipment.json` from `set_equipment`).
++//! Anything it can repair (unknown ids, out-of-range numbers, wrong types, missing fields) is repaired
++//! and reported through `load_warnings()`. Only unreadable input (not JSON, not an object, too large,
++//! or a newer schema version) returns `false`, and then the current state is left untouched.
++use crate::Game;
++use serde::{Deserialize, Serialize};
++use serde_json::{json, Map, Value};
++use std::collections::BTreeMap;
++use wasm_bindgen::prelude::*;
++
++/// Schema version written by this build. v0 = the ib-0.1.0 shape (no `version`, no `equipped`).
++pub const SAVE_VERSION: u32 = 1;
++/// Inputs above this size are rejected before parsing (QA save-tamper rec. 4).
++pub const MAX_SAVE_BYTES: usize = 256 * 1024;
++/// Vermilion Ink gauge range (SPEC section 2, Jake's `gauge.max` / `reset.clamp`).
++pub const INK_MAX: f64 = 100.0;
++/// Sanity caps so a hand-edited save cannot overflow `price * qty` or `gold += ...` (u32).
++pub const MAX_GOLD: u32 = 9_999_999;
++pub const MAX_ITEM_COUNT: u32 = 999;
++
++/// One equipment entry: its slot, who may wear it (empty = anyone allowed by the catalog) and
++/// `starting_for` (new-game gear, Ollie's items.json).
++#[derive(Clone, Default)]
++pub(crate) struct EquipDef { pub slot: String, pub who: Vec<String>, pub start: Option<String> }
++
++/// Equipment catalog. Accepts either shape:
++/// - live `data/items.json` (Ollie/Jane): `{ "items": [...], "equipment": [{ id, slot, equippable_by, starting_for? }] }`
++/// - Jane's `team/systems/jane/data/equipment.json`: `{ "slots", "equippable_by", "equipment": [{ id|null, slot }] }`
++/// Slots come from `slots` when present, else from the entries in order of first appearance.
++#[derive(Clone, Default)]
++pub(crate) struct EquipCatalog {
++    pub slots: Vec<String>,
++    /// Top-level member list; empty = every party member may equip.
++    pub equippable_by: Vec<String>,
++    pub ids: BTreeMap<String, EquipDef>,
++}
++
++/// Runtime-only companion data. Lives inside `Save` (skipped by serde) so the patch to `lib.rs`
++/// does not need to touch the `Game` struct or its constructor (both are edited by Rusty's patches).
++#[derive(Clone, Default)]
++pub(crate) struct SaveMeta {
++    pub equip: EquipCatalog,
++    pub warnings: Vec<Value>,
++}
++
++/// Persisted save state. JSON key order is the field order below; maps are sorted (BTreeMap).
++#[derive(Serialize, Deserialize, Clone)]
++pub(crate) struct Save {
++    #[serde(default)] pub version: u32,
++    /// mon, integer.
++    #[serde(default)] pub gold: u32,
++    /// item id -> count (items.json ids; equipment ids are also accepted here as carried gear).
++    #[serde(default, alias = "inventory")] pub inv: BTreeMap<String, u32>,
++    /// member id -> slot -> equipment id (null when the slot is empty).
++    #[serde(default)] pub equipped: BTreeMap<String, BTreeMap<String, Option<String>>>,
++    /// member id -> current HP.
++    #[serde(default)] pub hp: BTreeMap<String, f64>,
++    /// member id -> Vermilion Ink, 0..=100.
++    #[serde(default)] pub ink: BTreeMap<String, f64>,
++    #[serde(default)] pub flags: BTreeMap<String, bool>,
++    /// world node id.
++    #[serde(default)] pub node: String,
++    /// member id -> cumulative XP and level (Rusty's 0008-enemy-xp; same keys and meaning).
++    #[serde(default)] pub xp: BTreeMap<String, u32>,
++    #[serde(default)] pub lv: BTreeMap<String, u32>,
++    #[serde(skip)] pub meta: SaveMeta,
++}
++
++impl Default for Save {
++    fn default() -> Self {
++        Save { version: SAVE_VERSION, gold: 0, inv: BTreeMap::new(), equipped: BTreeMap::new(), hp: BTreeMap::new(),
++            ink: BTreeMap::new(), flags: BTreeMap::new(), node: String::new(),
++            xp: BTreeMap::new(), lv: BTreeMap::new(), meta: SaveMeta::default() }
++    }
++}
++
++fn warn(w: &mut Vec<Value>, code: &str, path: &str, detail: String) {
++    w.push(json!({ "code": code, "path": path, "detail": detail }));
++}
++
++/// Non-negative integer from a JSON number (floats are floored, negatives become 0, capped at `max`).
++fn uint(v: &Value, max: u32, path: &str, w: &mut Vec<Value>) -> Option<u32> {
++    let Some(f) = v.as_f64() else { warn(w, "bad_type", path, format!("expected a number, got {v}")); return None };
++    if !f.is_finite() { warn(w, "bad_type", path, format!("not a finite number: {v}")); return None }
++    let n = f.floor();
++    if n < 0.0 { warn(w, "clamped", path, format!("{v} -> 0")); return Some(0) }
++    if n > max as f64 { warn(w, "clamped", path, format!("{v} -> {max}")); return Some(max) }
++    if n != f { warn(w, "clamped", path, format!("{v} -> {n} (not an integer)")); }
++    Some(n as u32)
++}
++
++fn num_clamped(v: &Value, lo: f64, hi: f64, path: &str, w: &mut Vec<Value>) -> Option<f64> {
++    let Some(f) = v.as_f64().filter(|f| f.is_finite()) else { warn(w, "bad_type", path, format!("expected a number, got {v}")); return None };
++    let c = f.clamp(lo, hi);
++    if c != f { warn(w, "clamped", path, format!("{f} -> {c}")); }
++    Some(c)
++}
++
++fn obj<'a>(root: &'a Map<String, Value>, key: &str, w: &mut Vec<Value>) -> Option<&'a Map<String, Value>> {
++    match root.get(key) {
++        None | Some(Value::Null) => None,
++        Some(Value::Object(m)) => Some(m),
++        Some(v) => { warn(w, "bad_type", key, format!("expected an object, got {v}")); None }
++    }
++}
++
++impl EquipCatalog {
++    fn parse(s: &str) -> Option<EquipCatalog> {
++        let v: Value = serde_json::from_str(s).ok()?;
++        if !v.is_object() { return None }
++        let strs = |x: &Value| -> Vec<String> { x.as_array().map(|a| a.iter().filter_map(|x| x.as_str().map(String::from)).collect()).unwrap_or_default() };
++        let mut c = EquipCatalog { slots: strs(&v["slots"]), equippable_by: strs(&v["equippable_by"]), ids: BTreeMap::new() };
++        if let Some(a) = v["equipment"].as_array() {
++            for e in a {
++                let Some(slot) = e["slot"].as_str() else { continue };
++                // Slots referenced by entries count as slots even if `slots` omits them (items.json has no `slots`).
++                if !c.slots.iter().any(|s| s == slot) { c.slots.push(slot.into()); }
++                // Jane's equipment.json has `id: null` placeholders: those are not valid ids.
++                if let Some(id) = e["id"].as_str().filter(|x| !x.is_empty()) {
++                    c.ids.insert(id.into(), EquipDef { slot: slot.into(), who: strs(&e["equippable_by"]), start: e["starting_for"].as_str().map(String::from) });
++                }
++            }
++        }
++        Some(c)
++    }
++    /// `Ok` if `member` may wear `id` in `slot`; else the warning code.
++    fn fits(&self, member: &str, slot: &str, id: &str) -> Result<(), &'static str> {
++        let Some(d) = self.ids.get(id) else { return Err("unknown_equipment") };
++        if d.slot != slot { return Err("wrong_slot") }
++        if !d.who.is_empty() && !d.who.iter().any(|m| m == member) { return Err("not_equippable") }
++        Ok(())
++    }
++}
++
++impl Game {
++    fn can_equip(&self, member: &str) -> bool {
++        let e = &self.st.meta.equip;
++        self.party.iter().any(|m| m.id == member) && (e.equippable_by.is_empty() || e.equippable_by.iter().any(|x| x == member))
++    }
++
++    /// Every equippable member gets every slot (null when empty) so the save shape is stable.
++    fn fill_equipped(&self, eq: &mut BTreeMap<String, BTreeMap<String, Option<String>>>) {
++        if self.st.meta.equip.slots.is_empty() { return }
++        for m in &self.party {
++            if !self.can_equip(&m.id) { continue }
++            let row = eq.entry(m.id.clone()).or_default();
++            for s in &self.st.meta.equip.slots { row.entry(s.clone()).or_insert(None); }
++        }
++    }
++
++    /// Lenient load (see module docs). Called by `load_json` in lib.rs.
++    pub(crate) fn load_save(&mut self, s: &str) -> bool {
++        let mut w: Vec<Value> = Vec::new();
++        if s.len() > MAX_SAVE_BYTES {
++            warn(&mut w, "too_large", "", format!("{} bytes > {MAX_SAVE_BYTES}", s.len()));
++            self.st.meta.warnings = w; return false;
++        }
++        let root = match serde_json::from_str::<Value>(s) {
++            Ok(Value::Object(m)) => m,
++            Ok(other) => { warn(&mut w, "not_object", "", format!("save root is not an object: {}", short(&other.to_string()))); self.st.meta.warnings = w; return false }
++            Err(e) => { warn(&mut w, "malformed_json", "", e.to_string()); self.st.meta.warnings = w; return false }
++        };
++
++        // version
++        let version = match root.get("version") {
++            None => 0,
++            Some(v) => match v.as_u64() { Some(n) => n, None => { warn(&mut w, "bad_type", "version", format!("{v}; treated as 0")); 0 } },
++        };
++        if version > SAVE_VERSION as u64 {
++            warn(&mut w, "version_too_new", "version", format!("save is v{version}, this build reads up to v{SAVE_VERSION}"));
++            self.st.meta.warnings = w; return false;
++        }
++        if version < SAVE_VERSION as u64 { warn(&mut w, "migrated", "version", format!("v{version} -> v{SAVE_VERSION}")); }
++        // v0 (ib-0.1.0) has the same field shapes minus `version`/`equipped`, so it needs no field rewrites.
++
++        let mut out = Save { meta: SaveMeta { equip: self.st.meta.equip.clone(), warnings: vec![] }, ..Save::default() };
++
++        for k in root.keys() {
++            if !["version", "gold", "inv", "inventory", "equipped", "hp", "ink", "flags", "node", "xp", "lv"].contains(&k.as_str()) {
++                warn(&mut w, "unknown_field", k, "ignored".into());
++            }
++        }
++
++        // gold
++        if let Some(v) = root.get("gold") { if let Some(n) = uint(v, MAX_GOLD, "gold", &mut w) { out.gold = n; } }
++
++        // inventory: item id -> count
++        let item_ok = |id: &str| self.items.iter().any(|i| i.id == id) || self.st.meta.equip.ids.contains_key(id);
++        let inv_key = if root.contains_key("inv") { "inv" } else { "inventory" };
++        if let Some(m) = obj(&root, inv_key, &mut w) {
++            for (id, c) in m {
++                let path = format!("{inv_key}.{id}");
++                if !item_ok(id) { warn(&mut w, "unknown_item", &path, "dropped".into()); continue }
++                if let Some(n) = uint(c, MAX_ITEM_COUNT, &path, &mut w) { if n > 0 { out.inv.insert(id.clone(), n); } }
++            }
++        }
++
++        // hp / ink / xp / lv per party member (raw pass: ids and types; ranges are applied below)
++        let member = |id: &str| self.party.iter().find(|m| m.id == id);
++        let mut hp_raw: BTreeMap<String, f64> = BTreeMap::new();
++        if let Some(m) = obj(&root, "hp", &mut w) {
++            for (id, v) in m {
++                let path = format!("hp.{id}");
++                if member(id).is_none() { warn(&mut w, "unknown_member", &path, "dropped".into()); continue }
++                if let Some(x) = num_clamped(v, 0.0, f64::MAX, &path, &mut w) { hp_raw.insert(id.clone(), x); }
++            }
++        }
++        if let Some(m) = obj(&root, "ink", &mut w) {
++            for (id, v) in m {
++                let path = format!("ink.{id}");
++                if member(id).is_none() { warn(&mut w, "unknown_member", &path, "dropped".into()); continue }
++                if let Some(x) = num_clamped(v, 0.0, INK_MAX, &path, &mut w) { out.ink.insert(id.clone(), x); }
++            }
++        }
++        for key in ["xp", "lv"] {
++            if let Some(m) = obj(&root, key, &mut w) {
++                for (id, v) in m {
++                    let path = format!("{key}.{id}");
++                    if member(id).is_none() { warn(&mut w, "unknown_member", &path, "dropped".into()); continue }
++                    if let Some(n) = uint(v, u32::MAX, &path, &mut w) { if key == "xp" { out.xp.insert(id.clone(), n); } else { out.lv.insert(id.clone(), n); } }
++                }
++            }
++        }
++
++        // flags
++        if let Some(m) = obj(&root, "flags", &mut w) {
++            for (k, v) in m {
++                match v.as_bool() { Some(b) => { out.flags.insert(k.clone(), b); } None => warn(&mut w, "bad_type", &format!("flags.{k}"), format!("expected a bool, got {v}; dropped")) }
++            }
++        }
++
++        // node
++        match root.get("node") {
++            None | Some(Value::Null) => {}
++            Some(Value::String(n)) => out.node = n.clone(),
++            Some(v) => warn(&mut w, "bad_type", "node", format!("expected a string, got {v}")),
++        }
++
++        // equipped: member -> slot -> id|null
++        if let Some(m) = obj(&root, "equipped", &mut w) {
++            for (mid, row) in m {
++                if member(mid).is_none() { warn(&mut w, "unknown_member", &format!("equipped.{mid}"), "dropped".into()); continue }
++                if !self.can_equip(mid) { warn(&mut w, "not_equippable", &format!("equipped.{mid}"), "member is not in equippable_by; dropped".into()); continue }
++                let Some(row) = row.as_object() else { warn(&mut w, "bad_type", &format!("equipped.{mid}"), format!("expected an object, got {row}")); continue };
++                for (slot, id) in row {
++                    let path = format!("equipped.{mid}.{slot}");
++                    if !self.st.meta.equip.slots.contains(slot) { warn(&mut w, "unknown_slot", &path, "dropped".into()); continue }
++                    let id = match id { Value::Null => continue, Value::String(s) if s.is_empty() => continue, Value::String(s) => s, other => { warn(&mut w, "bad_type", &path, format!("expected an id or null, got {other}")); continue } };
++                    match self.st.meta.equip.fits(mid, slot, id) {
++                        Err(code) => warn(&mut w, code, &path, format!("{id} dropped")),
++                        Ok(()) => { out.equipped.entry(mid.clone()).or_default().insert(slot.clone(), Some(id.clone())); }
++                    }
++                }
++            }
++        }
++        let mut eq = std::mem::take(&mut out.equipped); self.fill_equipped(&mut eq); out.equipped = eq;
++
++        // Commit. Everything below mutates the game, so every `return false` must stay above this line.
++        // Level restore follows Rusty's 0008 load_json: lv clamped 1..cap, stats from stat_table.
++        for i in 0..self.party.len() {
++            let id = self.party[i].id.clone();
++            let def_lv = self.party[i].lv;
++            let hi = self.progression.cap().max(def_lv);
++            let lv = match out.lv.get(&id).copied() {
++                None => def_lv,
++                Some(l) => { let c = l.clamp(1, hi); if c != l { warn(&mut w, "clamped", &format!("lv.{id}"), format!("{l} -> {c}")); } c }
++            };
++            out.lv.insert(id.clone(), lv);
++            if !out.xp.contains_key(&id) { out.xp.insert(id.clone(), self.progression.total_at(lv).unwrap_or(0)); }
++            self.apply_level(i, lv);
++            // A missing member must be filled: battle code indexes `st.hp[&id]` / `st.ink[&id]` directly.
++            let max_hp = self.party[i].hp;
++            let hp = match hp_raw.get(&id).copied() {
++                None => { if root.contains_key("hp") { warn(&mut w, "defaulted", &format!("hp.{id}"), format!("missing -> max {max_hp}")); } max_hp }
++                Some(h) if h > max_hp => { warn(&mut w, "clamped", &format!("hp.{id}"), format!("{h} -> {max_hp}")); max_hp }
++                Some(h) => h,
++            };
++            out.hp.insert(id.clone(), hp);
++            if !out.ink.contains_key(&id) { if root.contains_key("ink") { warn(&mut w, "defaulted", &format!("ink.{id}"), "missing -> 0".into()); } out.ink.insert(id.clone(), 0.0); }
++        }
++        out.meta.warnings = w;
++        self.st = out;
++        true
++    }
++}
++
++fn short(s: &str) -> String { if s.len() > 60 { format!("{}…", &s[..s.char_indices().nth(60).map(|c| c.0).unwrap_or(s.len())]) } else { s.into() } }
++
++#[wasm_bindgen]
++impl Game {
++    /// Load the equipment catalog: pass the live `data/items.json` text (its `equipment` array) or Jane's
++    /// `equipment.json`. Call it right after the constructor and before `load_json`, or every equipped id
++    /// in the save is dropped as unknown. Also puts `starting_for` gear into empty slots (new game).
++    pub fn set_equipment(&mut self, equipment_json: &str) -> bool {
++        let Some(c) = EquipCatalog::parse(equipment_json) else { return false };
++        self.st.meta.equip = c;
++        // Keep the current state consistent with the new catalog.
++        let cat = self.st.meta.equip.clone();
++        let mut eq = std::mem::take(&mut self.st.equipped);
++        eq.retain(|mid, _| self.can_equip(mid));
++        for row in eq.values_mut() {
++            row.retain(|slot, _| cat.slots.contains(slot));
++        }
++        for (mid, row) in eq.iter_mut() {
++            for (slot, v) in row.iter_mut() { if let Some(id) = v { if cat.fits(mid, slot, id).is_err() { *v = None; } } }
++        }
++        self.fill_equipped(&mut eq);
++        // New-game gear (`starting_for`) goes into empty slots. A later `load_json` replaces all of it.
++        for (id, d) in &cat.ids {
++            if let Some(m) = &d.start {
++                if let Some(row) = eq.get_mut(m) { if let Some(v) = row.get_mut(&d.slot) { if v.is_none() && cat.fits(m, &d.slot, id).is_ok() { *v = Some(id.clone()); } } }
++            }
++        }
++        self.st.equipped = eq;
++        true
++    }
++    /// Warnings from the last `load_json`: `[{ "code", "path", "detail" }]` (empty after a clean load).
++    /// Codes: malformed_json, not_object, too_large, version_too_new (load returned false), migrated,
++    /// unknown_field, unknown_item, unknown_member, unknown_slot, unknown_equipment, wrong_slot,
++    /// not_equippable, bad_type, clamped, defaulted.
++    pub fn load_warnings(&self) -> String { Value::Array(self.st.meta.warnings.clone()).to_string() }
++    /// Schema version this build writes.
++    pub fn save_version(&self) -> u32 { SAVE_VERSION }
++    /// `{ "<member>": { "<slot>": id|null } }`
++    pub fn equipped_json(&self) -> String { serde_json::to_string(&self.st.equipped).unwrap_or_else(|_| "{}".into()) }
++    /// Put `id` in `member`'s `slot` (empty `id` clears it). Validates member, slot and id/slot match.
++    /// Stat mods and inventory accounting are not applied yet (pending Jane/Jake).
++    pub fn equip(&mut self, member: &str, slot: &str, id: &str) -> bool {
++        if !self.can_equip(member) || !self.st.meta.equip.slots.iter().any(|s| s == slot) { return false }
++        if !id.is_empty() && self.st.meta.equip.fits(member, slot, id).is_err() { return false }
++        self.st.equipped.entry(member.into()).or_default().insert(slot.into(), if id.is_empty() { None } else { Some(id.into()) });
++        true
++    }
++}
++
++#[cfg(test)]
++mod save_tests {
++    use super::*;
++    use std::collections::BTreeSet;
++
++    /// Same structure as team/systems/jane/data/equipment.json, with test ids filled in
++    /// (Jane's real file still has `id: null` placeholders).
++    const EQUIP: &str = r#"{ "slots": ["weapon","armor","accessory"], "equippable_by": ["itsuki","benika","gonzo"],
++        "equipment": [ {"id":"t_brush","slot":"weapon"}, {"id":"t_robe","slot":"armor"}, {"id":"t_charm","slot":"accessory"},
++                       {"id":null,"slot":"weapon"} ] }"#;
++
++    fn g() -> Game {
++        let p = std::fs::read_to_string("../data/party.json").unwrap();
++        let e = std::fs::read_to_string("../data/enemies.json").unwrap();
++        let i = std::fs::read_to_string("../data/items.json").unwrap();
++        let mut g = Game::new(&p, &e, &i, 7).unwrap();
++        assert!(g.set_equipment(EQUIP));
++        g
++    }
++    fn warns(g: &Game) -> Vec<Value> { serde_json::from_str::<Vec<Value>>(&g.load_warnings()).unwrap() }
++    fn codes(g: &Game) -> BTreeSet<String> { warns(g).iter().map(|w| w["code"].as_str().unwrap().to_string()).collect() }
++    fn has(g: &Game, code: &str, path: &str) -> bool { warns(g).iter().any(|w| w["code"] == code && w["path"] == path) }
++
++    #[test] fn round_trip() {
++        let mut a = g();
++        assert!(a.buy("rice_cake", 2));
++        a.set_flag("met_tsuru", true); a.set_node("hanshi");
++        assert!(a.equip("itsuki", "weapon", "t_brush")); assert!(a.equip("gonzo", "accessory", "t_charm"));
++        a.st.ink.insert("benika".into(), 42.5); a.st.hp.insert("gonzo".into(), 77.0);
++        let s = a.save_json();
++        let v: Value = serde_json::from_str(&s).unwrap();
++        assert_eq!(v["version"], SAVE_VERSION);
++        assert_eq!(v["equipped"]["itsuki"]["weapon"], "t_brush");
++        assert!(v["equipped"]["benika"]["armor"].is_null());
++        assert!(v.get("meta").is_none());
++        let mut b = g();
++        assert!(b.load_json(&s));
++        assert_eq!(warns(&b), Vec::<Value>::new());
++        assert_eq!(b.save_json(), s);
++        assert_eq!(b.gold(), a.gold()); assert!(b.flag("met_tsuru")); assert_eq!(b.node(), "hanshi");
++        assert_eq!(b.st.inv.get("rice_cake"), Some(&5));
++        // shop still works on loaded state
++        assert!(b.sell("rice_cake", 1));
++    }
++
++    #[test] fn fresh_game_saves_full_shape() {
++        let a = g();
++        let v: Value = serde_json::from_str(&a.save_json()).unwrap();
++        for k in ["version", "gold", "inv", "equipped", "hp", "ink", "flags", "node"] { assert!(v.get(k).is_some(), "missing {k}"); }
++        for m in ["itsuki", "benika", "gonzo"] { assert_eq!(v["equipped"][m].as_object().unwrap().len(), 3); }
++    }
++
++    #[test] fn drops_unknown_ids_with_warnings() {
++        let mut a = g();
++        let s = r#"{ "version": 1, "gold": 50,
++            "inv": { "rice_cake": 2, "mystery_box": 9, "t_robe": 1 },
++            "equipped": { "itsuki": { "weapon": "t_robe", "armor": "t_robe", "accessory": "ghost_ring", "hat": "t_charm" },
++                          "kenji": { "weapon": "t_brush" } },
++            "hp": { "itsuki": 10, "nobody": 5 }, "ink": { "benika": 12 }, "flags": { "a": true, "b": "yes" }, "node": "hanshi", "extra": 1 }"#;
++        assert!(a.load_json(s));
++        assert_eq!(a.gold(), 50);
++        assert_eq!(a.st.inv.get("rice_cake"), Some(&2));
++        assert_eq!(a.st.inv.get("t_robe"), Some(&1)); // carried gear is a valid inventory id
++        assert!(!a.st.inv.contains_key("mystery_box"));
++        let eq = &a.st.equipped["itsuki"];
++        assert_eq!(eq["weapon"], None); // wrong slot
++        assert_eq!(eq["armor"], Some("t_robe".into()));
++        assert_eq!(eq["accessory"], None);
++        assert!(!eq.contains_key("hat"));
++        assert!(!a.st.equipped.contains_key("kenji"));
++        assert!(!a.st.hp.contains_key("nobody"));
++        assert!(!a.flag("b"));
++        assert!(has(&a, "unknown_item", "inv.mystery_box"));
++        assert!(has(&a, "wrong_slot", "equipped.itsuki.weapon"));
++        assert!(has(&a, "unknown_equipment", "equipped.itsuki.accessory"));
++        assert!(has(&a, "unknown_slot", "equipped.itsuki.hat"));
++        assert!(has(&a, "unknown_member", "equipped.kenji"));
++        assert!(has(&a, "unknown_member", "hp.nobody"));
++        assert!(has(&a, "bad_type", "flags.b"));
++        assert!(has(&a, "unknown_field", "extra"));
++        // every party member still has hp/ink, so battles cannot panic on a missing key
++        a.start_battle("sumikage_c");
++        let pj: Value = serde_json::from_str(&a.party_json()).unwrap();
++        assert_eq!(pj.as_array().unwrap().len(), 3);
++    }
++
++    #[test] fn without_equipment_catalog_equipped_ids_are_dropped() {
++        let p = std::fs::read_to_string("../data/party.json").unwrap();
++        let e = std::fs::read_to_string("../data/enemies.json").unwrap();
++        let i = std::fs::read_to_string("../data/items.json").unwrap();
++        let mut a = Game::new(&p, &e, &i, 1).unwrap();
++        assert!(a.load_json(r#"{"version":1,"equipped":{"itsuki":{"weapon":"t_brush"}}}"#));
++        assert!(has(&a, "unknown_slot", "equipped.itsuki.weapon"));
++        assert_eq!(a.equipped_json(), "{}");
++    }
++
++    #[test] fn ink_and_numbers_clamped() {
++        let mut a = g();
++        assert!(a.load_json(r#"{ "version": 1, "gold": -5, "inv": { "rice_cake": 1e9, "plum_tonic": 2.7, "pine_tea": -1 },
++            "ink": { "itsuki": 250, "benika": -3, "gonzo": 55.5 }, "hp": { "itsuki": 99999 } }"#));
++        assert_eq!(a.st.ink["itsuki"], 100.0);
++        assert_eq!(a.st.ink["benika"], 0.0);
++        assert_eq!(a.st.ink["gonzo"], 55.5);
++        assert_eq!(a.gold(), 0);
++        assert_eq!(a.st.inv["rice_cake"], MAX_ITEM_COUNT);
++        assert_eq!(a.st.inv["plum_tonic"], 2);
++        assert!(!a.st.inv.contains_key("pine_tea"));
++        let max_hp = a.party.iter().find(|m| m.id == "itsuki").unwrap().hp;
++        assert_eq!(a.st.hp["itsuki"], max_hp);
++        assert!(has(&a, "clamped", "ink.itsuki")); assert!(has(&a, "clamped", "ink.benika"));
++        assert!(has(&a, "clamped", "gold")); assert!(has(&a, "clamped", "hp.itsuki"));
++        // gold cap
++        assert!(a.load_json(r#"{"version":1,"gold":9007199254740993}"#));
++        assert_eq!(a.gold(), MAX_GOLD);
++    }
++
++    #[test] fn malformed_json_keeps_state() {
++        let mut a = g();
++        assert!(a.buy("rice_cake", 1)); a.set_flag("x", true);
++        let before = a.save_json();
++        for bad in ["", "garbage", "{\"gold\": 5", "[1,2,3]", "null", "42", "{\"version\": 999, \"gold\": 1}"] {
++            assert!(!a.load_json(bad), "accepted {bad:?}");
++            assert_eq!(a.save_json(), before, "state clobbered by {bad:?}");
++            assert!(!warns(&a).is_empty());
++        }
++        assert!(!a.load_json(&format!("{{\"node\":\"{}\"}}", "x".repeat(MAX_SAVE_BYTES))));
++        assert!(codes(&a).contains("too_large"));
++        assert!(!a.load_json("{\"version\": 2}")); assert!(codes(&a).contains("version_too_new"));
++    }
++
++    #[test] fn missing_fields_default() {
++        let mut a = g();
++        assert!(a.load_json("{}"));
++        assert_eq!(a.gold(), 0);
++        assert!(a.st.inv.is_empty());
++        for m in a.party.clone() { assert_eq!(a.st.hp[&m.id], m.hp); assert_eq!(a.st.ink[&m.id], 0.0); }
++        assert_eq!(a.st.equipped.len(), 3);
++        assert!(codes(&a).contains("migrated"));
++        let v: Value = serde_json::from_str(&a.save_json()).unwrap();
++        assert_eq!(v["version"], SAVE_VERSION);
++    }
++
++    #[test] fn loads_v0_ib_0_1_0_save() {
++        // Exactly what ib-0.1.0's save_json() wrote (no version, no equipped).
++        let mut a = g();
++        let v0 = r#"{"gold":95,"inv":{"inkstone_chip":1,"paper_cracker":1,"rice_cake":4},"hp":{"benika":80,"gonzo":150,"itsuki":40},"ink":{"benika":30,"gonzo":20,"itsuki":85},"flags":{"hanshi_dusk":true},"node":"hanshi"}"#;
++        assert!(a.load_json(v0));
++        assert_eq!(a.gold(), 95); assert!(a.flag("hanshi_dusk")); assert_eq!(a.st.inv["rice_cake"], 4);
++        assert_eq!(codes(&a), ["migrated".to_string()].into_iter().collect());
++        // `inventory` is accepted as an alias of `inv`
++        assert!(a.load_json(r#"{"version":1,"inventory":{"rice_cake":2}}"#)); assert_eq!(a.st.inv["rice_cake"], 2);
++    }
++
++    #[test] fn level_and_xp_restore_and_clamp() {
++        let mut a = g();
++        let cap = a.progression.cap().max(a.party[0].lv);
++        assert!(a.load_json(r#"{"version":1,"lv":{"itsuki":999,"benika":0},"xp":{"gonzo":12,"nobody":3}}"#));
++        assert_eq!(a.st.lv["itsuki"], cap); assert_eq!(a.st.lv["benika"], 1);
++        assert_eq!(a.st.xp["gonzo"], 12);
++        assert!(has(&a, "clamped", "lv.itsuki")); assert!(has(&a, "clamped", "lv.benika")); assert!(has(&a, "unknown_member", "xp.nobody"));
++        let s = a.save_json(); let mut b = g(); assert!(b.load_json(&s)); assert_eq!(b.save_json(), s);
++    }
++
++    #[test] fn live_items_json_equipment() {
++        // The live data/items.json carries Ollie's `equipment` (slot, per-item equippable_by, starting_for).
++        let raw = std::fs::read_to_string("../data/items.json").unwrap();
++        let v: Value = serde_json::from_str(&raw).unwrap();
++        let Some(eqs) = v["equipment"].as_array() else { return }; // nothing to check on an items-only file
++        let mut a = g(); assert!(a.set_equipment(&raw));
++        let slots: Vec<String> = { let mut s: Vec<String> = vec![]; for e in eqs { let x = e["slot"].as_str().unwrap().to_string(); if !s.contains(&x) { s.push(x); } } s };
++        assert_eq!(a.st.meta.equip.slots, slots);
++        // starting gear is equipped on a fresh game
++        for e in eqs { if let Some(m) = e["starting_for"].as_str() {
++            assert_eq!(a.st.equipped[m][e["slot"].as_str().unwrap()].as_deref(), e["id"].as_str(), "starting gear for {m}");
++        } }
++        // an item limited to one member cannot be worn by another; it is dropped with not_equippable
++        if let Some(e) = eqs.iter().find(|e| e["equippable_by"].as_array().map(|x| x.len() == 1).unwrap_or(false)) {
++            let owner = e["equippable_by"][0].as_str().unwrap();
++            let other = a.party.iter().map(|m| m.id.clone()).find(|m| m != owner).unwrap();
++            let slot = e["slot"].as_str().unwrap(); let id = e["id"].as_str().unwrap();
++            assert!(!a.equip(&other, slot, id));
++            let s = format!(r#"{{"version":1,"equipped":{{"{other}":{{"{slot}":"{id}"}},"{owner}":{{"{slot}":"{id}"}}}}}}"#);
++            assert!(a.load_json(&s));
++            assert!(has(&a, "not_equippable", &format!("equipped.{other}.{slot}")));
++            assert_eq!(a.st.equipped[owner][slot].as_deref(), Some(id));
++            let out = a.save_json(); let mut b = g(); assert!(b.set_equipment(&raw)); assert!(b.load_json(&out)); assert_eq!(b.save_json(), out);
++            assert_eq!(warns(&b), Vec::<Value>::new());
++        }
++    }
++
++    #[test] fn equip_validates() {
++        let mut a = g();
++        assert!(!a.equip("itsuki", "weapon", "t_robe"));
++        assert!(!a.equip("itsuki", "hat", "t_brush"));
++        assert!(!a.equip("nobody", "weapon", "t_brush"));
++        assert!(!a.equip("itsuki", "weapon", "missing"));
++        assert!(a.equip("itsuki", "weapon", "t_brush"));
++        assert!(a.equip("itsuki", "weapon", ""));
++        let v: Value = serde_json::from_str(&a.equipped_json()).unwrap();
++        assert!(v["itsuki"]["weapon"].is_null());
++        // Jane's real file today: 3 slots, every id null -> no valid equipment ids.
++        let jane = r#"{"slots":["weapon","armor","accessory"],"equippable_by":["itsuki","benika","gonzo"],"equipment":[{"id":null,"slot":"weapon"}]}"#;
++        assert!(a.set_equipment(jane));
++        assert!(a.st.meta.equip.ids.is_empty()); assert_eq!(a.st.meta.equip.slots.len(), 3);
++        assert!(!a.set_equipment("not json"));
++    }
++}

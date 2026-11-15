@@ -2,7 +2,7 @@
 """
 Sumikage Wood ambient loops for Inkborne (Lucy, art).
 
-Seamless 12 fps overlay loops, 2560x1440, WebP with straight alpha:
+Seamless 12 fps overlay loops, 3200x1440 (Bob v2 POI size), WebP with straight alpha:
   1. poi-forest-mist    — distant drifting ink-wash fog (FX slot A, parallax 0.3)
   2. poi-forest-leaves  — falling bamboo leaves and pine needles (FX slot B, parallax 0.7)
 
@@ -42,7 +42,8 @@ WASH2 = np.array([0x6D, 0x67, 0x5B], dtype=np.float64)
 WASH3 = np.array([0xA3, 0x9C, 0x8C], dtype=np.float64)
 VERMILION = np.array([0xB3, 0x26, 0x1E], dtype=np.float64)
 
-W, H = 2560, 1440
+W, H = 3200, 1440  # Bob v2 POI size (SPEC 5 still says 2560)
+HW, HH = W // 2, H // 2  # mist is low-frequency; computed at half res and upscaled
 FPS = 12
 N_DEFAULT = 72  # 6 s — slow enough for mist, one screen-fall for leaves
 SEED = 20261115
@@ -91,7 +92,8 @@ def to_image(rgba: np.ndarray) -> Image.Image:
 
 def save_webp(im: Image.Image, path: Path) -> None:
     # Lossless keeps soft alpha edges clean (important for ink washes).
-    im.save(path, "WEBP", lossless=True, method=4)
+    # exact=True keeps paper/ink RGB under transparent pixels (default WebP zeroes them).
+    im.save(path, "WEBP", lossless=True, exact=True, method=4)
 
 
 def paste_rgba(dst: Image.Image, src: Image.Image, cx: float, cy: float) -> None:
@@ -100,16 +102,14 @@ def paste_rgba(dst: Image.Image, src: Image.Image, cx: float, cy: float) -> None
     y = int(round(cy - src.height / 2))
     sw, sh = src.size
     dw, dh = dst.size
-    sx0 = 0 if x >= 0 else -x
-    sy0 = 0 if y >= 0 else -y
-    sx1 = sw if x + sw <= dw else dw - x
-    sy1 = sh if y + sh <= dh else dh - y
-    if sx1 <= sx0 or sy1 <= sy0:
+    dx0, dy0 = max(x, 0), max(y, 0)
+    sx0, sy0 = dx0 - x, dy0 - y
+    dx1, dy1 = min(x + sw, dw), min(y + sh, dh)
+    if dx1 <= dx0 or dy1 <= dy0:
         return
-    crop = src.crop((sx0, sy0, sx1, sy1))
-    layer = Image.new("RGBA", dst.size, (0, 0, 0, 0))
-    layer.paste(crop, (x + sx0, y + sy0))
-    dst.alpha_composite(layer)
+    region = dst.crop((dx0, dy0, dx1, dy1))
+    piece = src.crop((sx0, sy0, sx0 + (dx1 - dx0), sy0 + (dy1 - dy0)))
+    dst.paste(Image.alpha_composite(region, piece), (dx0, dy0))
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +139,7 @@ def vertical_profile(h: int) -> np.ndarray:
     yy = np.linspace(0.0, 1.0, h, dtype=np.float64)[:, None]
     p = 1.00 * np.exp(-((yy - 0.62) / 0.10) ** 2)
     p += 0.62 * np.exp(-((yy - 0.52) / 0.07) ** 2)
-    p += 0.48 * np.exp(-((yy - 0.72) / 0.08) ** 2)
+    p += 0.62 * np.exp(-((yy - 0.73) / 0.09) ** 2)
     p *= np.clip((yy - 0.34) / 0.08, 0.0, 1.0)
     p *= np.clip((0.88 - yy) / 0.08, 0.0, 1.0)
     return p.astype(np.float32)
@@ -147,30 +147,31 @@ def vertical_profile(h: int) -> np.ndarray:
 
 def mist_frame(t: int, vols: dict, profile: np.ndarray, rng_grain: np.random.Generator) -> Image.Image:
     """Build one seamless mist frame as pale ink-wash veils (mostly paper-coloured)."""
-    low = zoom_slice(vols["low"][t], H, W)
-    mid = zoom_slice(vols["mid"][t], H, W)
-    hi = zoom_slice(vols["hi"][t], H, W)
-    fiber = zoom_slice(vols["fiber"][t], H, W)
-    edge_n = zoom_slice(vols["edge"][t], H, W)
-    envx = zoom_slice(vols["envx"][t], H, W)
+    # Half-res field (mist is soft and wide); upscaled after ink treatment.
+    low = zoom_slice(vols["low"][t], HH, HW)
+    mid = zoom_slice(vols["mid"][t], HH, HW)
+    hi = zoom_slice(vols["hi"][t], HH, HW)
+    fiber = zoom_slice(vols["fiber"][t], HH, HW)
+    edge_n = zoom_slice(vols["edge"][t], HH, HW)
+    envx = zoom_slice(vols["envx"][t], HH, HW)
 
     # Field in 0..1 with blotchy, not-too-smooth contrast (ink, not CG fog).
-    field = 0.55 * low + 0.32 * mid + 0.13 * hi
-    field = 0.5 + 0.5 * np.tanh(field * 0.95)
+    field = 0.42 * low + 0.35 * mid + 0.23 * hi
+    field = 0.5 + 0.5 * np.tanh(field * 1.25)
     # Horizontal envelope so the belt is uneven — thicker in some valleys, thin in others.
     env = 0.55 + 0.45 * (0.5 + 0.5 * np.tanh(envx * 1.1))
     d = field * env * profile
 
     # Soft wet wash.
-    wet = ndi.gaussian_filter(d, sigma=(7.0, 18.0), mode="nearest")  # slightly streaked in x
+    wet = ndi.gaussian_filter(d, sigma=(2.4, 7.0), mode="nearest")  # slightly streaked in x; half-res sigmas
     # Fibrous dry-brush streaks, wind-aligned (horizontal).
     fib = np.clip(0.5 + 0.5 * fiber, 0.0, 1.0)
-    streaks = ndi.gaussian_filter(d * fib, sigma=(1.2, 14.0), mode="nearest")
+    streaks = ndi.gaussian_filter(d * fib, sigma=(0.6, 7.0), mode="nearest")
     # Broken edges: residual of the wet wash, gated by high-frequency noise.
-    residual = np.clip(d - ndi.gaussian_filter(d, 5.0, mode="nearest"), 0.0, None)
+    residual = np.clip(d - ndi.gaussian_filter(d, 2.5, mode="nearest"), 0.0, None)
     dry = residual * np.clip(edge_n * 0.7 + 0.15, 0.0, 1.0) ** 1.4
 
-    ink = np.clip(0.72 * wet + 0.28 * streaks + 0.22 * dry, 0.0, 1.0)
+    ink = np.clip(0.60 * wet + 0.30 * streaks + 0.28 * dry, 0.0, 1.0)
     # Soft contrast roll so peaks are wisps, not slabs.
     ink = np.power(np.clip(ink, 0.0, 1.0), 1.15)
     ink *= 1.15
@@ -184,13 +185,21 @@ def mist_frame(t: int, vols: dict, profile: np.ndarray, rng_grain: np.random.Gen
     tcol = np.clip(ink * 0.55, 0.0, 1.0)[..., None]
     color = PAPER * (1.0 - tcol) + mix_rgb(PAPER, WASH3, 0.35) * tcol
     # Per-pixel colour (can't use rgba_from_density's single colour).
-    a = np.clip(ink, 0.0, 1.0) * 0.46  # peak ~0.46, close to Bob's 0.45 static band
+    a = np.clip(ink, 0.0, 1.0) * 0.42  # visible drift, still under Bob's 0.45 static preview
     a = np.where(a < 1.0 / 255.0, 0.0, a)
+    # Upscale to the POI resolution.
+    a = ndi.zoom(a, 2.0, order=3)
+    color = ndi.zoom(color, (2.0, 2.0, 1.0), order=3)
+    if a.shape != (H, W):
+        # Guard against zoom rounding.
+        a = np.array(Image.fromarray((np.clip(a, 0, 1) * 255).astype(np.uint8)).resize((W, H), Image.Resampling.BICUBIC), dtype=np.float32) / 255.0
+        c8 = np.clip(color, 0, 255).astype(np.uint8)
+        color = np.array(Image.fromarray(c8, "RGB").resize((W, H), Image.Resampling.BICUBIC), dtype=np.float32)
     out = np.zeros((H, W, 4), dtype=np.float32)
     out[..., 0] = color[..., 0]
     out[..., 1] = color[..., 1]
     out[..., 2] = color[..., 2]
-    out[..., 3] = a * 255.0
+    out[..., 3] = np.clip(a, 0, 1) * 255.0
     return to_image(out)
 
 
@@ -203,7 +212,7 @@ def generate_mist(n: int, seed: int) -> list[Path]:
     rng = np.random.default_rng(seed)
     print(f"[mist] building periodic volumes ({n} frames)…")
     vols = build_mist_volumes(n, rng)
-    profile = vertical_profile(H)
+    profile = vertical_profile(HH)
     paths = []
     for t in range(n):
         im = mist_frame(t, vols, profile, rng)
@@ -220,136 +229,138 @@ def generate_mist(n: int, seed: int) -> list[Path]:
 # Leaves
 # ---------------------------------------------------------------------------
 
+def _sdf_polyline(xx, yy, pts, env):
+    """Distance to a dense polyline and the envelope/width / t at the closest sample."""
+    dist = np.full(xx.shape, 1e9)
+    tt = np.zeros_like(xx)
+    ww = np.zeros_like(xx)
+    side = np.zeros_like(xx)
+    n = len(pts)
+    for i, ((px, py), t, w) in enumerate(zip(pts, np.linspace(0, 1, n), env)):
+        d = np.hypot(xx - px, yy - py)
+        closer = d < dist
+        dist = np.where(closer, d, dist)
+        tt = np.where(closer, t, tt)
+        ww = np.where(closer, w, ww)
+        if 0 < i < n - 1:
+            tx, ty = pts[i + 1][0] - pts[i - 1][0], pts[i + 1][1] - pts[i - 1][1]
+        elif i == 0:
+            tx, ty = pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]
+        else:
+            tx, ty = pts[-1][0] - pts[-2][0], pts[-1][1] - pts[-2][1]
+        nrm = math.hypot(tx, ty) + 1e-8
+        nx_, ny_ = -ty / nrm, tx / nrm
+        sd = (xx - px) * nx_ + (yy - py) * ny_
+        side = np.where(closer, sd, side)
+    return dist, tt, ww, side
+
+
 def _spine_leaf(rng: np.random.Generator, size: int, kind: str) -> np.ndarray:
-    """Raster a single sumi-e bamboo leaf or a small pine-needle cluster. Returns RGBA uint8."""
+    """Raster a sumi-e bamboo leaf or a small pine-needle cluster. Returns RGBA uint8."""
     s = size
     yy, xx = np.mgrid[0:s, 0:s].astype(np.float64)
     rgba = np.zeros((s, s, 4), dtype=np.float64)
 
+    def over(src_rgb, src_a):
+        out_a = rgba[..., 3] / 255.0
+        new_a = src_a + out_a * (1.0 - src_a)
+        for c in range(3):
+            rgba[..., c] = np.where(
+                new_a > 1e-6,
+                (src_rgb[c] * src_a + rgba[..., c] * out_a * (1.0 - src_a)) / np.maximum(new_a, 1e-6),
+                rgba[..., c],
+            )
+        rgba[..., 3] = new_a * 255.0
+
     if kind == "needles":
-        # 2–3 tapered needles radiating from a point, slightly fanned.
+        # 2–3 tapered ink needles from a shared origin, slightly fanned.
         n_needles = int(rng.integers(2, 4))
-        base_ang = rng.uniform(-0.5, 0.5)
-        cx, cy = s * 0.5, s * 0.55
+        base_ang = rng.uniform(-0.55, 0.55)
+        cx, cy = s * 0.50, s * 0.62
         for k in range(n_needles):
-            ang = base_ang + (k - (n_needles - 1) / 2) * rng.uniform(0.18, 0.32)
-            length = s * rng.uniform(0.38, 0.55)
+            ang = base_ang + (k - (n_needles - 1) / 2.0) * rng.uniform(0.16, 0.30)
+            length = s * rng.uniform(0.50, 0.72)
             ca, sa = math.cos(ang), math.sin(ang)
-            # Sample along the needle.
-            n = 60
+            n = 70
             t = np.linspace(0.0, 1.0, n)
-            # taper: widest near the base, pointed tip
-            env = (1.0 - t) ** 0.7 * rng.uniform(1.2, 2.0)
-            px = cx + t * length * ca
-            py = cy + t * length * sa
-            dist = np.full((s, s), 1e9)
-            tt = np.zeros((s, s))
-            ww = np.zeros((s, s))
-            for i in range(n):
-                d = np.hypot(xx - px[i], yy - py[i])
-                closer = d < dist
-                dist = np.where(closer, d, dist)
-                tt = np.where(closer, t[i], tt)
-                ww = np.where(closer, env[i], ww)
-            alpha = np.clip((ww - dist) / 0.9, 0.0, 1.0)
-            # Dry breaks along the shaft.
-            noise = rng.normal(0.0, 1.0, (s // 2, s // 2))
-            noise = ndi.zoom(noise, (s / noise.shape[0], s / noise.shape[1]), order=1)
-            if rng.random() < 0.5:
-                alpha *= np.clip(0.75 + 0.4 * noise, 0.0, 1.0)
-            shade = 0.15 + 0.85 * (1.0 - tt)  # darker toward the base
-            col = mix_rgb(INK, WASH2, rng.uniform(0.0, 0.25))
-            rgb_a = alpha * (0.75 + 0.25 * shade) * rng.uniform(0.85, 1.0)
-            for c in range(3):
-                rgba[..., c] = np.where(rgb_a[..., None] if False else rgb_a > rgba[..., 3] / 255.0,
-                                        col[c], rgba[..., c])  # placeholder, fixed below
-            # Simple over: darker ink wins.
-            src_a = rgb_a
-            out_a = rgba[..., 3] / 255.0
-            new_a = src_a + out_a * (1.0 - src_a)
-            for c in range(3):
-                rgba[..., c] = np.where(
-                    new_a > 1e-6,
-                    (col[c] * src_a + rgba[..., c] * out_a * (1.0 - src_a)) / np.maximum(new_a, 1e-6),
-                    rgba[..., c],
-                )
-            rgba[..., 3] = new_a * 255.0
+            env = (1.0 - t) ** 0.65 * rng.uniform(2.0, 3.4)  # px half-width at the base
+            pts = [(cx + ti * length * ca, cy + ti * length * sa) for ti in t]
+            dist, tt, ww, _ = _sdf_polyline(xx, yy, pts, env)
+            alpha = np.clip((ww - dist) / 0.85, 0.0, 1.0)
+            # Dry, broken tips.
+            tip = np.clip(tt, 0, 1)
+            if rng.random() < 0.7:
+                noise = rng.normal(0, 1, (max(8, s // 4), max(8, s // 4)))
+                noise = ndi.zoom(noise, (s / noise.shape[0], s / noise.shape[1]), order=1)
+                alpha *= np.clip(1.0 - 0.45 * tip * np.clip(0.4 + 0.8 * noise, 0, 1.2), 0, 1)
+            col = mix_rgb(INK, WASH1, rng.uniform(0.0, 0.2))
+            over(col, alpha * rng.uniform(0.82, 1.0))
         rgba[..., 3] = np.where(rgba[..., 3] < 1.0, 0.0, rgba[..., 3])
         return np.clip(rgba, 0, 255).astype(np.uint8)
 
-    # Bamboo leaf: curved lanceolate stroke, pointed at both ends, one wetter edge, a faint vein.
-    angle = rng.uniform(-0.55, 0.55)
-    curve = rng.uniform(-0.45, 0.45)
-    length = s * rng.uniform(0.70, 0.90)
-    maxw = s * rng.uniform(0.075, 0.155)
-    wetness = rng.uniform(0.25, 0.95)  # high = soft wash, low = dry-brush
+    # Bamboo leaf: slender lanceolate stroke, gently curved, pointed at both ends.
+    # A faint midrib, one slightly heavier long edge, wet or dry according to wetness.
+    angle = rng.uniform(-0.70, 0.70)
+    curve = rng.uniform(-0.18, 0.18)  # gentle — strong curves read as commas, not bamboo
+    length = s * rng.uniform(0.78, 0.92)
+    maxw = length * rng.uniform(0.055, 0.095)  # slender
+    wetness = rng.uniform(0.20, 0.90)
     cx, cy = s * 0.5, s * 0.5
     ca, sa = math.cos(angle), math.sin(angle)
-    n = 90
+    n = 100
     t = np.linspace(0.0, 1.0, n)
-    # Slightly fuller toward the base (t=0), still pointed at both ends.
-    env = (np.sin(np.pi * np.clip(t ** 0.85, 0, 1)) ** 0.80) * maxw
-    px = cx + (t - 0.5) * length * ca - 4.0 * curve * t * (1.0 - t) * length * sa
-    py = cy + (t - 0.5) * length * sa + 4.0 * curve * t * (1.0 - t) * length * ca
-    dist = np.full((s, s), 1e9)
-    tt = np.zeros((s, s))
-    ww = np.zeros((s, s))
-    # Side: signed left/right of the spine, for a wetter edge.
-    side = np.zeros((s, s))
-    for i in range(n):
-        d = np.hypot(xx - px[i], yy - py[i])
-        closer = d < dist
-        dist = np.where(closer, d, dist)
-        tt = np.where(closer, t[i], tt)
-        ww = np.where(closer, env[i], ww)
-        # Normal to the local tangent.
-        if 0 < i < n - 1:
-            tx, ty = px[i + 1] - px[i - 1], py[i + 1] - py[i - 1]
-        elif i == 0:
-            tx, ty = px[1] - px[0], py[1] - py[0]
-        else:
-            tx, ty = px[-1] - px[-2], py[-1] - py[-2]
-        nrm = math.hypot(tx, ty) + 1e-8
-        nx_, ny_ = -ty / nrm, tx / nrm
-        sd = (xx - px[i]) * nx_ + (yy - py[i]) * ny_
-        side = np.where(closer, sd, side)
+    # Pointed at both ends; a touch fuller toward the base (t=0).
+    env = (np.sin(np.pi * np.clip(t ** 0.80, 0, 1)) ** 0.90) * maxw
+    pts = []
+    for ti in t:
+        px = cx + (ti - 0.5) * length * ca - 4.0 * curve * ti * (1.0 - ti) * length * sa
+        py = cy + (ti - 0.5) * length * sa + 4.0 * curve * ti * (1.0 - ti) * length * ca
+        pts.append((px, py))
+    dist, tt, ww, side = _sdf_polyline(xx, yy, pts, env)
 
-    edge_soft = 0.7 + 2.2 * wetness
+    edge_soft = 0.55 + 1.6 * wetness
     alpha = np.clip((ww - dist) / edge_soft, 0.0, 1.0)
-    # Wet bloom: slight bleed outside the body.
-    if wetness > 0.5:
-        bloom = ndi.gaussian_filter(alpha, sigma=1.2 + 1.4 * wetness)
-        alpha = np.clip(np.maximum(alpha, bloom * 0.35), 0.0, 1.0)
-    # Dry-brush: eat holes near the edges when wetness is low.
-    noise = rng.normal(0.0, 1.0, (max(8, s // 3), max(8, s // 3)))
-    noise = ndi.zoom(noise, (s / noise.shape[0], s / noise.shape[1]), order=1)
-    noise = ndi.gaussian_filter(noise, 0.8)
-    if wetness < 0.7:
+    if wetness > 0.55:
+        bloom = ndi.gaussian_filter(alpha, sigma=0.8 + 1.1 * wetness)
+        alpha = np.clip(np.maximum(alpha, bloom * 0.28), 0.0, 1.0)
+
+    # Directional dry-brush: elongate noise along the leaf axis, bite only the edges.
+    # Build axis-aligned noise then rotate into the leaf frame.
+    ns = max(16, s // 2)
+    n0 = rng.normal(0.0, 1.0, (ns, ns))
+    # Stretch along x (the leaf's local axis) before rotating.
+    n0 = ndi.gaussian_filter(n0, sigma=(0.4, 2.4))
+    nimg = Image.fromarray(((n0 - n0.min()) / (n0.max() - n0.min() + 1e-6) * 255).astype(np.uint8), "L")
+    nimg = nimg.resize((s, s), Image.Resampling.BILINEAR).rotate(-math.degrees(angle), resample=Image.Resampling.BILINEAR)
+    noise = np.array(nimg).astype(np.float64) / 255.0 * 2.0 - 1.0
+    if wetness < 0.75:
         edge = np.clip(alpha * (1.0 - alpha) * 4.0, 0.0, 1.0)
-        bite = np.clip(0.55 + 0.7 * noise, 0.0, 1.2)
-        alpha = np.clip(alpha * (1.0 - (1.0 - wetness) * 0.55 * edge * (1.0 - bite)), 0.0, 1.0)
-        # A few fibrous streaks along the leaf axis.
-        # Approximate by slightly stretching noise along angle.
-        alpha *= np.clip(0.82 + 0.28 * noise, 0.25, 1.0) ** (1.0 - 0.6 * wetness)
+        bite = np.clip(0.50 + 0.85 * noise, 0.0, 1.3)
+        alpha = np.clip(alpha * (1.0 - (1.0 - wetness) * 0.50 * edge * (1.0 - np.clip(bite, 0, 1))), 0.0, 1.0)
+        # Subtle fibre inside the body, not a mottled scale pattern.
+        alpha *= np.clip(0.90 + 0.14 * noise, 0.55, 1.0) ** (1.0 - 0.5 * wetness)
 
-    # Ink density: darker on one edge, a little paler toward the tip.
-    wet_edge = 0.5 + 0.5 * np.tanh(side / max(2.0, maxw * 0.35))
+    # Flat ink, not a 3D shade: a slightly heavier long edge and a paler tip.
+    heavy = (side > 0).astype(np.float64)
+    heavy = ndi.gaussian_filter(heavy, 0.7)
     tip = np.clip(tt, 0.0, 1.0)
-    shade = 0.55 + 0.45 * wet_edge
-    shade *= 0.75 + 0.25 * (1.0 - tip)
-    shade = np.clip(shade, 0.0, 1.0)
-    col_dark = mix_rgb(INK, WASH1, rng.uniform(0.0, 0.25))
-    col_pale = mix_rgb(WASH2, WASH3, rng.uniform(0.0, 0.4))
-    color = col_dark[None, None, :] * shade[..., None] + col_pale[None, None, :] * (1.0 - shade[..., None])
+    col_body = mix_rgb(INK, WASH1, rng.uniform(0.05, 0.35))
+    col_edge = mix_rgb(INK, WASH1, rng.uniform(0.00, 0.12))
+    col_tip = mix_rgb(WASH1, WASH2, rng.uniform(0.15, 0.45))
+    w_edge = 0.22 * heavy
+    w_tip = 0.30 * tip
+    color = (col_body[None, None, :] * (1.0 - w_edge - w_tip * 0.6)[..., None]
+             + col_edge[None, None, :] * w_edge[..., None]
+             + col_tip[None, None, :] * (w_tip * 0.6)[..., None])
 
-    # Central vein: a thinner, darker line along the spine, fading at the tip.
-    vein_w = max(0.7, maxw * 0.10)
-    vein = np.clip((vein_w - dist) / 0.8, 0.0, 1.0) * (1.0 - tip) ** 0.6 * 0.55
-    vein *= (alpha > 0.15).astype(np.float64)
+    # Midrib: a thin dark line, fading before the tip.
+    vein_w = max(0.55, maxw * 0.09)
+    vein = np.clip((vein_w - dist) / 0.7, 0.0, 1.0) * (1.0 - np.clip((tip - 0.15) / 0.75, 0, 1)) ** 0.7
+    vein *= (alpha > 0.18).astype(np.float64) * 0.70
     color = color * (1.0 - vein[..., None]) + INK[None, None, :] * vein[..., None]
-    alpha = np.clip(alpha + vein * 0.15, 0.0, 1.0)
+    alpha = np.clip(alpha + vein * 0.10, 0.0, 1.0)
+    alpha *= rng.uniform(0.84, 1.0)
 
-    alpha *= rng.uniform(0.82, 1.0)
     rgba[..., :3] = color
     rgba[..., 3] = np.where(alpha < 1.0 / 255.0, 0.0, alpha * 255.0)
     return np.clip(rgba, 0, 255).astype(np.uint8)
@@ -357,51 +368,55 @@ def _spine_leaf(rng: np.random.Generator, size: int, kind: str) -> np.ndarray:
 
 def make_stamps(rng: np.random.Generator) -> list[Image.Image]:
     stamps = []
-    # A set of unique leaves / needles at a working resolution; scaled per instance later.
+    # Working resolution is high; instances scale down to ~40–130 px.
     for _ in range(10):
-        arr = _spine_leaf(rng, 160, "bamboo")
-        stamps.append(Image.fromarray(arr, "RGBA"))
+        stamps.append(Image.fromarray(_spine_leaf(rng, 200, "bamboo"), "RGBA"))
     for _ in range(4):
-        arr = _spine_leaf(rng, 120, "needles")
-        stamps.append(Image.fromarray(arr, "RGBA"))
+        stamps.append(Image.fromarray(_spine_leaf(rng, 160, "needles"), "RGBA"))
     return stamps
 
 
-def plan_leaves(n: int, rng: np.random.Generator, n_leaves: int = 34) -> list[dict]:
-    """Every parameter is periodic in `n` frames, so the loop joins without a jump."""
-    margin = 110
+def plan_leaves(n: int, rng: np.random.Generator, n_leaves: int = 42) -> list[dict]:
+    """Every parameter is periodic in `n` frames, so the loop joins without a jump.
+
+    x is planned in Bob v2's 3200-wide forest. Mid-layer openings (path clearings)
+    where falling leaves read against the far peaks are around x 809–1110 and 2252–2642.
+    """
+    margin = 120
     leaves = []
+    # Weighted zones: clearings, path, groves.
+    # (x0, x1, weight)
+    zones = [
+        (809, 1110, 0.26),    # main left-centre path opening
+        (2245, 2642, 0.18),   # right clearing by the leaning seal-stone
+        (200, 800, 0.14),     # left pine grove
+        (1110, 1800, 0.16),   # centre pines / first seal-stone
+        (1800, 2245, 0.12),   # bamboo stand
+        (2642, 3120, 0.14),   # right bamboo / near rock
+    ]
+    zw = np.array([z[2] for z in zones], dtype=np.float64)
+    zw /= zw.sum()
     for i in range(n_leaves):
-        # Prefer the open path and the tree edges, where falling leaves read clearly.
-        # Path opening is roughly x 700–1860 in 2560 space.
-        zone = rng.random()
-        if zone < 0.55:
-            x0 = rng.uniform(720, 1860)
-        elif zone < 0.80:
-            x0 = rng.uniform(180, 720)   # left grove
-        else:
-            x0 = rng.uniform(1860, 2420)  # right grove
-        # Varied fall periods → slight speed variation, all still wrap once per loop.
+        z = zones[int(rng.choice(len(zones), p=zw))]
+        x0 = rng.uniform(z[0], z[1])
         period = (H + 2 * margin) * rng.uniform(0.88, 1.28)
-        speed = period / n  # px per frame
+        speed = period / n
         y_phase = rng.uniform(0.0, period)
         sway_amp = rng.uniform(24.0, 90.0)
-        sway_cycles = int(rng.choice([1, 1, 1, 2]))  # integer cycles
+        sway_cycles = int(rng.choice([1, 1, 1, 2]))
         sway_ph = rng.uniform(0.0, 2 * math.pi)
-        rot0 = rng.uniform(-40.0, 40.0)
-        rot_amp = rng.uniform(10.0, 38.0)
+        rot0 = rng.uniform(-50.0, 50.0)
+        rot_amp = rng.uniform(12.0, 40.0)
         rot_cycles = int(rng.choice([1, 1, 2]))
         rot_ph = rng.uniform(0.0, 2 * math.pi)
-        # Distant leaves are smaller and paler (we bake paleness into a per-leaf opacity).
         depth = rng.uniform(0.0, 1.0)
-        scale = 0.28 + 0.55 * (0.35 + 0.65 * depth)  # ~0.28–0.83 of the 160px stamp
-        if rng.random() < 0.25:
-            scale *= rng.uniform(0.7, 0.9)  # a few tiny ones
-        opacity = 0.55 + 0.45 * depth
+        scale = 0.32 + 0.50 * (0.30 + 0.70 * depth)  # of a 200px stamp ≈ 64–164 px
+        if rng.random() < 0.22:
+            scale *= rng.uniform(0.65, 0.85)
+        opacity = 0.58 + 0.42 * depth
         sid = int(rng.integers(0, 14))
-        # Needles a bit smaller.
         if sid >= 10:
-            scale *= 0.85
+            scale *= 0.80
         leaves.append(dict(
             x0=x0, y_phase=y_phase, period=period, speed=speed, margin=margin,
             sway_amp=sway_amp, sway_cycles=sway_cycles, sway_ph=sway_ph,
@@ -435,7 +450,7 @@ def generate_leaves(n: int, seed: int) -> list[Path]:
     print(f"[leaves] {len(leaves)} leaves, {len(stamps)} stamps, {n} frames…")
     paths = []
     for t in range(n):
-        canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        canvas = Image.new("RGBA", (W, H), (int(PAPER[0]), int(PAPER[1]), int(PAPER[2]), 0))
         # Draw back-to-front by scale (smaller / paler first).
         order = sorted(range(len(leaves)), key=lambda i: leaves[i]["scale"])
         for i in order:
@@ -468,7 +483,7 @@ def generate_leaves(n: int, seed: int) -> list[Path]:
 
 
 def leaf_size_guard(lf: dict) -> float:
-    return 160 * lf["scale"] + 8
+    return 200 * lf["scale"] + 8
 
 
 # ---------------------------------------------------------------------------
@@ -479,8 +494,9 @@ def load_layer(name: str) -> Image.Image:
     p = ART / f"{name}.png"
     im = Image.open(p)
     if im.size != (W, H):
-        im = im.resize((W, H), Image.Resampling.LANCZOS)
-    return im.convert("RGBA") if im.mode != "RGBA" else im
+        # Do not silently stretch a size mismatch — v2 POI layers must be 3200x1440.
+        raise RuntimeError(f"{p} is {im.size}, expected {(W, H)}")
+    return im.convert("RGBA")
 
 
 def composite_preview(far, mid, near, mist=None, leaves=None) -> Image.Image:
@@ -542,8 +558,15 @@ def encode_gif(mp4: Path, out: Path, width: int = 960) -> None:
     palette.unlink(missing_ok=True)
 
 
-def still(im: Image.Image, path: Path) -> None:
-    im.convert("RGB").resize((1280, 720), Image.Resampling.LANCZOS).save(path, quality=92, optimize=True)
+def still_full(im: Image.Image, path: Path) -> None:
+    """Whole 3200x1440 layer, scaled to 1600x720 (same aspect)."""
+    im.convert("RGB").resize((1600, 720), Image.Resampling.LANCZOS).save(path, quality=92, optimize=True)
+
+
+def still_view(im: Image.Image, path: Path, x0: int = 0) -> None:
+    """A 2560x1440 game-view crop (Bob: 2560 view into 3200) scaled to 1280x720."""
+    crop = im.convert("RGBA").crop((x0, 0, x0 + 2560, 1440))
+    crop.convert("RGB").resize((1280, 720), Image.Resampling.LANCZOS).save(path, optimize=True)
 
 
 def seam_strip(paths: list[Path], out: Path, crop=None) -> None:
@@ -618,11 +641,11 @@ def write_manifest(n_mist: int, n_leaves: int, reports: list[dict]) -> None:
             "town": "Hanshi",
         },
         "notes": (
-            "Full-screen 2560x1440 looping overlays, one WebP frame per file, 12 fps, straight alpha. "
-            "SPEC section 5 only documents horizontal strips; a 2560-wide strip of 72 frames is impractical "
-            "(184320 px). Load the numbered frames, or the preview animated files for review. "
-            "Position registers 1:1 with Bob's POI layers (anchor [0.5, 1.0] at the stage bottom-centre). "
-            "Palette from SPEC section 5; no vermilion in these two keys (leaves and mist are ink/paper only)."
+            "Full-screen 3200x1440 looping overlays (Bob v2 POI width; SPEC section 5 still says 2560). "
+            "One lossless WebP frame per file, 12 fps, straight alpha. SPEC only documents horizontal strips; "
+            "a 3200-wide strip of 72 frames is impractical. Load the numbered frames, or the preview files for review. "
+            "The overlay is the same size as the POI layers and left-aligned with them at x=0 (anchor [0.5, 1.0] "
+            "sits at the layer bottom-centre, x=1600,y=1440). Palette from SPEC section 5; no vermilion in these two keys."
         ),
         "palette": {
             "paper": "#ece6d8",
@@ -640,8 +663,8 @@ def write_manifest(n_mist: int, n_leaves: int, reports: list[dict]) -> None:
                 "files": [f"{i:02d}.webp" for i in range(n_mist)],
                 "w": W, "h": H, "fw": W, "fh": H,
                 "frames": n_mist, "fps": FPS, "loop": True,
-                "x": 1280, "y": 1440,
-                "position": [1280, 1440],
+                "x": 1600, "y": 1440,
+                "position": [1600, 1440],
                 "anchor": [0.5, 1.0],
                 "sit_above": "poi-forest-far",
                 "layer": "fx-slot-a",
@@ -653,7 +676,7 @@ def write_manifest(n_mist: int, n_leaves: int, reports: list[dict]) -> None:
                 "notes": (
                     "Distant ink-wash fog bands among the far peaks and the mid-layer tree line, "
                     "centred near y≈0.62×1440 (Bob's slot-A preview band). Pale paper-tinted veils. "
-                    "Suggested global opacity 0.90 on top of the baked alpha (peak baked alpha ≈ 0.46). "
+                    "Suggested global opacity 0.90 on top of the baked alpha (peak baked alpha ≈ 0.42). "
                     "Do not use multiply — the RGB is already unmixed paper/wash."
                 ),
             },
@@ -663,8 +686,8 @@ def write_manifest(n_mist: int, n_leaves: int, reports: list[dict]) -> None:
                 "files": [f"{i:02d}.webp" for i in range(n_leaves)],
                 "w": W, "h": H, "fw": W, "fh": H,
                 "frames": n_leaves, "fps": FPS, "loop": True,
-                "x": 1280, "y": 1440,
-                "position": [1280, 1440],
+                "x": 1600, "y": 1440,
+                "position": [1600, 1440],
                 "anchor": [0.5, 1.0],
                 "sit_above": "poi-forest-mid",
                 "layer": "fx-slot-b",
@@ -703,14 +726,14 @@ def build_previews(n_mist: int, n_leaves: int) -> list[Path]:
 
     # Seam strips: a mid-band crop where mist lives (y 600–1200), and a wider crop for leaves.
     seam_strip(mist_paths, prev / "poi-forest-mist-seam.jpg", crop=(0, 560, W, 1200))
-    seam_strip(leaf_paths, prev / "poi-forest-leaves-seam.jpg", crop=(480, 0, 2080, H))
+    seam_strip(leaf_paths, prev / "poi-forest-leaves-seam.jpg", crop=(400, 0, 2800, H))
 
     # Alpha checks on frame 0 and a mid frame.
     chk = checker_bg().convert("RGBA")
     for name, paths, idx in (("mist", mist_paths, 0), ("mist", mist_paths, n_mist // 3),
                              ("leaves", leaf_paths, 0), ("leaves", leaf_paths, n_leaves // 3)):
         im = Image.open(paths[idx]).convert("RGBA")
-        still(Image.alpha_composite(chk, im), prev / f"poi-forest-{name}-alphacheck-f{idx:02d}.jpg")
+        still_full(Image.alpha_composite(chk, im), prev / f"poi-forest-{name}-alphacheck-f{idx:02d}.jpg")
 
     # Composited preview frames (1280x720) for mp4/gif + stills.
     tmp = prev / "_tmp"
@@ -726,9 +749,13 @@ def build_previews(n_mist: int, n_leaves: int) -> list[Path]:
     for t in range(n_mist):
         mist = Image.open(mist_paths[t]).convert("RGBA")
         leaves = Image.open(leaf_paths[t]).convert("RGBA")
-        c_mist = composite_preview(far, mid, near, mist=mist, leaves=None).resize((1280, 720), Image.Resampling.LANCZOS)
-        c_leaves = composite_preview(far, mid, near, mist=None, leaves=leaves).resize((1280, 720), Image.Resampling.LANCZOS)
-        c_both = composite_preview(far, mid, near, mist=mist, leaves=leaves).resize((1280, 720), Image.Resampling.LANCZOS)
+        full_mist = composite_preview(far, mid, near, mist=mist, leaves=None)
+        full_leaves = composite_preview(far, mid, near, mist=None, leaves=leaves)
+        full_both = composite_preview(far, mid, near, mist=mist, leaves=leaves)
+        # MP4/GIF: the whole 3200-wide layer at 1600x720 so the scroll width is visible.
+        c_mist = full_mist.resize((1600, 720), Image.Resampling.LANCZOS)
+        c_leaves = full_leaves.resize((1600, 720), Image.Resampling.LANCZOS)
+        c_both = full_both.resize((1600, 720), Image.Resampling.LANCZOS)
         p1 = tmp / f"mist_{t:03d}.png"
         p2 = tmp / f"leaves_{t:03d}.png"
         p3 = tmp / f"both_{t:03d}.png"
@@ -739,9 +766,14 @@ def build_previews(n_mist: int, n_leaves: int) -> list[Path]:
         leaves_only_paths.append(p2)
         both_paths.append(p3)
         if t in still_idxs:
+            # Full-layer stills (1600x720) and the default 2560-wide game view (1280x720, x=0).
             c_mist.convert("RGB").save(prev / f"poi-forest-mist-still-f{t:02d}.png", optimize=True)
             c_leaves.convert("RGB").save(prev / f"poi-forest-leaves-still-f{t:02d}.png", optimize=True)
             c_both.convert("RGB").save(prev / f"poi-forest-ambient-still-f{t:02d}.png", optimize=True)
+            still_view(full_mist, prev / f"poi-forest-mist-view-f{t:02d}.png", 0)
+            still_view(full_leaves, prev / f"poi-forest-leaves-view-f{t:02d}.png", 0)
+            still_view(full_both, prev / f"poi-forest-ambient-view-f{t:02d}.png", 0)
+            still_view(full_both, prev / f"poi-forest-ambient-view-right-f{t:02d}.png", 640)
         if t % 12 == 0:
             print(f"  [preview] frame {t}/{n_mist-1}")
 
@@ -750,6 +782,9 @@ def build_previews(n_mist: int, n_leaves: int) -> list[Path]:
     shutil.copy(prev / f"poi-forest-mist-still-f{mid_i:02d}.png", prev / "poi-forest-mist-still.png")
     shutil.copy(prev / f"poi-forest-leaves-still-f{mid_i:02d}.png", prev / "poi-forest-leaves-still.png")
     shutil.copy(prev / f"poi-forest-ambient-still-f{mid_i:02d}.png", prev / "poi-forest-ambient-still.png")
+    shutil.copy(prev / f"poi-forest-mist-view-f{mid_i:02d}.png", prev / "poi-forest-mist-view.png")
+    shutil.copy(prev / f"poi-forest-leaves-view-f{mid_i:02d}.png", prev / "poi-forest-leaves-view.png")
+    shutil.copy(prev / f"poi-forest-ambient-view-f{mid_i:02d}.png", prev / "poi-forest-ambient-view.png")
 
     print("[preview] encoding mp4 / gif…")
     encode_mp4(str(tmp / "mist_%03d.png"), prev / "poi-forest-mist.mp4")

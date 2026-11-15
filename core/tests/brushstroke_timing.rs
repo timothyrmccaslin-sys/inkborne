@@ -179,10 +179,21 @@ fn miss_breaks_chain_at_that_hit() {
     let items = std::fs::read_to_string(root.join("data/items.json")).unwrap();
 
     // Itsuki / Falling Pine is 3 hits in both live data and Jake's drop.
+    // sumikage_c is a live encounter in data/enemies.json (blotling, hollow_lantern, blotling).
     let mut game = inkborne_core::Game::new(&party, &enemies, &items, 7).expect("Game::new");
-    game.start_battle("sumikage_c");
-    let actor = game.current() as usize;
-    let target = 1usize; // first enemy in the default encounter layout
+    let battle: serde_json::Value =
+        serde_json::from_str(&game.start_battle("sumikage_c")).expect("battle json");
+    let fighters = battle["fighters"].as_array().expect("fighters");
+    let actor = fighters
+        .iter()
+        .position(|f| f["id"] == "itsuki")
+        .expect("itsuki in party");
+    let target = fighters
+        .iter()
+        .position(|f| f["side"].as_u64() == Some(1))
+        .expect("sumikage_c must spawn at least one enemy");
+    assert_eq!(fighters[target]["side"].as_u64(), Some(1), "target must be an enemy");
+    assert_eq!(fighters[actor]["side"].as_u64(), Some(0), "actor must be a party member");
     let result: serde_json::Value =
         serde_json::from_str(&game.stroke(actor, target, 0, &[2, 0, 2])).unwrap();
     let events = result["events"]
@@ -193,4 +204,9 @@ fn miss_breaks_chain_at_that_hit() {
     assert_eq!(events[1]["grade"].as_u64(), Some(0));
     assert!(events[0].get("dmg").is_some());
     assert!(events[1].get("dmg").is_none());
+    assert_eq!(
+        events[0]["target"].as_u64(),
+        Some(target as u64),
+        "clean hit must land on the enemy target: {result}"
+    );
 }

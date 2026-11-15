@@ -530,14 +530,15 @@ def fx_seal(el):
 ROOT = (256, 268); FEET = 440
 WING = {  # local coords: u outward, v up; feathers hang from the arm
     "crane": dict(wrist=(86, 82), tip=(198, 138), nprim=12, nsec=14, plen=(70, 120), slen=(78, 92), pw=15, sw=19, cov=1,
-                  pfan=1.05, dark_prim=True, scale_far=0.76, scale_near=0.88),
-    "kite":  dict(wrist=(86, 56), tip=(196, 92), nprim=6, nsec=10, plen=(90, 140), slen=(58, 70), pw=12, sw=15, cov=1,
-                  pfan=0.85, dark_prim=False, scale_far=0.86),
-    "owl":   dict(wrist=(70, 62), tip=(162, 52), scale_far=0.84, scale_near=0.98),
+                  pfan=1.05, dark_prim=True, scale_far=0.7, scale_near=0.77),
+    "kite":  dict(wrist=(86, 56), tip=(196, 92), nprim=6, nsec=10, plen=(80, 120), slen=(58, 70), pw=12, sw=15, cov=1,
+                  pfan=0.85, dark_prim=False, scale_far=0.7, scale_near=0.77),
+    "owl":   dict(wrist=(70, 62), tip=(162, 52), scale_far=0.78, scale_near=0.9),
 }
 # rounded owl silhouette (u outward, v up), leading edge then scalloped trailing edge back to the root
-OWL_OUT = [(0, 0), (40, 46), (100, 60), (158, 50), (198, 26), (214, -4), (206, -32), (182, -52), (144, -66), (102, -74), (62, -70), (28, -56), (6, -28)]
-OWL_LEAD = [(0, 0), (40, 46), (100, 60), (158, 50), (198, 26), (214, -4)]
+OWL_OUT = []  # (round 3) owl outline now comes from the feathers themselves
+OWL_LEAD = [(0, 0), (34, 28), (90, 38), (140, 38), (176, 30)]
+OWL_HUB = (146, 18)
 def _owl_lead_v(u):
     xs = [p[0] for p in OWL_LEAD]; ys = [p[1] for p in OWL_LEAD]; return float(np.interp(u, xs, ys))
 
@@ -552,69 +553,88 @@ def _wing_xf(side, spread, flap, sc):
     return X
 
 def owl_wing(masks, side, spread, flap, growth, rng_k, lag=0.0, sc=1.0):
-    """Broad, rounded, soft-edged owl wing: wet silhouette wash, irregular rounded feathers, barred primaries,
-    slate shingle coverts with faint red cracks."""
+    """Stone Owl wing: broad rounded leading edge (covert band), deep chord of hanging secondaries with a soft
+    scalloped trailing edge, a short stubby fringe of separated primaries with soft comb serrations, and
+    dark/light bars aligned across every flight feather. Ink wash in slate tint, faint red cracks."""
     ink, wash, tipm, crack = masks
-    X = _wing_xf(side, spread, flap + 0.3, sc); rng = R(rng_k)
-    gs = 0.25 + 0.75 * growth
-    # soft rounded silhouette
-    if growth > 0.15:
-        sil = catmull([(u * gs, v * gs) for u, v in OWL_OUT + [OWL_OUT[0]]], 8)
-        t_, d_ = wash.tmp()
-        d_.polygon([P(*X(u, v, lag)) for u, v in sil], fill=int(85 * cl((growth - 0.15) / 0.4)))
-        wash.add(t_)
-    # flight feathers: fan from a hand/arm hub out to the scalloped rim, irregular lengths, widths and spacing
-    hub_hand, hub_arm = (92, 34), (40, 10)
-    rim = catmull([(u, v) for u, v in OWL_OUT[4:13]], 12)  # from upper tip round to the inner trailing edge
-    nrim = len(rim); nf = 17
-    qs = np.sort(np.clip(np.linspace(0.02, 0.98, nf) + rng.normal(0, 0.018, nf), 0, 1))
-    for i, q in enumerate(qs):
-        tu, tv = rim[int(q * (nrim - 1))]
-        hu = tu * (0.62 if q < 0.35 else 0.85) + rng.normal(0, 4); hv = _owl_lead_v(hu) - 14 + rng.normal(0, 3)
-        L = rng.uniform(0.9, 1.1)
-        tu, tv = hu + (tu - hu) * L, hv + (tv - hv) * L
-        g = cl((growth - q * 0.35) / 0.6)
+    X = _wing_xf(side, spread, flap + 0.22, sc); rng = R(rng_k)
+    def XL(u, v): return X(u, v, lag)
+    fm = Mask(ink.N // SS)
+    flen = 0.3 + 0.7 * spread
+    lead_v = lambda u: float(np.interp(u, [p[0] for p in OWL_LEAD], [p[1] for p in OWL_LEAD]))
+    bars = [0.34, 0.52, 0.70, 0.87]
+    feathers = []
+    nsec = 11
+    for i in range(nsec):                       # secondaries hang almost straight down from the arm
+        q = (i + 0.5) / nsec; u = 8 + q * 112 + rng.normal(0, 2)
+        feathers.append(dict(u=u, v=lead_v(u) - 10, ang=-np.pi / 2 + 0.05 + 0.25 * q + rng.normal(0, 0.04),
+                             L=rng.uniform(84, 96), w=rng.uniform(19, 23), prim=False, q=q * 0.6))
+    npr = 7
+    for i in range(npr):                        # primaries fan round the broad tip: stubby, separated fingers
+        q = i / (npr - 1); u = OWL_HUB[0] + rng.normal(0, 2)
+        L = 76 * rng.uniform(0.94, 1.05)          # equal lengths round a wrist hub -> rounded tip
+        feathers.append(dict(u=u, v=OWL_HUB[1] + rng.normal(0, 2), ang=-np.pi / 2 + 0.3 + 1.32 * q + rng.normal(0, 0.03),
+                             L=L, w=rng.uniform(12, 14), prim=True, q=0.6 + q * 0.4, i=i))
+    for j, fd in enumerate(feathers):
+        g = cl((growth - fd["q"] * 0.4) / 0.6)
         if g <= 0.02: continue
-        bend = rng.normal(0, 6)
-        pts = [(hu + (tu - hu) * s_ * g + bend * math.sin(np.pi * s_), hv + (tv - hv) * s_ * g) for s_ in np.linspace(0, 1, 5)]
-        pts = [(u * gs, v * gs) for u, v in pts]
-        fw = rng.uniform(20, 31)
-        rk = R(rng_k + 40 + i)
-        W = [X(u, v, lag) for u, v in pts]
-        brush(wash, W, fw * sc, rk, dry=0.2, wet=0.7, taper=(0.12, 0.16), bristles=9)
-        brush(tipm, W[2:], fw * 0.95 * sc, rk, dry=0.3, wet=0.6, taper=(0.35, 0.14), bristles=8)  # dark rounded slate tip
-        if rng.random() < 0.85:  # shaft line, partial length
-            s0 = rng.uniform(0.05, 0.25)
-            brush(ink, [X(u + side * 0, v - 2, lag) for u, v in pts], rng.uniform(2.2, 4.2) * sc, rk, t0=s0, t1=rng.uniform(0.8, 1.0), local=True,
-                  dry=0.6, wet=0.3, taper=(0.2, 0.4), bristles=3)
-        if q < 0.6 and g > 0.6:  # owl barring: short dry dabs across the feather
-            for b in range(rng.integers(2, 4)):
-                s_ = rng.uniform(0.45, 0.92); u0, v0 = pts[0]; u1, v1 = pts[-1]
-                bu, bv = u0 + (u1 - u0) * s_, v0 + (v1 - v0) * s_
-                dx, dy = (v1 - v0), -(u1 - u0); ln = math.hypot(dx, dy) + 1e-6; dx, dy = dx / ln * fw * 0.32, dy / ln * fw * 0.32
-                brush(ink, [X(bu - dx, bv - dy, lag), X(bu + dx, bv + dy, lag)], rng.uniform(2.5, 4.5) * sc, R(rng_k + 90 + i * 5 + b), dry=0.8, wet=0.2, taper=(0.3, 0.3), bristles=3)
-    # coverts: irregular rows of slate shingles over the upper wing
+        L = fd["L"] * flen * g; a = fd["ang"]; bend = 0.08 * (1 if fd["prim"] else -0.5)
+        pts = [(fd["u"] + math.cos(a + bend * s_) * L * s_, fd["v"] + math.sin(a + bend * s_) * L * s_) for s_ in np.linspace(0, 1, 5)]
+        W = [XL(*p) for p in pts]
+        rk = R(rng_k + 10 + j)
+        brush(wash, W, fd["w"] * sc, rk, dry=0.2, wet=0.75, taper=(0.05, 0.14 if not fd["prim"] else 0.22), bristles=9)
+        if fd["prim"]:   # primaries a shade darker so the stubby fringe reads
+            t2, d2 = tipm.tmp(); tm = Mask(ink.N // SS)
+            brush(tm, W, fd["w"] * 0.9 * sc, R(rng_k + 950 + j), dry=0.3, wet=0.6, taper=(0.05, 0.22), bristles=8)
+            brush(tm, W[3:], fd["w"] * 0.7 * sc, R(rng_k + 970 + j), dry=0.25, wet=0.7, taper=(0.3, 0.2), bristles=6, value=255)
+            tipm.add(Image.fromarray((np.clip(tm.arr(), 0, 1) * 120).astype(np.uint8)))
+        brush(fm, W, fd["w"] * 0.95 * sc, R(rng_k + 900 + j), dry=0.0, wet=1.0, taper=(0.05, 0.14 if not fd["prim"] else 0.22), bristles=6)
+        if fd["prim"] and rng.random() < 0.5:   # shaft (primaries only)
+            brush(ink, W, rng.uniform(1.1, 1.6) * sc, R(rng_k + 60 + j), t0=0.12, t1=rng.uniform(0.7, 0.92), local=True,
+                  dry=0.5, wet=0.4, taper=(0.2, 0.5), bristles=2)
+        if fd["prim"] and fd["i"] >= npr - 2 and g > 0.6:   # soft comb serrations on the outer primaries' leading side
+            for h in range(10):
+                s_ = 0.2 + 0.78 * h / 9
+                bu, bv = fd["u"] + math.cos(a) * L * s_, fd["v"] + math.sin(a) * L * s_
+                na = a + np.pi / 2; hl = rng.uniform(3, 5.5)
+                ou, ov = bu + math.cos(na) * fd["w"] * 0.42, bv + math.sin(na) * fd["w"] * 0.42
+                brush(ink, [XL(ou, ov), XL(ou + math.cos(na - 0.6) * hl, ov + math.sin(na - 0.6) * hl)], 1.2 * sc,
+                      R(rng_k + 400 + j * 10 + h), dry=0.4, wet=0.5, taper=(0.1, 0.8), bristles=2)
+    if growth > 0.45:
+        lp = catmull(OWL_LEAD, 10); du = np.gradient(lp[:, 0]); dv = np.gradient(lp[:, 1]); ln = np.hypot(du, dv) + 1e-6
+        nu, nv = dv / ln, -du / ln                      # inward normal (into the wing)
+        bm = Mask(ink.N // SS); bg = cl((growth - 0.45) / 0.4)
+        for k, dd in enumerate([34, 50, 66, 82, 98]):
+            dd = dd * flen
+            pts = [(lp[i, 0] + nu[i] * dd + rng.normal(0, 1.0), lp[i, 1] + nv[i] * dd + rng.normal(0, 1.0)) for i in range(0, len(lp), 3)]
+            pts = [p for p in pts if p[0] > -10]
+            brush(bm, [XL(*p) for p in pts], (8.5 - k * 0.6) * sc, R(rng_k + 700 + k), dry=0.4, wet=0.55, taper=(0.02, 0.05), bristles=12)
+        for k, rr in enumerate([34, 50, 66]):        # bars across the primary fingers: arcs round the wrist hub
+            rr = rr * flen
+            arc = [(OWL_HUB[0] + rr * math.cos(a_), OWL_HUB[1] + rr * math.sin(a_)) for a_ in np.linspace(-1.35, 0.25, 12)]
+            brush(bm, [XL(*p) for p in arc], (5.5 - k * 0.5) * sc, R(rng_k + 720 + k), dry=0.4, wet=0.55, taper=(0.05, 0.05), bristles=10)
+        clipm = np.clip(ndi.gaussian_filter(fm.arr(), 0.8 * SS) * 1.3, 0, 1)
+        tipm.add(Image.fromarray((np.clip(bm.arr() * clipm * bg, 0, 1) * 240).astype(np.uint8)))
+    # coverts: a second, shorter row over the feather bases, spotted rather than barred
     if growth > 0.3:
-        for i in range(26):
-            q = rng.random(); row = rng.integers(0, 3)
-            u = lerp(16, 170, q) + rng.normal(0, 6); v = _owl_lead_v(lerp(16, 170, q)) - 10 - row * 18 + rng.normal(0, 4)
+        for i in range(12):
+            q = (i + 0.5) / 12; u = 10 + q * 168 + rng.normal(0, 3)
             g = cl((growth - 0.3 - q * 0.3) / 0.4)
             if g <= 0: continue
-            L = rng.uniform(18, 32) * g; ang = -np.pi / 2 + 0.2 + 0.6 * q + rng.normal(0, 0.15)
-            pts = [((u + math.cos(ang) * L * s_) * gs, (v + math.sin(ang) * L * s_) * gs) for s_ in (0, 0.5, 1)]
-            rk = R(rng_k + 200 + i)
-            brush(wash, [X(a, b, lag) for a, b in pts], rng.uniform(16, 26) * sc, rk, dry=0.3, wet=0.6, taper=(0.15, 0.25), bristles=7)
-            if rng.random() < 0.65:
-                brush(ink, [X(a, b - 2, lag) for a, b in pts[1:]], rng.uniform(2.0, 3.6) * sc, rk, dry=0.55, wet=0.3, taper=(0.2, 0.5), bristles=3)
-            if rng.random() < 0.16:
-                c0 = X(*pts[0], lag)
-                brush(crack, [c0, (c0[0] + side * 6, c0[1] + 7), (c0[0] + side * 1, c0[1] + 15), (c0[0] + side * 5, c0[1] + 24)],
-                      1.9, R(rng_k + 300 + i), dry=0.2, wet=0.8, taper=(0, 0.3), bristles=2)
+            a = -np.pi / 2 + 0.1 + 0.9 * q ** 2; L = rng.uniform(30, 40) * flen * g
+            pts = [(u + math.cos(a) * L * s_, lead_v(u) - 12 + math.sin(a) * L * s_) for s_ in (0, 0.5, 1)]
+            brush(wash, [XL(*p) for p in pts], rng.uniform(20, 26) * sc, R(rng_k + 600 + i), dry=0.25, wet=0.7, taper=(0.1, 0.25), bristles=8)
+            sp = pts[2]; brush(tipm, [XL(sp[0] - 2, sp[1] + 3), XL(sp[0] + 2, sp[1])], 4.5 * sc, R(rng_k + 630 + i), dry=0.3, wet=0.6, bristles=4)
+            if rng.random() < 0.3:
+                c0 = XL(*pts[1])
+                brush(crack, [c0, (c0[0] + side * 5, c0[1] + 7), (c0[0] + side * 1, c0[1] + 14), (c0[0] + side * 5, c0[1] + 21)],
+                      1.8, R(rng_k + 660 + i), dry=0.2, wet=0.8, taper=(0, 0.3), bristles=2)
+    # broad, rounded leading edge: thick soft covert band plus an ink edge
     ga = cl(growth / 0.35)
-    if ga > 0:
-        arm = [(u * gs, v * gs) for u, v in OWL_LEAD[:5]]
-        brush(ink, [X(u, v, lag) for u, v in arm], 15 * sc, R(rng_k + 500), t1=ga, dry=0.55, wet=0.5, taper=(0.1, 0.6), bristles=16, head=False)
-    return [X(206 * gs, -32 * gs, lag)]
+    lead = [XL(u, v) for u, v in OWL_LEAD]
+    brush(wash, [(x, y + 4) for x, y in lead], 34 * sc, R(rng_k + 500), t1=ga, dry=0.2, wet=0.85, taper=(0.04, 0.3), bristles=12)
+    brush(ink, lead, 10 * sc, R(rng_k + 501), t1=ga, dry=0.45, wet=0.55, taper=(0.08, 0.5), bristles=12)
+    return [XL(205, -20)]
 
 def wing(masks, kind, side, spread, flap, growth, rng_k, lag=0.0, sc=1.0):
     if kind == "owl": return owl_wing(masks, side, spread, flap, growth, rng_k, lag, sc)
@@ -667,10 +687,10 @@ def render_wings(C, el, spread, flap, growth, f, fade=1.0, lag=0.0, extra=None):
     owl = kind == "owl"
     for layer, k in ((far, 0.6), (near, 1.0)):
         ink, wash, tipm, crack = layer
-        ink_layer(C, wash.arr(), washc, density=(0.7 if owl else 0.62) * k * fade, bleed=2.2 if owl else 1.4, rough=0.75 if owl else 0.6,
+        ink_layer(C, wash.arr(), washc, density=(0.55 if owl else 0.62) * k * fade, bleed=2.2 if owl else 1.4, rough=0.75 if owl else 0.6,
                   edge=0.3 if owl else 0.4, halo=0.3 if owl else 0.2, halo_col=T, grain=0.75, seed=30, fine_w=0.35 if owl else 0.45)
         if owl:
-            ink_layer(C, tipm.arr(), lerp(PAL["wash1"], T, 0.35), density=0.7 * k * fade, bleed=1.3, rough=0.6, edge=0.45, halo=0.15, halo_col=T, grain=0.7, seed=31)
+            ink_layer(C, tipm.arr(), lerp(PAL["wash1"], T, 0.3), density=0.88 * k * fade, bleed=1.3, rough=0.6, edge=0.45, halo=0.15, halo_col=T, grain=0.7, seed=31)
         else:
             ink_layer(C, tipm.arr(), lerp(T, PAL["vermilion"], 0.25), density=(0.55 if extra is None else extra.get("tip", 0.55)) * k * fade,
                       bleed=1.2, rough=0.6, edge=0.3, halo=0.3, grain=0.7, seed=31)
@@ -731,7 +751,7 @@ def fx_inkwing(el):
     size = CONFIG["frame_big"]; n = F["inkwing"]; E = CONFIG["elements"][el]; T = hexrgb(E["tint"]); frames = []
     rng = R(800); cx0, cy0 = 256, 318; cx1, cy1 = ROOT[0], ROOT[1] + 10
     ws = np.concatenate([np.exp(rng.uniform(np.log(5), np.log(20), 9)), rng.uniform(2, 3.5, 5)])
-    V = {"strands": [dict(a0=k * 2 * np.pi / 10 + rng.normal(0, 0.35), w=float(ws[k]), R=rng.uniform(150, 250), tilt=rng.uniform(0.42, 0.6),
+    V = {"strands": [dict(a0=k * 2 * np.pi / 10 + rng.normal(0, 0.35), w=float(ws[k]), R=rng.uniform(140, 215), tilt=rng.uniform(0.42, 0.6),
                           lp=rng.uniform(0.9, 1.6), spd=rng.uniform(0.85, 1.2), dry=rng.uniform(0.3, 0.85), d=rng.uniform(0, 0.15)) for k in range(14)],
          "core": None}
     V["drops"] = [dict(k=int(rng.integers(0, 9)), b=int(rng.integers(1, 15)), q=rng.uniform(0.0, 0.3), v=rng.uniform(14, 34),
@@ -756,7 +776,7 @@ def fx_inkwing(el):
             tips = render_wings(C, el, spread, flap, growth, f, extra={"tip": 0.55, "crack": 0.45 * cl((f - 18) / 5)})
             if 21 <= f <= 27:
                 dm = Mask(size)
-                for tx_, ty_ in tips: draw_splat(dm, None, tx_, ty_ + 30, burst, cl((f - 20.5) / 5), blob=False, reach=1.2)
+                for tx_, ty_ in tips: draw_splat(dm, None, min(max(tx_, 70), 442), ty_ + 30, burst, cl((f - 20.5) / 5), blob=False, reach=0.9)
                 ink_layer(C, dm.arr(), lerp(PAL["ink"], T, 0.15), density=0.9 * (1 - cl((f - 24) / 4)), bleed=0.7, rough=0.4, edge=0.4, grain=0.5, seed=42)
         ink_layer(C, red.arr(), PAL["vermilion"], density=0.95, bleed=0.7, rough=0.4, edge=0.4, halo=0.15, grain=0.5, seed=43)
         frames.append(C.image())
@@ -766,7 +786,7 @@ def fx_inkwing_loop(el):
     size = CONFIG["frame_big"]; n = F["inkwing_loop"]; E = CONFIG["elements"][el]; T = hexrgb(E["tint"]); frames = []
     rng = R(900); kind = E["wing"]
     wisps = [dict(ph=k / 5 + rng.uniform(-0.04, 0.04), side=(-1 if k % 2 else 1), y=rng.uniform(-30, 60), x=rng.uniform(0, 80)) for k in range(5)]
-    ash = [dict(ph=rng.random(), x=rng.uniform(40, 472), y0=rng.uniform(160, 330), s=rng.uniform(1.2, 2.6), red=rng.random() < 0.3) for _ in range(26)]
+    ash = [dict(ph=rng.random(), x=rng.uniform(60, 452), y0=rng.uniform(160, 330), s=rng.uniform(1.2, 2.6), red=rng.random() < 0.3) for _ in range(26)]
     for f in range(n):
         C = Canvas(size); ph = f / n
         flap = 0.10 * math.sin(2 * np.pi * ph); lag = 0.06 * math.sin(2 * np.pi * ph - 1.2)
@@ -774,7 +794,7 @@ def fx_inkwing_loop(el):
         if kind == "crane":
             for k, w_ in enumerate(wisps):
                 q = (ph + w_["ph"]) % 1.0
-                x0 = 256 + w_["side"] * (150 + w_["x"] + 90 * q); y0 = 200 + w_["y"] - 30 * q
+                x0 = 256 + w_["side"] * (120 + 0.6 * w_["x"] + 60 * q); y0 = 200 + w_["y"] - 30 * q
                 pts = [(x0 - w_["side"] * 40 * (1 - s_), y0 + 10 * math.sin(s_ * 3 + q * 6)) for s_ in np.linspace(0, 1, 5)]
                 dens = math.sin(np.pi * q)
                 if dens > 0.15: brush(fx, pts, 4 + 3 * dens, R(910 + k), dry=0.8, wet=0.1, taper=(0.4, 0.5), bristles=5)

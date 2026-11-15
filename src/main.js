@@ -3,10 +3,11 @@ import init, { Game } from '../pkg/inkborne_core.js';
 import { Input } from './input.js';
 import { Audio } from './audio.js';
 import { Art } from './art.js';
-import { setStrings } from './ui.js';
+import { setStrings, setInputSource } from './ui.js';
+import { createEncounters } from './encounters.js';
 import { PAL, paper, rng } from './ink.js';
-export const APP_VERSION = 'ib-0.1.0';
-const SAVE_KEY = 'inkborne-save-v1';
+import { writeSave, loadSave, readSave, backupSave } from './save.js'; // Jared: key 'inkborne-save-v1', guarded storage, load warnings
+export const APP_VERSION = 'ib-0.1.1';
 const W = 1280, H = 720;
 const BASE = new URL('../', import.meta.url).href;
 const SCENES = {};
@@ -27,10 +28,19 @@ game.toLogical = (p) => p && { x: (p.x - game.ox) / game.scale, y: (p.y - game.o
 
 async function json(p) { const r = await fetch(BASE + p); if (!r.ok) throw new Error(p + ' ' + r.status); return r.text(); }
 
-game.save = () => { try { localStorage.setItem(SAVE_KEY, game.core.save_json()); } catch (e) {} };
-function readSave() { try { const s = localStorage.getItem(SAVE_KEY); if (!s) return null; const v = JSON.parse(s); if (!v || typeof v !== 'object' || typeof v.gold !== 'number' || typeof v.hp !== 'object' || typeof v.inv !== 'object') return null; return s; } catch (e) { return null; } }
-game.hasSave = () => !!readSave();
-game.load = () => { const s = readSave(); try { return s ? game.core.load_json(s) : false; } catch (e) { return false; } };
+game.save = () => writeSave(game.core);
+// QA ST-2: Continue is offered only if the stored save really loads. probeSave() test-loads it into a throwaway core
+// (title enter), and a save the core rejects is copied to inkborne-save-v1.bak before New Game can overwrite it.
+game.saveOk = false;
+game.hasSave = () => game.saveOk;
+game.probeSave = () => {
+  const raw = readSave(); if (!raw || !game.makeCore) return (game.saveOk = false);
+  let ok = false; const c = game.makeCore(); try { ok = !!c.load_json(raw); } catch (e) { ok = false; } try { c.free && c.free(); } catch (e) {}
+  if (!ok) backupSave(raw);
+  return (game.saveOk = ok);
+};
+game.backupSave = () => backupSave();
+game.load = () => loadSave(game.core, game.data && game.data.world); // unknown saved node -> world.start
 
 function make(name, params) { const sc = SCENES[name].create(game, params || {}); sc.name = name; return sc; }
 game.go = (name, params) => transition(() => { for (const s of game.stack) s.exit && s.exit(); game.stack = [make(name, params)]; game.stack[0].enter && game.stack[0].enter(); });
@@ -57,8 +67,20 @@ function drawWipe(w) {
 }
 
 let last = performance.now();
+// FPS meter (QA): on with ?fps=1, or toggled in the installed app by tapping the title's version label 5 times (localStorage 'inkborne-fps').
+const FPS_KEY = 'inkborne-fps';
+game.fps = { on: /[?&]fps=1\b/.test(location.search) || (() => { try { return localStorage.getItem(FPS_KEY) === '1'; } catch (e) { return false; } })(), s: [], cur: 0, min: 0, next: 0 };
+game.toggleFps = () => { const f = game.fps; f.on = !f.on; f.s = []; try { localStorage.setItem(FPS_KEY, f.on ? '1' : '0'); } catch (e) {} return f.on; };
+function fpsTick(now, rawMs) {
+  const f = game.fps; if (!f.on) return; if (rawMs > 0 && rawMs < 1000) f.s.push([now, rawMs]);
+  while (f.s.length && now - f.s[0][0] > 1000) f.s.shift();
+  if (now >= f.next && f.s.length) { f.next = now + 250; let sum = 0, worst = 0; for (const [, ms] of f.s) { sum += ms; if (ms > worst) worst = ms; } f.cur = Math.round(1000 * f.s.length / sum); f.min = Math.round(1000 / worst); }
+  ctx.setTransform(game.dpr, 0, 0, game.dpr, 0, 0); ctx.font = '12px ui-monospace, Menlo, monospace'; ctx.textBaseline = 'top';
+  const msg = `${f.cur} fps  min ${f.min}`; const w = ctx.measureText(msg).width + 10;
+  ctx.fillStyle = 'rgba(22,19,15,0.72)'; ctx.fillRect(4, 4, w, 18); ctx.fillStyle = f.min < 50 ? '#ff8a7a' : '#ece6d8'; ctx.fillText(msg, 9, 7);
+}
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now; game.t += dt; game.now = now;
+  const rawMs = now - last; const dt = Math.min(0.05, rawMs / 1000); last = now; game.t += dt; game.now = now;
   const inp = game.input; inp.begin();
   game.taps = inp.pointerTaps.map(game.toLogical);
   const top = game.top();
@@ -73,6 +95,7 @@ function frame(now) {
   if (top) top.draw(ctx, game.t);
   if (game.wipe) drawWipe(game.wipe);
   ctx.restore();
+  fpsTick(now, rawMs);
   inp.end(); game.painted = (game.painted || 0) + 1;
   requestAnimationFrame(frame);
 }
@@ -85,12 +108,16 @@ document.getElementById('menu-btn').addEventListener('click', () => game.fullscr
 async function boot() {
   try {
     await init();
-    const [party, enemies, items, trans, strings, barks, dialogue, shops, world, story, forest, town] = await Promise.all(
-      ['party', 'enemies', 'items', 'transformation', 'strings', 'barks', 'dialogue', 'shops', 'world', 'story', 'pois/forest', 'pois/town'].map((n) => json(`data/${n}.json`)));
-    game.data = { party: JSON.parse(party), enemies: JSON.parse(enemies), items: JSON.parse(items), strings: JSON.parse(strings), barks: JSON.parse(barks).barks, dialogue: JSON.parse(dialogue), shops: JSON.parse(shops), world: JSON.parse(world), story: JSON.parse(story), pois: { forest: JSON.parse(forest), town: JSON.parse(town) }, poiRaw: { forest, town } };
-    game.core = new Game(party, enemies, items, (Date.now() & 0xffff) >>> 0); game.core.set_rules(trans);
+    const [party, enemies, items, trans, strings, barks, dialogue, shops, world, story, forest, town, zones] = await Promise.all(
+      ['party', 'enemies', 'items', 'transformation', 'strings', 'barks', 'dialogue', 'shops', 'world', 'story', 'pois/forest', 'pois/town', 'zones'].map((n) => json(`data/${n}.json`)));
+    game.data = { party: JSON.parse(party), enemies: JSON.parse(enemies), items: JSON.parse(items), strings: JSON.parse(strings), barks: JSON.parse(barks).barks, dialogue: JSON.parse(dialogue), shops: JSON.parse(shops), world: JSON.parse(world), story: JSON.parse(story), pois: { forest: JSON.parse(forest), town: JSON.parse(town) }, zones: JSON.parse(zones), poiRaw: { forest, town } };
+    // equipment (Ollie/Jane) is buyable + owned, but no equip screen yet: hand it to the core as inert 'gear' items
+    const itemsCore = JSON.stringify({ items: [...game.data.items.items, ...(game.data.items.equipment || []).map((e) => ({ id: e.id, name: e.name, desc: e.desc, kind: 'gear', power: 0, price: e.price || 0 }))] });
+    game.makeCore = () => { const c = new Game(party, enemies, itemsCore, (Date.now() & 0xffff) >>> 0); c.set_rules(trans); if (c.set_equipment) c.set_equipment(items); return c; }; // slots + equipment ids for save validation, before any load
+    game.core = game.makeCore();
     setStrings(game.data.strings);
-    game.input = new Input(document.body); game.audio = new Audio(BASE); game.art = new Art(BASE);
+    game.input = new Input(document.body); setInputSource(() => game.input.source || 'touch');
+    game.enc = createEncounters(game.data.zones, {}); game.audio = new Audio(BASE); game.art = new Art(BASE);
     await Promise.all([game.art.load(), document.fonts && document.fonts.ready]);
     paper(W, H); // warm the paper cache
     for (const n of scenes) SCENES[n] = await import(`./scenes/${n}.js`);

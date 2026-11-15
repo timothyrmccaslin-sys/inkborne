@@ -1,0 +1,344 @@
+{
+  "_status": "APPROVED by Jake (2026-11-15)",
+  "_note": "Numbers-only merge file for the integrator (Marc). Keyed by the 11 exact equipment ids in live data/items.json (Ollie + integrator). Names, descs, slots, tier, equippable_by, starting_for and in_shop are copied here as reference and must stay in sync with the live file; do not invent ids or names. Merge mods, element, price, sellable, sell_price, resist and ink onto the matching live equipment entry by id. Equipment bonuses are applied in a later patch with Jared (save fields). Flat bonuses only, sized from Jake's L1-L6 ranges and damage formula raw = max(a*0.25, 2a - d). Approved by Jake on 2026-11-15.",
+  "slots": [
+    "weapon",
+    "armor",
+    "accessory"
+  ],
+  "stat_keys": [
+    "hp",
+    "atk",
+    "def",
+    "mat",
+    "mdf",
+    "spd"
+  ],
+  "sell_rule": "Sell price is floor(price/2) (SPEC 7) for sellable stock. Starter gear (starting_for set) and any piece with in_shop false is unsellable (sellable: false, sell_price: 0), because the demo has no replacement in the shop.",
+  "mod_policy": {
+    "kind": "flat",
+    "source": "Jake, party.json stat_table, demo L1 to about L6",
+    "damage": "raw = max(a*0.25, 2a - d); each atk point is about 2 damage, each def point blocks about 1",
+    "weapon_atk_cap": 8,
+    "spd_cap": 2,
+    "ink_accessories_max": 1,
+    "ranges_l1_to_l6": {
+      "itsuki": {
+        "hp": [
+          150,
+          230
+        ],
+        "atk": [
+          22,
+          35
+        ],
+        "def": [
+          12,
+          19
+        ],
+        "mat": [
+          10,
+          15
+        ],
+        "mdf": [
+          10,
+          16
+        ],
+        "spd": [
+          14,
+          18
+        ]
+      },
+      "benika": {
+        "hp": [
+          125,
+          190
+        ],
+        "atk": [
+          15,
+          24
+        ],
+        "def": [
+          10,
+          16
+        ],
+        "mat": [
+          22,
+          36
+        ],
+        "mdf": [
+          16,
+          26
+        ],
+        "spd": [
+          16,
+          21
+        ]
+      },
+      "gonzo": {
+        "hp": [
+          200,
+          310
+        ],
+        "atk": [
+          20,
+          32
+        ],
+        "def": [
+          18,
+          29
+        ],
+        "mat": [
+          8,
+          12
+        ],
+        "mdf": [
+          14,
+          22
+        ],
+        "spd": [
+          8,
+          11
+        ]
+      }
+    },
+    "tier_rationale": {
+      "weapon_t1": "Starter weapons: +2 atk (top of Jake's +0 to +2 band). Benika also gets +2 mat, since her Seal Art scales off mat. Starting gear is real, but Inkwing's roughly +50% atk stays the spike.",
+      "weapon_t2": "Best demo weapons: +8 atk, Jake's cap. Benika gets +4 atk (the unused mid-tier budget, on her weaker physical side) and +8 mat. There is no mid-tier weapon id in the 11, so a dedicated +4 mid weapon is unused.",
+      "armor_t1": "Jake's tier-1 armor: +3 def. Sold at Kōbō Tsuru so the party can buy a first layer in town.",
+      "armor_t2": "Jake's tier-2 armor: +6 def, plus +3 mdf on this one optional mdf piece (lacquer 'beads ink off'). Both armors are all-party, so Gonzō's +8 def option is unused.",
+      "accessory": "Jake asked for a mix of all three types: prayer_mala is the stat piece (mdf +4, Gonzō's starter; 'steadies the breath'); paper_charm is the one ink accessory (+1 ink per Stroke hit landed, no battle-start ink; shop stock so the demo can feel the 18-to-21 fill); lantern_bell is dusk resist x0.75 after the elements.json chart ('keeps the grey at bay'; Blotlings are dusk)."
+    }
+  },
+  "equipment": [
+    {
+      "id": "redcord_katana",
+      "name": "Red-Cord Katana",
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 2
+      },
+      "element": null,
+      "price": 40,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki"
+      ],
+      "starting_for": "itsuki",
+      "status": "APPROVED by Jake",
+      "rationale": "Itsuki starter. +2 atk, top of Jake's +0 to +2 starter band, on L1-L6 atk 22-35."
+    },
+    {
+      "id": "prayerslip_bow",
+      "name": "Prayer-Slip Bow",
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 1,
+        "mat": 2
+      },
+      "element": null,
+      "price": 40,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "benika"
+      ],
+      "starting_for": "benika",
+      "status": "APPROVED by Jake",
+      "rationale": "Benika starter. +1 atk and +2 mat (Jake: mat as well as atk), both inside the +0 to +2 starter band. Seal Art scales off mat; Strokes still use atk."
+    },
+    {
+      "id": "ironband_staff",
+      "name": "Iron-Banded Staff",
+      "slot": "weapon",
+      "tier": 1,
+      "mods": {
+        "atk": 2
+      },
+      "element": null,
+      "price": 40,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "gonzo"
+      ],
+      "starting_for": "gonzo",
+      "status": "APPROVED by Jake",
+      "rationale": "Gonzō starter. +2 atk, top of the starter band, on L1-L6 atk 20-32. Strokes and his Seal Art both scale off atk."
+    },
+    {
+      "id": "sealedge_katana",
+      "name": "Seal-Edge Katana",
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 8
+      },
+      "element": null,
+      "price": 180,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "Itsuki's best demo weapon. +8 atk, Jake's cap, so Inkwing's roughly +50% atk stays the bigger spike."
+    },
+    {
+      "id": "cranefeather_bow",
+      "name": "Crane-Feather Bow",
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 4,
+        "mat": 8
+      },
+      "element": null,
+      "price": 180,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "benika"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "Benika's best demo weapon. +8 mat (cap, for Seal Arts) and +4 atk (the mid-tier budget, on her weaker physical side). No mid-tier bow id exists in the 11."
+    },
+    {
+      "id": "bellbronze_staff",
+      "name": "Bell-Bronze Staff",
+      "slot": "weapon",
+      "tier": 2,
+      "mods": {
+        "atk": 8
+      },
+      "element": null,
+      "price": 180,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "gonzo"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "Gonzō's best demo weapon. +8 atk, Jake's cap. Strokes and Stone Owl Verse both scale off atk."
+    },
+    {
+      "id": "washi_vest",
+      "name": "Layered Washi Vest",
+      "slot": "armor",
+      "tier": 1,
+      "mods": {
+        "def": 3
+      },
+      "element": null,
+      "price": 40,
+      "sell_price": 20,
+      "sellable": true,
+      "in_shop": true,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "All-party tier-1 armor. +3 def (Jake). Sold at Kōbō Tsuru for 40 mon, about 1.5 average fights."
+    },
+    {
+      "id": "lacquer_haori",
+      "name": "Lacquered Haori",
+      "slot": "armor",
+      "tier": 2,
+      "mods": {
+        "def": 6,
+        "mdf": 3
+      },
+      "element": null,
+      "price": 180,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "All-party tier-2 armor. +6 def (Jake), plus +3 mdf on this one optional mdf piece. Not Gonzō-only, so the +8 def option is unused."
+    },
+    {
+      "id": "prayer_mala",
+      "name": "Prayer-Bead Mala",
+      "slot": "accessory",
+      "tier": 1,
+      "mods": {
+        "mdf": 4
+      },
+      "element": null,
+      "price": 60,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "gonzo"
+      ],
+      "starting_for": "gonzo",
+      "status": "APPROVED by Jake",
+      "rationale": "Gonzō starter, type (a) stat accessory. +4 mdf (Jake's mdf budget). 'Counting them steadies the breath.' spd left alone; his role is to be slow."
+    },
+    {
+      "id": "paper_charm",
+      "name": "Folded Paper Charm",
+      "slot": "accessory",
+      "tier": 1,
+      "mods": {},
+      "element": null,
+      "ink": {
+        "on_stroke_hit_landed": 1,
+        "on_battle_start": 0
+      },
+      "price": 60,
+      "sell_price": 30,
+      "sellable": true,
+      "in_shop": true,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "Type (c), the one demo ink accessory. +1 ink per Stroke hit landed, which takes a good chain's fill from 18 to 21 (6 turns down to 5). No flat ink at battle start. Shop stock so the party can buy it mid-demo. Paper/ink flavor."
+    },
+    {
+      "id": "lantern_bell",
+      "name": "Lantern Bell",
+      "slot": "accessory",
+      "tier": 2,
+      "mods": {},
+      "element": null,
+      "resist": {
+        "element": "dusk",
+        "mult": 0.75,
+        "apply_after": "elements.json chart"
+      },
+      "price": 150,
+      "sell_price": 0,
+      "sellable": false,
+      "in_shop": false,
+      "equippable_by": [
+        "itsuki",
+        "benika",
+        "gonzo"
+      ],
+      "status": "APPROVED by Jake",
+      "rationale": "Type (b) elemental resist. Dusk damage x0.75 after the elements.json chart. 'Its ring keeps the grey at bay.' Blotlings are dusk; Hollow Lantern is gale and the Smudge Ronin is stone, so this is a fodder-fight resist, not a boss one. No spd; Jake's spd cap is +2 and this piece spends its budget on the resist."
+    }
+  ]
+}

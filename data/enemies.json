@@ -12,6 +12,7 @@
    "mdf": 4,
    "spd": 12,
    "mon": 12,
+   "xp": 12,
    "moves": [
     {
      "id": "splash",
@@ -41,6 +42,7 @@
    "mdf": 10,
    "spd": 15,
    "mon": 20,
+   "xp": 18,
    "moves": [
     {
      "id": "dim",
@@ -70,6 +72,7 @@
    "mdf": 14,
    "spd": 13,
    "mon": 150,
+   "xp": 150,
    "moves": [
     {
      "id": "drip",
@@ -97,6 +100,35 @@
   ],
   "sumikage_boss": [
    "smudge_ronin"
+  ],
+  "road_blotling": [
+   "blotling"
+  ],
+  "road_blotling_pair": [
+   "blotling",
+   "blotling"
+  ],
+  "road_lantern": [
+   "hollow_lantern"
+  ],
+  "road_blotling_lantern": [
+   "blotling",
+   "hollow_lantern"
+  ],
+  "wood_blotling": [
+   "blotling"
+  ],
+  "wood_blotling_pair": [
+   "blotling",
+   "blotling"
+  ],
+  "wood_blotling_lantern": [
+   "blotling",
+   "hollow_lantern"
+  ],
+  "wood_lantern_pair": [
+   "hollow_lantern",
+   "hollow_lantern"
   ]
  }
 }
