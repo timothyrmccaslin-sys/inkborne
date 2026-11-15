@@ -1,13 +1,18 @@
-# Inkborne integration progress (Marc)
-- [x] SPEC.md v1.1 (Inkborne, Vermilion Ink, Unfurl, SFX extras, transformation.json)
-- [x] Rust core (core/src/lib.rs, crate inkborne_core): battle, judge, ink, Unfurl/Inkwing, Seal Arts, Still Water, items, shop, walker, save. Tests pass.
-- [x] src/ink.js brush helpers
-- [x] data from team via tools/integrate.py (party=jake lv5, items/shops/strings/barks/dialogue/story=story team, mon=jane, sfx=james, voice=rita, bg=bob). Core updated to Jake rules, pkg built.
-- [ ] JS: main, input, audio, art, ui, scenes (title, world, poi, action: battle/dialogue/shop)
-- [ ] PWA: index.html, manifest, sw.js, icons
-- [ ] Tests (Chromium + WebKit iPad), shots, mp4
-- [ ] Repo + Pages deploy, personal site card
-- Layout decisions: POIs are one screen (1280x720 logical) using Bob's 3 layers; walk band y>=540. Town shop door ~x610, Hotaru by stone lantern ~x260. Forest ambush mid path, Smudge Ronin at right seal-stone.
-- Helen LAYOUT_NOTES adopted: touch rects T1 64,496,192x188 / T2 1024,496,192x188 / M 1152,36,64x64; bottom bars x272-1008; battle stage anchors; HUD B4; menu B5; banner B3; dialogue D1/D2/D7; shop S4.
-- world.json names from Lisa (Hakushi Clearing, Shuin Stair, Usuzumi Shore).
-- Files written: src/{ink,figures,input,audio,art,ui,main}.js, scenes/{title,world,poi}.js, index.html, style.css, manifest.json, data/pois/*. TODO: battle.js dialogue.js shop.js sw.js icons kanji font tests deploy site.
+# Inkborne progress (integrator)
+Updated: Sun Nov 15 2026, 3:37 PM CT. Live: https://timothyrmccaslin-sys.github.io/inkborne/ (ib-0.1.0, commit 63923da)
+
+## Done
+- All three views playable: world map -> Sumikage Wood / Hanshi POIs -> battle, dialogue (hanshi_dusk), shop (Kobo Tsuru).
+- Battle: Brushstroke Chains (clean ±95 / good ±150 ms), Vermilion Ink, Unfurl -> Inkwing (Frank's FX strips), Seal Arts, Still Water, items, flee, victory/defeat.
+- Audio wired: Cody music (manifest loop points), James SFX/ambience, Rita voice blips. All READMEs state self-generated, no samples.
+- Wes's sw.js + manifest; offline reload verified on live URL. Real art icons. Kanji subset font.
+- QA P0/P1 fixes (findings.md 3:22 PM).
+- Smoke: tools-free Playwright run boots, plays boss fight to Victory with Unfurl + Seal Arts, no page errors.
+
+## Placeholders still in (procedural, marked TODO(art))
+- Character sprites + portraits (Kenji), UI frames (Nancy), ambient loops (Lucy). Smudge Ronin is an original procedural design.
+
+## Next
+- poi-town-mid seam fix from Bob (same key) -> rerun tools/integrate.py, tools/gen-sw-list.py, bump version.
+- Every release: python3 tools/integrate.py && python3 tools/gen-sw-list.py && tools/bump-version.sh X.Y.Z
+- timothymccaslin.com project card (not done by this run).
